@@ -6,7 +6,7 @@
         shared_scripts { '@tLib/imports.lua' }
 
     This sets up a global `tlib` table with lazy-loading:
-        tlib.coords   → loads imports/coords/shared.lua (Coords.*)
+        tlib.coords   → loads shared/imports/coords/shared.lua (Coords.*)
 
     Modules are loaded on first access. You can also eagerly load modules
     by listing them in your fxmanifest.lua:
@@ -27,21 +27,10 @@ end
 
 local context = IsDuplicityVersion() and 'server' or 'client'
 
--- Apply CFX-idiom polyfills (Citizen, CreateThread, Wait, GetGameTimer) in
--- the consumer VM on Helix so existing FiveM-pattern code keeps running
--- without per-resource changes. Self-contained — does not require Platform.
-do
-    local polyfill = LoadResourceFile(tLibName, 'lua/adapter/polyfill.lua')
-    if polyfill then
-        local fn, err = load(polyfill, '@@tLib/lua/adapter/polyfill.lua')
-        if fn then pcall(fn) end
-    end
-end
-
 -- Enforce tlib_min_version *before* anything touches tlib, so an outdated
 -- tLib produces a clear "update tLib" message instead of a cryptic
 -- "No such export X" when a module added in a later tLib version is used.
--- Duplicated from imports/versioncheck/server.lua because this file runs
+-- Duplicated from shared/imports/versioncheck/server.lua because this file runs
 -- in consumer resource VMs, while versioncheck runs inside tLib's own VM.
 local function parseVer(s)
     if not s then return { 0, 0, 0 } end
@@ -68,7 +57,7 @@ if requiredVersion and requiredVersion ~= '' then
 end
 
 local function loadModule(self, module)
-    local dir = ('imports/%s'):format(module)
+    local dir = ('shared/imports/%s'):format(module)
     local chunk = LoadResourceFile(tLibName, ('%s/%s.lua'):format(dir, context))
     local shared = LoadResourceFile(tLibName, ('%s/shared.lua'):format(dir))
 
@@ -77,11 +66,11 @@ local function loadModule(self, module)
     end
 
     if chunk then
-        local fn, err = load(chunk, ('@@tLib/imports/%s/%s.lua'):format(module, context))
+        local fn, err = load(chunk, ('@@tLib/shared/imports/%s/%s.lua'):format(module, context))
 
         if not fn or err then
             if shared then
-                fn, err = load(shared, ('@@tLib/imports/%s/shared.lua'):format(module))
+                fn, err = load(shared, ('@@tLib/shared/imports/%s/shared.lua'):format(module))
             end
 
             if not fn or err then
@@ -125,12 +114,15 @@ local tlib = setmetatable({
 
 _ENV.tlib = tlib
 
--- Eagerly load modules declared in the consumer's fxmanifest:
---   tlib_modules { 'coords' }
-for i = 1, GetNumResourceMetadata(resourceName, 'tlib_module') do
-    local name = GetResourceMetadata(resourceName, 'tlib_module', i - 1)
-    if name and not rawget(tlib, name) then
-        loadModule(tlib, name)
+-- Eagerly load modules declared in the consumer's fxmanifest.
+-- Supports both singular form:  tlib_module { 'coords' }
+-- and plural form:              tlib_modules { 'coords', 'kvp' }
+for _, key in ipairs({ 'tlib_module', 'tlib_modules' }) do
+    for i = 1, GetNumResourceMetadata(resourceName, key) do
+        local name = GetResourceMetadata(resourceName, key, i - 1)
+        if name and not rawget(tlib, name) then
+            loadModule(tlib, name)
+        end
     end
 end
 
