@@ -84,6 +84,63 @@ local function loadModule(self, module)
     end
 end
 
+--- Is `module` actually present in the INSTALLED tLib?
+---
+--- This exists because `tlib.<anything>` can never be falsy. An unresolvable name falls
+--- through to the export proxy in `call` below, which returns a *function*, so the obvious
+--- guard a consumer writes --
+---
+---     if tlib.diag then tlib.diag.info(...) end        -- WRONG
+---
+--- -- passes against every tLib ever released, including ones with no `diag` module at all.
+--- The crash then lands one line later as "attempt to index a function value", which names
+--- the consumer's file and says nothing about the real cause: a library too old to have the
+--- module. That is the least debuggable place for it, because the modules most worth
+--- guarding (`diag` above all) are the ones a consumer reaches for while reporting that the
+--- install is already broken.
+---
+--- `type(tlib.diag) == 'table'` happens to work today, but only by accident of the proxy
+--- being a function; it would break the moment the proxy became callable-table. Ask this
+--- instead:
+---
+---     if tlib.has('diag') then tlib.diag.info(...) end -- RIGHT
+---
+--- Probes the files rather than the cache on purpose: a loaded module is cached as
+--- `result or true`, so a module that legitimately returns a function would be
+--- indistinguishable from the proxy by type alone.
+---
+--- ## `has` cannot probe for its own absence — mind the bootstrap
+---
+--- `has` is subject to the very proxy it exists to defeat. On any tLib released before
+--- `has` landed, `tlib.has` is not a real key, so `__index` hands back the export proxy and
+--- `tlib.has('diag')` calls `exports.tLib.has(nil, 'diag')` — an export that does not
+--- exist. It RAISES, in the consumer's first script, which is worse than the truthiness
+--- bug it replaces. A capability probe is never able to report its own absence.
+---
+--- What makes it safe is the version gate above, not defensive code at the call site.
+--- `@tLib/imports.lua` is the FIRST entry in every consumer's `shared_scripts`, so the
+--- gate runs before any consumer file is loaded: pin `tlib_min_version` at or above the
+--- release that introduced `has`, and an older tLib stops with "requires tLib vX or newer"
+--- instead of reaching a call site at all. That is the whole point of the gate.
+---
+--- So: **`tlib.has` is safe if and only if the consumer's `tlib_min_version` names a
+--- release that contains it.** Consumers that must tolerate an older tLib — because their
+--- pin is lower, or because they run before their own pin can be trusted — have to reach
+--- it through `pcall` and treat a throw as "unknown", not as "absent":
+---
+---     local ok, present = pcall(function() return tlib.has('diag') end)
+---     if ok and present == false then return nil end  -- definitive: not there
+---     -- a throw means an old tLib; fall through to your own fallback
+---
+--- Note `has` answers about the FILE, not the interface: a `true` says the module exists,
+--- never that it exports the function you are about to call.
+local function moduleExists(module)
+    if type(module) ~= 'string' or module == '' then return false end
+    local dir = ('shared/imports/%s'):format(module)
+    return LoadResourceFile(tLibName, ('%s/%s.lua'):format(dir, context)) ~= nil
+        or LoadResourceFile(tLibName, ('%s/shared.lua'):format(dir)) ~= nil
+end
+
 local function call(self, index)
     local module = rawget(self, index)
 
@@ -91,7 +148,8 @@ local function call(self, index)
         module = loadModule(self, index)
 
         if not module then
-            -- Fall through to tLib exports for non-import modules
+            -- Fall through to tLib exports for non-import modules.
+            -- NOTE: this is why `tlib.<name>` is never nil -- see moduleExists above.
             local function method(...)
                 return exports[tLibName][index](nil, ...)
             end
@@ -107,6 +165,7 @@ local tlib = setmetatable({
     name = tLibName,
     context = context,
     resource = resourceName,
+    has = moduleExists,
 }, {
     __index = call,
     __call = call,
