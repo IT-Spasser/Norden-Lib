@@ -5,15 +5,9 @@
     Usage in consumer fxmanifest.lua:
         shared_scripts { '@tLib/imports.lua' }
 
-    This sets up a global `tlib` table with lazy-loading:
-        tlib.coords   → loads shared/imports/coords/shared.lua (Coords.*)
+    Modules lazy-load on first access of `tlib.<name>`.
+    Design notes: docs/internal/imports-entrypoint.md
 
-    Modules are loaded on first access. You can also eagerly load modules
-    by listing them in your fxmanifest.lua:
-        tlib_module { 'coords' }
-
-    Heavy / stateful systems (Discovery, Menu, Dialog, Toast, Theme) are
-    accessed via exports['tLib']:Method() — they run inside tLib's own VM.
 ]]
 
 local resourceName = GetCurrentResourceName()
@@ -27,11 +21,9 @@ end
 
 local context = IsDuplicityVersion() and 'server' or 'client'
 
--- Enforce tlib_min_version *before* anything touches tlib, so an outdated
--- tLib produces a clear "update tLib" message instead of a cryptic
--- "No such export X" when a module added in a later tLib version is used.
--- Duplicated from shared/imports/versioncheck/server.lua because this file runs
--- in consumer resource VMs, while versioncheck runs inside tLib's own VM.
+-- Enforce tlib_min_version *before* anything touches tlib, so an outdated tLib
+-- says "update tLib" instead of "No such export X". Duplicated from
+-- versioncheck/server.lua: this file runs in consumer VMs, that one in tLib's.
 local function parseVer(s)
     if not s then return { 0, 0, 0 } end
     s = s:gsub('^v', '')
@@ -86,54 +78,10 @@ end
 
 --- Is `module` actually present in the INSTALLED tLib?
 ---
---- This exists because `tlib.<anything>` can never be falsy. An unresolvable name falls
---- through to the export proxy in `call` below, which returns a *function*, so the obvious
---- guard a consumer writes --
----
----     if tlib.diag then tlib.diag.info(...) end        -- WRONG
----
---- -- passes against every tLib ever released, including ones with no `diag` module at all.
---- The crash then lands one line later as "attempt to index a function value", which names
---- the consumer's file and says nothing about the real cause: a library too old to have the
---- module. That is the least debuggable place for it, because the modules most worth
---- guarding (`diag` above all) are the ones a consumer reaches for while reporting that the
---- install is already broken.
----
---- `type(tlib.diag) == 'table'` happens to work today, but only by accident of the proxy
---- being a function; it would break the moment the proxy became callable-table. Ask this
---- instead:
----
----     if tlib.has('diag') then tlib.diag.info(...) end -- RIGHT
----
---- Probes the files rather than the cache on purpose: a loaded module is cached as
---- `result or true`, so a module that legitimately returns a function would be
---- indistinguishable from the proxy by type alone.
----
---- ## `has` cannot probe for its own absence — mind the bootstrap
----
---- `has` is subject to the very proxy it exists to defeat. On any tLib released before
---- `has` landed, `tlib.has` is not a real key, so `__index` hands back the export proxy and
---- `tlib.has('diag')` calls `exports.tLib.has(nil, 'diag')` — an export that does not
---- exist. It RAISES, in the consumer's first script, which is worse than the truthiness
---- bug it replaces. A capability probe is never able to report its own absence.
----
---- What makes it safe is the version gate above, not defensive code at the call site.
---- `@tLib/imports.lua` is the FIRST entry in every consumer's `shared_scripts`, so the
---- gate runs before any consumer file is loaded: pin `tlib_min_version` at or above the
---- release that introduced `has`, and an older tLib stops with "requires tLib vX or newer"
---- instead of reaching a call site at all. That is the whole point of the gate.
----
---- So: **`tlib.has` is safe if and only if the consumer's `tlib_min_version` names a
---- release that contains it.** Consumers that must tolerate an older tLib — because their
---- pin is lower, or because they run before their own pin can be trusted — have to reach
---- it through `pcall` and treat a throw as "unknown", not as "absent":
----
----     local ok, present = pcall(function() return tlib.has('diag') end)
----     if ok and present == false then return nil end  -- definitive: not there
----     -- a throw means an old tLib; fall through to your own fallback
----
---- Note `has` answers about the FILE, not the interface: a `true` says the module exists,
---- never that it exports the function you are about to call.
+--- `tlib.<anything>` is never falsy -- an unknown name returns the export proxy,
+--- a function -- so `if tlib.diag then` is not a guard. Probes files, not the
+--- module cache. Safe only behind the version gate above: see
+--- docs/internal/imports-entrypoint.md.
 local function moduleExists(module)
     if type(module) ~= 'string' or module == '' then return false end
     local dir = ('shared/imports/%s'):format(module)
@@ -149,7 +97,6 @@ local function call(self, index)
 
         if not module then
             -- Fall through to tLib exports for non-import modules.
-            -- NOTE: this is why `tlib.<name>` is never nil -- see moduleExists above.
             local function method(...)
                 return exports[tLibName][index](nil, ...)
             end
@@ -173,9 +120,69 @@ local tlib = setmetatable({
 
 _ENV.tlib = tlib
 
--- Eagerly load modules declared in the consumer's fxmanifest.
--- Supports both singular form:  tlib_module { 'coords' }
--- and plural form:              tlib_modules { 'coords', 'kvp' }
+--- Modules whose LOADING IS THEIR WIRING, loaded by tLib itself: their file
+--- scope registers the handler, and a consumer may have no Lua call to trigger
+--- the lazy load. `studioOnly` is a default, not a permission. See
+--- docs/internal/imports-entrypoint.md.
+local AUTOLOAD = {
+    { name = 'occupancy' },
+    { name = 'telemetry', studioOnly = true },
+}
+
+--- Does this consumer's manifest credit the studio? Loaded by path into a
+--- private env, because sh_branding.lua assigns a global `StudioBranding`.
+local isStudio
+local function studioResource()
+    if isStudio ~= nil then return isStudio end
+    isStudio = false
+    -- An authorless manifest cannot be the studio, and answering from metadata
+    -- avoids compiling sh_branding.lua into every third-party consumer's VM.
+    if GetNumResourceMetadata(resourceName, 'author') == 0
+        and GetNumResourceMetadata(resourceName, 'authors') == 0 then
+        return false
+    end
+    local chunk = LoadResourceFile(tLibName, 'shared/sh_branding.lua')
+    if chunk then
+        local fn = load(chunk, '@@tLib/shared/sh_branding.lua', 't',
+            setmetatable({}, { __index = _ENV }))
+        local ok, branding = pcall(fn)
+        if ok and type(branding) == 'table' then
+            isStudio = branding.isStudioResource(resourceName) == true
+        end
+    end
+    return isStudio
+end
+
+--- Can this VM read tLib's files AT ALL? The discriminator between "one module
+--- is missing" and "I cannot read tLib", which have different fixes. Asked only
+--- after a module has already failed.
+local function tlibReadable()
+    return LoadResourceFile(tLibName, 'fxmanifest.lua') ~= nil
+end
+
+for _, entry in ipairs(AUTOLOAD) do
+    if (not entry.studioOnly or studioResource()) and not rawget(tlib, entry.name) then
+        -- These names are tLib's own, so one that resolves to no file is a tLib
+        -- packaging bug rather than a consumer typo.
+        if not loadModule(tlib, entry.name) and tlibReadable() then
+            -- A print, not error(): this is a shared_script in every consumer,
+            -- so raising here stops every t* resource on the server at once.
+            print(('^1[tLib] cannot load its own module "%s" — no '
+                .. 'shared/imports/%s/%s.lua and no shared.lua. tLib v%s is packaged '
+                .. 'wrong; %s is running WITHOUT it.^0')
+                :format(entry.name, entry.name, context,
+                    GetResourceMetadata(tLibName, 'version', 0) or '?', resourceName))
+        end
+    end
+end
+
+-- Eagerly load modules declared in the consumer's fxmanifest:
+--   tlib_module { 'coords' }   /   tlib_modules { 'coords', 'kvp' }
+--
+-- Not load-bearing any more except for `realtime`, which tLib's server bundle
+-- reads off the manifest to decide whether to install the realtime hub. Kept as
+-- an auditable parts list. See docs/internal/imports-entrypoint.md.
+--
 for _, key in ipairs({ 'tlib_module', 'tlib_modules' }) do
     for i = 1, GetNumResourceMetadata(resourceName, key) do
         local name = GetResourceMetadata(resourceName, key, i - 1)
