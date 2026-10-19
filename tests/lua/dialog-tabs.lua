@@ -1,4 +1,4 @@
--- Run from tLib root with the existing scripts/run-lua-suite.lua Fengari runner.
+-- Run from NLib root with the existing scripts/run-lua-suite.lua Fengari runner.
 -- Real dialog/state and dialog/exports, driven through the actual ShowDialog
 -- export and read off the actual showDialog NUI message.
 --
@@ -17,7 +17,7 @@ local function eq(actual, expected, message)
         message .. ': expected ' .. tostring(expected) .. ', got ' .. tostring(actual))
 end
 
-_TLIB_IS_FIVEM, _TLIB_SIDE = true, 'client'
+_NLIB_IS_FIVEM, _NLIB_SIDE = true, 'client'
 Logger = { create = function() return function() end end }
 
 local h = { events = {}, exports = {}, messages = {}, owner = 'consumer' }
@@ -25,7 +25,7 @@ function AddEventHandler(name, fn)
     h.events[name] = h.events[name] or {}
     table.insert(h.events[name], fn)
 end
-function GetCurrentResourceName() return 'tLib' end
+function GetCurrentResourceName() return 'NLib' end
 function GetInvokingResource() return h.owner end
 function RegisterNuiCallbackType() end
 function SendNUIMessage(message) h.messages[#h.messages + 1] = message end
@@ -55,7 +55,7 @@ DialogExports.register()
 -- The NUI is reported ready first: showDialog is buffered until it is, and a
 -- suite that read h.messages before that would assert against an empty list and
 -- pass vacuously.
-for _, fn in ipairs(h.events['__cfx_nui:__tlib_nui_ready'] or {}) do fn({}, function() end) end
+for _, fn in ipairs(h.events['__cfx_nui:__nlib_nui_ready'] or {}) do fn({}, function() end) end
 
 -- Platform.sendUIEvent wraps every payload as { name = evt, args = { data } }
 -- because that is what client/web/src/lib/nui.ts destructures. Assert through

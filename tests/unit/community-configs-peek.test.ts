@@ -28,9 +28,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 const g = globalThis as unknown as Record<string, unknown>;
 // Every convar returns its default: the key is baked in, not configured,
 // so an unconfigured server is still authenticated. See the comment on
-// `TLIB_PUBLIC_KEY` for why that is deliberate.
+// `NLIB_PUBLIC_KEY` for why that is deliberate.
 g.GetConvar = (_name: string, defaultValue: string) => defaultValue;
-g.GetCurrentResourceName = () => "tLib";
+g.GetCurrentResourceName = () => "NLib";
 
 const { importConfig, peekConfig } = await import("../../server/lib/community-configs/api");
 

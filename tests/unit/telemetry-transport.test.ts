@@ -81,7 +81,7 @@ function harness(opts: { enabled?: boolean; credential?: string; install?: strin
 }
 
 const event = (n: number) => ({
-  event: "tlib.error_reported",
+  event: "nlib.error_reported",
   at: n,
   dimensions: { fingerprint: "00000001" },
   measures: { causeDepth: 0 },
@@ -294,7 +294,7 @@ describe("one endpoint, and an earlier draft had two", () => {
      * The text half of a report was going to a `/api/v1/diagnostics/reports`
      * that would have had to be built, with its own breaker so an unbuilt
      * endpoint could not take down the one that works. It is gone: the ingest
-     * takes a top-level `stack` on `tlib.error_reported` and keeps one readable
+     * takes a top-level `stack` on `nlib.error_reported` and keeps one readable
      * copy per `(day, stackHash)`. Asserted rather than assumed, because a
      * second POST to a route that does not exist is a 404 per batch forever and
      * the breaker would hide it.

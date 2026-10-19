@@ -223,8 +223,8 @@ describe("findDeadClasses", () => {
   test("treats a class defined in the project's own CSS as declared", async () => {
     const dir = mkdtempSync(join(tmpdir(), "deadclass-"));
     try {
-      writeFileSync(join(dir, "c.tsx"), '<div class="tlib-nui-toasts" />');
-      writeFileSync(join(dir, "s.css"), ".tlib-nui-toasts { display: grid; }");
+      writeFileSync(join(dir, "c.tsx"), '<div class="nlib-nui-toasts" />');
+      writeFileSync(join(dir, "s.css"), ".nlib-nui-toasts { display: grid; }");
       const dead = await findDeadClasses({ uno: stubUno([]), roots: [dir] });
       expect(dead).toEqual([]);
     } finally {

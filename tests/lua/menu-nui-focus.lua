@@ -1,4 +1,4 @@
-_TLIB_IS_FIVEM = true
+_NLIB_IS_FIVEM = true
 local focused, focusCalls = true, 0
 local commands = {}
 Platform = { createThread = function() end }

@@ -518,7 +518,7 @@ describe("cn: the real call sites the shield was measured against", () => {
   });
 
   test("a text input's large size resolves to one font size, not two", () => {
-    // tLib and tRadio ui/input.tsx -- the cva base sets one size and the `lg` variant another.
+    // NLib and tRadio ui/input.tsx -- the cva base sets one size and the `lg` variant another.
     // Unshielded BOTH shipped, because the base's is a named size and `base` is not in the
     // font-size regex, so the rendered size was decided by UnoCSS's emit order. This is the one
     // real call site whose rendered output the shield CHANGES rather than restores.

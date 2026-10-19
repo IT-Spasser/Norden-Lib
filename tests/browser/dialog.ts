@@ -127,9 +127,9 @@ const errors: string[] = [];
 const calls: { event: string; data: any }[] = [];
 page.on("pageerror", (error: Error) => errors.push(error.message));
 await page.addInitScript(() => {
-  (window as any).GetParentResourceName = () => "tLib";
+  (window as any).GetParentResourceName = () => "NLib";
 });
-await page.route("https://tlib/**", async (route: any) => {
+await page.route("https://nlib/**", async (route: any) => {
   calls.push({
     event: new URL(route.request().url()).pathname.slice(1),
     data: route.request().postDataJSON(),
@@ -178,7 +178,7 @@ try {
   // theme-tokens.css and --ring in `internal/shared-ts/ui/*`. These two lines used to pin
   // the neutral #eeeeee, which is the 2026-09-22 repaint recorded in
   // `internal/shared-ts/admin-ui/index.tsx`; it was reverted because the other five
-  // bundles never followed it and a tLib dialog opened over a tELS editor
+  // bundles never followed it and a NLib dialog opened over a tELS editor
   // repainted the primary button. Pinned as a literal on purpose: a token read
   // would agree with whatever the sheet says.
   assert.equal(
@@ -520,7 +520,7 @@ try {
   // zag fires `onValueChange` on every pointer move, so wiring `dialogChange`
   // to it meant one NUI call per step of a drag — and tRadar's cl_settings.lua
   // answers each one with an `UpdateDialogField` push back, so a drag was a full
-  // round trip per pixel in every resource using a tLib dialog. The commit is on
+  // round trip per pixel in every resource using a NLib dialog. The commit is on
   // `onValueChangeEnd` now, with `onValueChange` kept for the local value.
   //
   // Both halves are asserted. The count alone would also pass if the thumb never
@@ -622,7 +622,7 @@ try {
   await pause();
   assert.equal(
     await page.getByRole("dialog").evaluate((el: Element) => getComputedStyle(el).animationName),
-    "tlib-nui-rise"
+    "nlib-nui-rise"
   );
   await page.getByRole("combobox").click();
   await page.getByRole("option", { name: "Beta" }).waitFor();
@@ -634,7 +634,7 @@ try {
     document.body.append(probe);
     window.postMessage({ name: "closeDialog", args: [{ id: "test-dialog", instance: 6 }] }, "*");
     await new Promise((resolve) => setTimeout(resolve, 25));
-    const panel = document.querySelector<HTMLElement>(".tlib-nui-dialog");
+    const panel = document.querySelector<HTMLElement>(".nlib-nui-dialog");
     probe.focus();
     return {
       inert: !panel || panel.inert,
@@ -704,9 +704,9 @@ try {
       // `querySelector(...)!` calls would deref null and this assertion would
       // crash rather than measure. Presence/absence is the exact test: there is
       // no third state. Same reasoning as the CSS in shared/ts/nui-kit/nui.css.
-      reset: top(".tlib-nui-field-cell[data-labelless] .tlib-nui-button"),
-      standalone: top(".tlib-nui-field-cell:not([data-labelless]) .tlib-nui-button"),
-      standaloneRow: document.querySelectorAll(".tlib-nui-field-row")[1]!.getBoundingClientRect()
+      reset: top(".nlib-nui-field-cell[data-labelless] .nlib-nui-button"),
+      standalone: top(".nlib-nui-field-cell:not([data-labelless]) .nlib-nui-button"),
+      standaloneRow: document.querySelectorAll(".nlib-nui-field-row")[1]!.getBoundingClientRect()
         .top,
     };
   });
@@ -747,7 +747,7 @@ try {
   await send("closeDialog", { id: "test-dialog", instance: 8 });
   await pause();
   assert.equal(
-    await page.locator(".tlib-nui-dialog").count(),
+    await page.locator(".nlib-nui-dialog").count(),
     0,
     "reduced-motion close unmounts without animation event"
   );

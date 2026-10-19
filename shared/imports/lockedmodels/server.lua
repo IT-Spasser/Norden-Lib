@@ -1,9 +1,9 @@
 --[[
-    tLib/shared/imports/lockedmodels — vehicles a server refuses to re-configure.
+    NLib/shared/imports/lockedmodels — vehicles a server refuses to re-configure.
 
     Usage, in a resource's per-model save path:
 
-        if tlib.lockedmodels.isLocked(model) then
+        if nlib.lockedmodels.isLocked(model) then
             -- keep the stored entry, drop the incoming one
         end
 
@@ -20,11 +20,11 @@
     Because it is a property of the SERVER, not of the build. The same tree is
     editable on a developer machine and locked on the test box, and a convar is
     the one piece of configuration that cannot travel inside a release -- the
-    same reasoning `demo` already states. `tlib_locked_models` unset is the
+    same reasoning `demo` already states. `nlib_locked_models` unset is the
     normal case and locks nothing, so a customer is never affected by a switch
     they did not set.
 
-        set tlib_locked_models "18charger21tr,fpiu21tr"
+        set nlib_locked_models "18charger21tr,fpiu21tr"
 
      The security property
 
@@ -50,7 +50,7 @@
 
 local LockedModels = {}
 
-local CONVAR = 'tlib_locked_models'
+local CONVAR = 'nlib_locked_models'
 
 --- name -> true, plus hash-as-string -> true for the same model.
 local locked = {}

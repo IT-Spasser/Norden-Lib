@@ -1,4 +1,4 @@
--- tlib.versioncheck. See tLib/server.lua and tRadio/server/sv_version.lua for use.
+-- nlib.versioncheck. See NLib/server.lua and tRadio/server/sv_version.lua for use.
 
 -- Eligibility comes from the resource loading this module, never from opts.name
 -- or opts.author: branding policy, not an authenticity boundary.
@@ -6,21 +6,21 @@
 -- The rule is loaded as the exact file the menu registry's limit exemption uses,
 -- the way shared/imports/menu/shared.lua loads shared/lib/menu/schema.lua. One copy is what
 -- stops the banner and the exemption disagreeing about who counts as the studio.
--- LoadResourceFile reads from disk, so tLib need not have started.
+-- LoadResourceFile reads from disk, so NLib need not have started.
 if type(StudioBranding) ~= 'table' then
     local path = 'shared/sh_branding.lua'
-    local source = assert(LoadResourceFile('tLib', path), 'Missing tLib module: ' .. path)
-    assert(load(source, '@@tLib/' .. path))()
+    local source = assert(LoadResourceFile('NLib', path), 'Missing NLib module: ' .. path)
+    assert(load(source, '@@NLib/' .. path))()
 end
 
 -- Same mechanism, same reason: the `studios` provider below talks to the same
--- host the marketplace does, so it must honour `tlib_api_base_url` too.
+-- host the marketplace does, so it must honour `nlib_api_base_url` too.
 -- Without this the convar was only half a switch -- installs went to a local dev
 -- worker while the version check and its changelog still hit production.
 if type(StudioApi) ~= 'table' then
     local path = 'shared/sh_api.lua'
-    local source = assert(LoadResourceFile('tLib', path), 'Missing tLib module: ' .. path)
-    assert(load(source, '@@tLib/' .. path))()
+    local source = assert(LoadResourceFile('NLib', path), 'Missing NLib module: ' .. path)
+    assert(load(source, '@@NLib/' .. path))()
 end
 
 local function hasStudioAuthor()
@@ -347,8 +347,8 @@ local SETTLE_MS  = 1000
 local _settled   = false
 local _deadline  = 0
 local _pending   = {}
-local _isTlib    = GetCurrentResourceName() == 'tLib'
-local _tlibDone  = _isTlib -- tLib doesn't wait for itself
+local _isNlib    = GetCurrentResourceName() == 'NLib'
+local _nlibDone  = _isNlib -- NLib doesn't wait for itself
 
 AddEventHandler('onResourceStart', function(res)
     if _settled then return end
@@ -356,13 +356,13 @@ AddEventHandler('onResourceStart', function(res)
     _deadline = GetGameTimer() + SETTLE_MS
 end)
 
-if not _isTlib then
+if not _isNlib then
     -- Already printed, which happens on a restart after boot.
-    if GetResourceState('tLib') == 'started' then
-        _tlibDone = true
+    if GetResourceState('NLib') == 'started' then
+        _nlibDone = true
     end
-    AddEventHandler('tlib:versioncheckDone', function()
-        _tlibDone = true
+    AddEventHandler('nlib:versioncheckDone', function()
+        _nlibDone = true
         if _settled and _pending then
             for _, fn in ipairs(_pending) do fn() end
             _pending = nil
@@ -373,12 +373,12 @@ end
 CreateThread(function()
     local maxDeadline = GetGameTimer() + 35000
     _deadline = GetGameTimer() + SETTLE_MS
-    while not _settled or not _tlibDone do
+    while not _settled or not _nlibDone do
         Wait(200)
         local now = GetGameTimer()
-        if now >= maxDeadline then _tlibDone = true end
+        if now >= maxDeadline then _nlibDone = true end
         if now >= _deadline or now >= maxDeadline then _settled = true end
-        if _settled and _tlibDone and _pending then
+        if _settled and _nlibDone and _pending then
             local pending = _pending
             _pending = nil
             for _, fn in ipairs(pending) do fn() end
@@ -387,7 +387,7 @@ CreateThread(function()
 end)
 
 local function afterStartup(fn)
-    if _settled and _tlibDone then fn()
+    if _settled and _nlibDone then fn()
     else
         if _pending then _pending[#_pending + 1] = fn end
     end
@@ -614,8 +614,8 @@ local function check(opts)
                     print('^5' .. url .. '^7')
                 end
             end
-            if _isTlib then
-                TriggerEvent('tlib:versioncheckDone')
+            if _isNlib then
+                TriggerEvent('nlib:versioncheckDone')
             end
         end)
     end
@@ -684,7 +684,7 @@ local function github(repo)
                 url       = data.html_url,
             })
         end, 'GET', '', {
-            ['User-Agent'] = (repo:match('[^/]+$') or 'tLib') .. '-VersionCheck',
+            ['User-Agent'] = (repo:match('[^/]+$') or 'NLib') .. '-VersionCheck',
             ['Accept'] = 'application/vnd.github.v3+json',
         })
     end
@@ -736,7 +736,7 @@ local function studios(product, current)
             finish({ version = data.product.currentVersion, changelog = table.concat(parts, '\n'), url = '' })
         -- Through `StudioApi.headers` and never as a literal table, because
         -- the per-install id has to be on this request as it is on every other
-        -- studio call. IT RUNS REGARDLESS OF `tlib_telemetry` — the update
+        -- studio call. IT RUNS REGARDLESS OF `nlib_telemetry` — the update
         -- check is not diagnostics and is not gated on consent — which is
         -- exactly why docs/content/convars.mdx has to say out loud that the id
         -- is sent whether or not diagnostics are on. (It said so on the hub's

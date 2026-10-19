@@ -1,6 +1,6 @@
 -- World and entity natives behind Platform.
 
-local log = Logger.create('tLib/adapter/world')
+local log = Logger.create('NLib/adapter/world')
 
 -- Takes either key case. A FiveM vector3 already has .x/.y/.z, so it passes
 -- through without a copy.
@@ -8,7 +8,7 @@ local function _toCoordTable(v)
     if type(v) ~= 'table' and type(v) ~= 'userdata' then
         return { x = 0, y = 0, z = 0 }
     end
-    if _TLIB_IS_FIVEM and v.x ~= nil then
+    if _NLIB_IS_FIVEM and v.x ~= nil then
         return v
     end
     return {
@@ -18,7 +18,7 @@ local function _toCoordTable(v)
     }
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getPlayerCoords()
         local coords = GetEntityCoords(PlayerPedId())
         return { x = coords.x, y = coords.y, z = coords.z }
@@ -27,7 +27,7 @@ else
     Platform.getPlayerCoords = Platform._stub('getPlayerCoords')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getPlayerHeading()
         return GetEntityHeading(PlayerPedId())
     end
@@ -35,7 +35,7 @@ else
     Platform.getPlayerHeading = Platform._stub('getPlayerHeading')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getPlayerPed()
         return PlayerPedId()
     end
@@ -43,7 +43,7 @@ else
     Platform.getPlayerPed = Platform._stub('getPlayerPed')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getEntityCoords(entity)
         if not entity or entity == 0 then return { x = 0, y = 0, z = 0 } end
         local c = GetEntityCoords(entity)
@@ -53,7 +53,7 @@ else
     Platform.getEntityCoords = Platform._stub('getEntityCoords')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.setEntityCoords(entity, coords)
         if not entity or entity == 0 then return end
         local c = _toCoordTable(coords)
@@ -63,7 +63,7 @@ else
     Platform.setEntityCoords = Platform._stub('setEntityCoords')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getEntityHeading(entity)
         if not entity or entity == 0 then return 0 end
         return GetEntityHeading(entity)
@@ -72,7 +72,7 @@ else
     Platform.getEntityHeading = Platform._stub('getEntityHeading')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.setEntityHeading(entity, heading)
         if not entity or entity == 0 then return end
         SetEntityHeading(entity, heading or 0)
@@ -81,7 +81,7 @@ else
     Platform.setEntityHeading = Platform._stub('setEntityHeading')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.doesEntityExist(entity)
         if not entity or entity == 0 then return false end
         return DoesEntityExist(entity)
@@ -90,7 +90,7 @@ else
     Platform.doesEntityExist = Platform._stub('doesEntityExist')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.deleteEntity(entity)
         if not entity or entity == 0 then return end
         SetEntityAsMissionEntity(entity, true, true)
@@ -100,7 +100,7 @@ else
     Platform.deleteEntity = Platform._stub('deleteEntity')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.createObject(model, coords, networked)
         local c    = _toCoordTable(coords)
         local hash = type(model) == 'number' and model or GetHashKey(model)
@@ -131,7 +131,7 @@ else
     Platform.createObject = Platform._stub('createObject')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     --- `model` is a name or a hash; `heading` is yaw in degrees.
     function Platform.createPed(model, coords, heading, networked)
         local c    = _toCoordTable(coords)
@@ -159,7 +159,7 @@ else
 end
 
 -- Returns (player, distance), or nil, nil if nobody is within radius.
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getClosestPlayer(coords, radius)
         local c                    = _toCoordTable(coords)
         local myId                 = PlayerId()
@@ -190,7 +190,7 @@ else
     Platform.getClosestPlayer = Platform._stub('getClosestPlayer')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getPlayersInRadius(coords, radius)
         local c      = _toCoordTable(coords)
         local result = {}
@@ -213,7 +213,7 @@ else
     Platform.getPlayersInRadius = Platform._stub('getPlayersInRadius')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     --- Ground Z at (x, y), or nil if the probe never resolves.
     function Platform.getGroundZ(x, y)
         -- GetGroundZFor_3dCoord needs a Z above the ground, so probe from high up.
@@ -237,7 +237,7 @@ end
 
 -- One frame of world-space text; call every frame from a thread.
 -- opts: scale, color = {r,g,b,a}, outline.
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.drawText3D(coords, text, opts)
         opts          = opts or {}
         local c       = _toCoordTable(coords)
@@ -267,7 +267,7 @@ end
 
 -- One frame of a marker; call every frame from a thread.
 -- opts: dir, rot, scale, color, bobUpDown, faceCamera.
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.drawMarker(markerType, coords, opts)
         opts      = opts or {}
         local c   = _toCoordTable(coords)

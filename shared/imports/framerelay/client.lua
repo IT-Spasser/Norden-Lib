@@ -1,10 +1,10 @@
 --[[
-    tLib — THE VEHICLE FRAME RELAY
+    NLib — THE VEHICLE FRAME RELAY
 
     Loaded into the CONSUMER's VM like every other module under shared/imports/:
-    `tlib.framerelay`. Client only.
+    `nlib.framerelay`. Client only.
 
-        local relay = tlib.framerelay.create({
+        local relay = nlib.framerelay.create({
             key       = 'tdetScreenFrame',
             frame     = function() return localFrame end,
             hasScreen = function(vehicle) return tdetGetAttachedProp(vehicle) ~= nil end,
@@ -85,14 +85,14 @@ FrameRelay.STALE_MS = FrameRelay.HEARTBEAT_MS * 3
 ---   heartbeatMs  number?   overrides FrameRelay.HEARTBEAT_MS
 ---   staleMs      number?   overrides FrameRelay.STALE_MS
 function FrameRelay.create(descriptor)
-    assert(type(descriptor) == 'table', 'tlib.framerelay.create: descriptor table required')
+    assert(type(descriptor) == 'table', 'nlib.framerelay.create: descriptor table required')
     local d = descriptor
 
     assert(type(d.key) == 'string' and d.key ~= '',
-        'tlib.framerelay.create: descriptor.key must be a non-empty statebag key')
+        'nlib.framerelay.create: descriptor.key must be a non-empty statebag key')
     for _, name in ipairs({ 'frame', 'sanitise', 'differs' }) do
         assert(type(d[name]) == 'function',
-            ('tlib.framerelay.create: descriptor.%s must be a function'):format(name))
+            ('nlib.framerelay.create: descriptor.%s must be a function'):format(name))
     end
 
     local KEY          = d.key
@@ -120,7 +120,7 @@ function FrameRelay.create(descriptor)
 
     --- One publish pass. Safe to call every frame; it writes rarely.
     function instance.publishTick()
-        local occupancy = tlib.occupancy
+        local occupancy = nlib.occupancy
         local vehicle, netId = occupancy.myVehicle()
         local mine = vehicle ~= nil and occupancy.isController() == true
 

@@ -6,7 +6,7 @@
  *
  * It shipped `Discard` first, with `tone="primary"` AND `autofocus`, under an
  * affirmative-left reading of the pair. Every other confirmation footer in the
- * estate — tELS's discard guard, tUnit's `CharacterEditor`, and tLib's own
+ * estate — tELS's discard guard, tUnit's `CharacterEditor`, and NLib's own
  * shared `PropEditor` prompt — puts the lossy action on the right and gives the
  * affirmative slot to the safe answer, because "Keep editing" IS the affirmative
  * answer to "discard?".
@@ -15,7 +15,7 @@
  * the whole layout away, on a dialog whose own body says "This cannot be undone".
  *
  * THE SAVE/CANCEL FOOTER ABOVE IT IS NOT PART OF THIS AND IS UNCHANGED. That
- * one is affirmative-left, which is where all four of tLib's affirmative/cancel
+ * one is affirmative-left, which is where all four of NLib's affirmative/cancel
  * pairs were deliberately moved. A destructive confirmation is a different widget
  * answering a different question; the comment at the call site says so.
  *
@@ -38,7 +38,7 @@
 
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { cleanup, render } from "@solidjs/testing-library";
-import type { Component } from "@tlib/shared/hud-geometry";
+import type { Component } from "@nlib/shared/hud-geometry";
 import { flush } from "solid-js";
 import LayoutEditor from "../src/layout/LayoutEditor";
 
@@ -67,11 +67,11 @@ beforeEach(() => {
   sent = [];
   realFetch = globalThis.fetch;
   (window as unknown as { GetParentResourceName: () => string }).GetParentResourceName = () =>
-    "tlib-test";
+    "nlib-test";
   globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     const href = typeof url === "string" ? url : url instanceof URL ? url.href : url.url;
     sent.push({
-      event: href.replace("https://tlib-test/", ""),
+      event: href.replace("https://nlib-test/", ""),
       data: init?.body ? JSON.parse(String(init.body)) : undefined,
     });
     return new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } });
@@ -127,7 +127,7 @@ const answers = (c: HTMLElement) =>
 
 /** Make the session dirty through the editor's own public surface. */
 function nudge(c: HTMLElement) {
-  const surface = q(c, ".tlib-layout__surface") ?? c.firstElementChild!;
+  const surface = q(c, ".nlib-layout__surface") ?? c.firstElementChild!;
   (surface as HTMLElement).dispatchEvent(
     new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true })
   );
@@ -153,7 +153,7 @@ describe("the discard prompt's answers", () => {
   test("the lossy answer is on the RIGHT and the safe one takes the affirmative slot", async () => {
     const { container } = await openEditor();
     nudge(container);
-    q(container, ".tlib-layout__discard")!.click();
+    q(container, ".nlib-layout__discard")!.click();
     flush();
     expect(prompt(container)).not.toBeNull();
     const order = answers(container).map((b) => b.dataset.discardAnswer);
@@ -166,7 +166,7 @@ describe("the discard prompt's answers", () => {
     // away on a dialog that says "This cannot be undone".
     const { container } = await openEditor();
     nudge(container);
-    q(container, ".tlib-layout__discard")!.click();
+    q(container, ".nlib-layout__discard")!.click();
     flush();
     const [keep, discard] = answers(container);
     expect(keep!.dataset.tone).toBe("primary");
@@ -178,7 +178,7 @@ describe("the discard prompt's answers", () => {
   test("Keep editing dismisses and keeps the session open", async () => {
     const { container } = await openEditor();
     nudge(container);
-    q(container, ".tlib-layout__discard")!.click();
+    q(container, ".nlib-layout__discard")!.click();
     flush();
     sent = [];
     answers(container)[0]!.click();
@@ -191,7 +191,7 @@ describe("the discard prompt's answers", () => {
   test("Discard is the only answer that finishes the session", async () => {
     const { container } = await openEditor();
     nudge(container);
-    q(container, ".tlib-layout__discard")!.click();
+    q(container, ".nlib-layout__discard")!.click();
     flush();
     sent = [];
     answers(container)[1]!.click();
@@ -205,7 +205,7 @@ describe("the discard prompt's answers", () => {
 describe("the guard itself", () => {
   test("a clean session's Cancel does not prompt", async () => {
     const { container } = await openEditor();
-    q(container, ".tlib-layout__discard")!.click();
+    q(container, ".nlib-layout__discard")!.click();
     await settle();
     expect(prompt(container)).toBeNull();
   });
@@ -248,7 +248,7 @@ describe("the guard itself", () => {
     // no-op, and undoing it back to the opening state closes without a question.
     const { container } = await openEditor();
     nudge(container);
-    q(container, ".tlib-layout__discard")!.click();
+    q(container, ".nlib-layout__discard")!.click();
     flush();
     expect(prompt(container)).not.toBeNull();
     // Dismiss, then undo the nudge back to clean, then Cancel again: a session
@@ -259,7 +259,7 @@ describe("the guard itself", () => {
       new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true, cancelable: true })
     );
     flush();
-    q(container, ".tlib-layout__discard")!.click();
+    q(container, ".nlib-layout__discard")!.click();
     await settle();
     expect(prompt(container)).toBeNull();
   });

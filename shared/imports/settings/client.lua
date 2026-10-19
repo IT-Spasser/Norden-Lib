@@ -1,7 +1,7 @@
 -- Settings with KVP persistence, resolved player KVP -> server default ->
--- hardcoded default. Requires tlib.kvp.
+-- hardcoded default. Requires nlib.kvp.
 --
---   local settings = tlib.settings.create({
+--   local settings = nlib.settings.create({
 --       { key = 'tels_emissive',    type = 'float',  default = 1.0, clamp = { 0.1, 3.0 } },
 --       { key = 'tels_env_quality', type = 'int',    default = 4,   clamp = { 0, 4 } },
 --       { key = 'tels_hud_visible', type = 'bool',   default = true },
@@ -53,7 +53,7 @@ end
 local settingsMod = {}
 
 function settingsMod.create(defs)
-    local kvp = tlib.kvp
+    local kvp = nlib.kvp
     -- One view per scope rather than one per definition: the views are
     -- stateless and the only difference is how `key` resolves.
     local scopedKvp = kvp.view({ serverScoped = true })

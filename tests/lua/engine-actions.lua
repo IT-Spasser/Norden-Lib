@@ -1,7 +1,7 @@
 -- Standalone from resource root:
 --   bunx --bun fengari tests/lua/engine-actions.lua
 --
--- Oracle for tLib's client-side action dispatcher and effect scheduler.
+-- Oracle for NLib's client-side action dispatcher and effect scheduler.
 --
 -- The claim this suite exists to hold the engine to is the one that made client
 -- dispatch safe to open up to every resource: a resource can reach the handlers it
@@ -38,7 +38,7 @@ Platform = {
 }
 
 assert(loadfile('shared/lib/menu/schema.lua', 't', _G),
-    'shared/lib/menu/schema.lua not found -- run this suite from the tLib resource root')()
+    'shared/lib/menu/schema.lua not found -- run this suite from the NLib resource root')()
 assert(loadfile('client/lib/menu/actions.lua', 't', _G))()
 
 local M = MenuActions

@@ -5,7 +5,7 @@
 -- client's is `source == 65535`; the server's is a positive source, a rate
 -- limit, and optionally a permission gate.
 --
--- The rate limit here is the REAL tlib.ratelimit, not a stub. Composition with
+-- The rate limit here is the REAL nlib.ratelimit, not a stub. Composition with
 -- it is the whole reason the server half exists, and a stubbed bucket would
 -- prove the call was made and nothing about whether it refuses.
 
@@ -28,7 +28,7 @@ local now = 0
 GetGameTimer = function() return now end
 
 local ratelimit = dofile('shared/imports/ratelimit/server.lua')
-tlib = { ratelimit = ratelimit }
+nlib = { ratelimit = ratelimit }
 
 --  CLIENT: fromServer
 
@@ -66,7 +66,7 @@ assert(got == nil, 'a nil source must not reach the handler')
 -- console flood as the payload.
 assert(lineCount('tels:serverDefaults') == 1,
     'seven rejections produce exactly one line')
-assert(lineCount('tlib.net.fromServer') == 1, 'and it names the function that dropped it')
+assert(lineCount('nlib.net.fromServer') == 1, 'and it names the function that dropped it')
 release()
 
 -- A second event name gets its own line; the budget is per name, not global.
@@ -133,7 +133,7 @@ fire('tradar:requestServerSettings', nil)
 assert(seenSrc == nil, 'a nil source is not a player')
 
 -- The rate limit, on by default ---------------------------------------------
--- 1000 ms, because that is what every tlib.ratelimit.bucket call site in this
+-- 1000 ms, because that is what every nlib.ratelimit.bucket call site in this
 -- tree already passes and because an unlimited request-shaped handler is a free
 -- amplifier: a few bytes in, a framework job lookup and a panel payload out.
 ratelimit.reset()
@@ -195,7 +195,7 @@ fire('tradar:saveLayout', 7)
 assert(served == 1 and #denied == 0, 'an allowed player is served')
 fire('tradar:saveLayout', 9)
 assert(served == 1 and #denied == 1 and denied[1] == 9, 'a denied player gets onDenied')
--- One line per event name per session. tLib own RegisterAdminEvent prints per
+-- One line per event name per session. NLib own RegisterAdminEvent prints per
 -- denial, which on an event any client may fire is an amplifier of its own.
 fire('tradar:saveLayout', 10)
 fire('tradar:saveLayout', 11)
@@ -205,7 +205,7 @@ release()
 
 -- Only a boolean true is a grant. A truthy 1 crossing from a framework export
 -- is not: `IsPlayerAceAllowed` is the one native in this estate that answers
--- with it, and it is reached through tlib.permission, which normalises it. A
+-- with it, and it is reached through nlib.permission, which normalises it. A
 -- raw truthy value here means the caller did not go through that.
 ratelimit.reset()
 registered = {}
@@ -218,7 +218,7 @@ release()
 assert(loose == 0, 'a truthy non-boolean from allow is not a grant')
 
 -- An allow that THROWS denies. An owner function erroring must never become an
--- open event — the rule tlib.access applies to its own `custom` mode.
+-- open event — the rule nlib.access applies to its own `custom` mode.
 ratelimit.reset()
 registered = {}
 local thrown = 0

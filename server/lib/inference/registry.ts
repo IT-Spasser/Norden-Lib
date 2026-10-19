@@ -8,7 +8,7 @@
 // Control plane only. No inference passes through here and no bytes are proxied:
 // an advertisement is a note saying "capability C, artifact W, reachable at U",
 // and the consumer then talks to U directly. That is what keeps this generic
-// enough to live in tLib without tLib knowing anything about models.
+// enough to live in NLib without NLib knowing anything about models.
 //
 // Two rules are enforced rather than documented:
 //
@@ -57,7 +57,7 @@ export class Registry {
   /**
    * The boot id handles are stamped with.
    *
-   * A handle from before a tLib restart names an epoch that no longer exists, so
+   * A handle from before a NLib restart names an epoch that no longer exists, so
    * it cannot withdraw an advertisement the new registry made under the same
    * counter value.
    */

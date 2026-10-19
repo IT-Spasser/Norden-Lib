@@ -24,8 +24,8 @@ const ref = (pixels: number) => pixels / 1080;
 const make = (id: string, label: string, x: number, y: number) => {
   const layout = { x, y, scale: 1, visible: true, anchor: "top-left" };
   return {
-    key: `tLib:${id}`,
-    owner: "tLib",
+    key: `NLib:${id}`,
+    owner: "NLib",
     id,
     label,
     width: 240,
@@ -51,11 +51,11 @@ const open = (session: number) =>
       make("notifications", "Notifications", ref(80), ref(120)),
     ],
   });
-const panel = page.locator(".tlib-layout__panel");
-const surface = page.locator(".tlib-layout");
+const panel = page.locator(".nlib-layout__panel");
+const surface = page.locator(".nlib-layout");
 const button = (name: string | RegExp) => page.getByRole("button", { name });
-const proxy = (label: string) => page.locator(`.tlib-layout__proxy[aria-label^="${label}"]`);
-const selectedProxy = page.locator(".tlib-layout__proxy--selected");
+const proxy = (label: string) => page.locator(`.nlib-layout__proxy[aria-label^="${label}"]`);
+const selectedProxy = page.locator(".nlib-layout__proxy--selected");
 const row = (label: string) => panel.getByRole("button", { name: new RegExp(`^${label}`) });
 const shot = async (name: string) => {
   const directory = process.env.LAYOUT_SCREENSHOT_DIR;
@@ -74,7 +74,7 @@ const dragBy = async (box: any, dx: number, dy: number, modifier?: string) => {
 };
 const measure = async (name: string) => {
   metrics[name] = await panel.evaluate((el: HTMLElement) => {
-    const parts = [".tlib-layout__row-select", ".tlib-layout__finish", ".tlib-layout__discard"];
+    const parts = [".nlib-layout__row-select", ".nlib-layout__finish", ".nlib-layout__discard"];
     const controls = parts.map((selector) => {
       const target = el.querySelector(selector)!;
       const css = getComputedStyle(target);
@@ -109,9 +109,9 @@ const measure = async (name: string) => {
 try {
   page.on("pageerror", (e: Error) => errors.push(e.message));
   await page.addInitScript(() => {
-    (window as any).GetParentResourceName = () => "tLib";
+    (window as any).GetParentResourceName = () => "NLib";
   });
-  await page.route("https://tlib/**", async (route: any) => {
+  await page.route("https://nlib/**", async (route: any) => {
     calls.push({
       event: new URL(route.request().url()).pathname.slice(1),
       data: route.request().postDataJSON(),
@@ -133,7 +133,7 @@ try {
   await panel.waitFor();
 
   // The panel is a list and two commit actions. Nothing else.
-  assert.equal(await page.locator(".tlib-layout__row").count(), 3);
+  assert.equal(await page.locator(".nlib-layout__row").count(), 3);
   assert.equal(await page.getByRole("combobox").count(), 0, "no dropdowns remain");
   assert.equal(await page.getByRole("checkbox").count(), 0, "no option checkboxes remain");
   assert.equal(await page.getByRole("spinbutton").count(), 0);
@@ -166,7 +166,7 @@ try {
     Math.abs((await demo.boundingBox()).x - safeInset) < 1,
     "a near miss snaps onto the safe-zone edge"
   );
-  assert.equal(await page.locator(".tlib-layout__guide").count(), 0, "guides clear on release");
+  assert.equal(await page.locator(".nlib-layout__guide").count(), 0, "guides clear on release");
   await button("Undo").click();
   const held = await demo.boundingBox();
   await dragBy(demo, safeInset + 4 - held.x, 0, "Alt");
@@ -193,27 +193,27 @@ try {
   }
   // Dropping into a corner re-derives the anchor, which is reported, never chosen.
   await dragBy(await demo.boundingBox(), 4000, 4000);
-  assert.match(await page.locator(".tlib-layout__pinned").textContent(), /bottom right/);
+  assert.match(await page.locator(".nlib-layout__pinned").textContent(), /bottom right/);
   await shot("layout-corner-anchor");
   await dragBy(await demo.boundingBox(), -4000, -4000);
-  assert.match(await page.locator(".tlib-layout__pinned").textContent(), /top left/);
+  assert.match(await page.locator(".nlib-layout__pinned").textContent(), /top left/);
 
   // Scroll wheel scales about the anchor pivot.
   const beforeWheel = await demo.boundingBox();
-  assert.equal(await page.locator(".tlib-layout__scale-badge").count(), 0, "no idle readout");
+  assert.equal(await page.locator(".nlib-layout__scale-badge").count(), 0, "no idle readout");
   await page.mouse.move(
     beforeWheel.x + beforeWheel.width / 2,
     beforeWheel.y + beforeWheel.height / 2
   );
   await page.mouse.wheel(0, -120);
-  assert.equal(await page.locator(".tlib-layout__scale-badge").count(), 1, "readout while scaling");
+  assert.equal(await page.locator(".nlib-layout__scale-badge").count(), 1, "readout while scaling");
   await page.mouse.wheel(0, -120);
   const grown = await demo.boundingBox();
   assert.ok(grown.width > beforeWheel.width);
   // Top-left anchored, so the pivot corner holds still while it grows.
   assert.ok(Math.abs(grown.x - beforeWheel.x) < 1 && Math.abs(grown.y - beforeWheel.y) < 1);
   await page.waitForTimeout(350); // let the burst settle into one history entry
-  assert.equal(await page.locator(".tlib-layout__scale-badge").count(), 0);
+  assert.equal(await page.locator(".nlib-layout__scale-badge").count(), 0);
   await button("Undo").click();
   assert.ok(
     Math.abs((await demo.boundingBox()).width - beforeWheel.width) < 1,
@@ -226,7 +226,7 @@ try {
   assert.ok(Math.abs((await demo.boundingBox()).width - start.width) < 1);
 
   // Corner handles resize about the opposite corner.
-  const handle = await page.locator(".tlib-layout__handle--se").boundingBox();
+  const handle = await page.locator(".nlib-layout__handle--se").boundingBox();
   const beforeResize = await demo.boundingBox();
   await dragBy(handle, 120, 45);
   const resized = await demo.boundingBox();
@@ -240,12 +240,12 @@ try {
   // Visibility lives on the widget and in the list; both drive one state.
   await proxy("Radio preview").getByRole("button", { name: "Hide Radio preview" }).click();
   assert.ok(
-    await demo.evaluate((el: HTMLElement) => el.classList.contains("tlib-layout__proxy--hidden"))
+    await demo.evaluate((el: HTMLElement) => el.classList.contains("nlib-layout__proxy--hidden"))
   );
   await row("Radio preview").click();
   await panel.getByRole("button", { name: "Show Radio preview" }).click();
   assert.ok(
-    await demo.evaluate((el: HTMLElement) => !el.classList.contains("tlib-layout__proxy--hidden"))
+    await demo.evaluate((el: HTMLElement) => !el.classList.contains("nlib-layout__proxy--hidden"))
   );
 
   // Arrow keys nudge the selected widget; the panel handle owns its own.
@@ -360,9 +360,9 @@ try {
   await panel.waitFor();
   await open(103);
   await pause();
-  await send("layoutRemove", { session: 103, key: "tLib:channels" });
+  await send("layoutRemove", { session: 103, key: "NLib:channels" });
   await pause();
-  assert.equal(await page.locator(".tlib-layout__row").count(), 2, "a stopped resource drops out");
+  assert.equal(await page.locator(".nlib-layout__row").count(), 2, "a stopped resource drops out");
   await send("layoutClose", { session: 102 });
   assert.ok(await panel.isVisible(), "stale close ignored");
   await page.keyboard.press("Escape");

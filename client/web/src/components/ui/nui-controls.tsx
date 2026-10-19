@@ -24,7 +24,7 @@ import { omit, Show } from "solid-js";
 import "../../../../../shared/ts/nui-kit/nui.css";
 
 /** Shared with Ark's Checkbox.Control, which wears the same class. */
-export const NUI_CHECKBOX_CLASS = "tlib-nui-control tlib-nui-checkbox-control";
+export const NUI_CHECKBOX_CLASS = "nlib-nui-control nlib-nui-checkbox-control";
 
 /** Deep lucide import: the barrel is ~400KB and this module is on the menu's
  *  path. */
@@ -42,7 +42,7 @@ export function NuiCheckbox(props: { checked: boolean; class?: string }) {
       aria-hidden="true"
     >
       <Show when={props.checked}>
-        <span class="tlib-nui-checkbox-indicator">
+        <span class="nlib-nui-checkbox-indicator">
           <NuiCheckGlyph />
         </span>
       </Show>
@@ -70,9 +70,9 @@ export function NuiRange(
       type="range"
       // Array form, not a template literal: UnoCSS tokenises `foo${` as two
       // broken candidates, so a utility immediately before an interpolation is
-      // never extracted. These are hand-written `tlib-` classes rather than
+      // never extracted. These are hand-written `nlib-` classes rather than
       // utilities, but the form is the house rule because the failure is silent.
-      class={["tlib-nui-control tlib-nui-range", props.class]}
+      class={["nlib-nui-control nlib-nui-range", props.class]}
       style={{
         "--nui-range-fill": `${Math.max(0, Math.min(1, props.fill)) * 100}%`,
         ...(props.color ? { "--nui-range-color": props.color } : {}),
@@ -85,5 +85,5 @@ export function NuiRange(
 /** Shared so the two readouts never disagree about width, alignment or numeral
  *  shaping. */
 export function NuiRangeValue(props: { children: JSX.Element }) {
-  return <output class="tlib-nui-slider-value">{props.children}</output>;
+  return <output class="nlib-nui-slider-value">{props.children}</output>;
 }

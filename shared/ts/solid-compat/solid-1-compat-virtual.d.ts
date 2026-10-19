@@ -1,7 +1,7 @@
 /*
  * SOLID 1 -> 2 COMPATIBILITY LAYER  ·  TYPES FOR THE `virtual:` SPECIFIERS
  *
- * One shared copy, kept in tLib and consumed by five projects. `README.md` in
+ * One shared copy, kept in NLib and consumed by five projects. `README.md` in
  * this directory documents the layer as a whole: what it solves, what each of
  * the five modules does, how a project adopts it, what `vendorPackages` is for
  * and how to derive one, and the debug environment variables. Read that first.
@@ -30,7 +30,7 @@
  *
  * An ambient declaration only applies if its file is part of the program, and a
  * consumer's tsconfig `include` is its own `src` — it has no reason to name a
- * file inside tLib. The triple-slash reference is what pulls this into the
+ * file inside NLib. The triple-slash reference is what pulls this into the
  * program wherever one of the shims is reached, rather than asking four separate
  * projects to each add a path to their `include`.
  *
@@ -47,7 +47,7 @@
  *
  * IT CANNOT WORK FROM A SHARED LOCATION, MEASURED. TypeScript resolves
  * `"solid-js"` relative to the file containing the declaration, and this file
- * lives in tLib, where `shared/ts/node_modules/solid-js` is **1.9.12** — tLib's
+ * lives in NLib, where `shared/ts/node_modules/solid-js` is **1.9.12** — NLib's
  * own UI and every t* resource are deliberately still on Solid 1.9.x. So the
  * precise form would type a Solid-2 shim against Solid 1's declarations and
  * report errors that say nothing about the consumer's actual toolchain. A

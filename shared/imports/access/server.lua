@@ -1,9 +1,9 @@
 --[[
-    tLib/shared/imports/access — who is allowed to use this resource.
+    NLib/shared/imports/access — who is allowed to use this resource.
 
     Usage in a consumer (server scripts):
 
-        local radio = tlib.access.gate(Config.access, { key = 'radio', label = 'the radio' })
+        local radio = nlib.access.gate(Config.access, { key = 'radio', label = 'the radio' })
 
         RegisterNetEvent('tRadio:transmit', function(...)
             if not radio:allowed(source) then return end
@@ -47,11 +47,11 @@ local detected = {}
 local function loadAdapters()
     if frameworks then return end
 
-    local chunk = LoadResourceFile('tLib', 'shared/imports/access/adapters.lua')
+    local chunk = LoadResourceFile('NLib', 'shared/imports/access/adapters.lua')
     local built = { frameworks = {}, inventories = {} }
 
     if chunk then
-        local fn = load(chunk, '@@tLib/shared/imports/access/adapters.lua')
+        local fn = load(chunk, '@@NLib/shared/imports/access/adapters.lua')
         if fn then
             local ok, result = pcall(fn)
             if ok and type(result) == 'table' then built = result end
@@ -60,7 +60,7 @@ local function loadAdapters()
 
     frameworks, inventories = {}, {}
     -- Registered adapters come FIRST, so a server can override a built-in that
-    -- has drifted from their fork without waiting on a tLib release.
+    -- has drifted from their fork without waiting on a NLib release.
     for _, a in ipairs(extraFrameworks) do frameworks[#frameworks + 1] = a end
     for _, a in ipairs(built.frameworks or {}) do frameworks[#frameworks + 1] = a end
     for _, a in ipairs(extraInventories) do inventories[#inventories + 1] = a end
@@ -116,7 +116,7 @@ end
 
 --
 -- Detection is redone whenever ANY resource starts: a consumer's dependency on
--- tLib says nothing about qbx_core or ox_inventory, and caching "nothing
+-- NLib says nothing about qbx_core or ox_inventory, and caching "nothing
 -- detected" would deny every player for the life of the server.
 if AddEventHandler then
     AddEventHandler('onResourceStart', function()
@@ -171,7 +171,7 @@ function access.use(frameworkName, inventoryName)
         for _, adapter in ipairs(list) do
             if adapter.name == wanted then return adapter, true end
         end
-        print(('^1[%s] tlib.access: no %s adapter named "%s". Detection is unchanged.^7')
+        print(('^1[%s] nlib.access: no %s adapter named "%s". Detection is unchanged.^7')
             :format(RESOURCE, label, tostring(wanted)))
         return nil, false
     end
@@ -279,7 +279,7 @@ local function problems(block, label, environment)
                     end
                 end
                 if environment and not access.framework() then
-                    badEnv(('access.mode for %s is "job", but no supported framework was detected, so NO player can pass this gate.\n  Fix: start your framework before %s, or pin it with tlib.access.use("qbx_core"), or switch to mode = "ace".')
+                    badEnv(('access.mode for %s is "job", but no supported framework was detected, so NO player can pass this gate.\n  Fix: start your framework before %s, or pin it with nlib.access.use("qbx_core"), or switch to mode = "ace".')
                         :format(label, RESOURCE))
                 end
             end
@@ -288,7 +288,7 @@ local function problems(block, label, environment)
                 bad(('access.mode for %s is "item", but access.item is not set.\n  Fix: set item = "the_item_name" exactly as it appears in your inventory\'s item list.')
                     :format(label))
             elseif environment and not access.inventory() then
-                badEnv(('access.mode for %s is "item", but no supported inventory was detected, so NO player can pass this gate.\n  Fix: start your inventory before %s, or pin it with tlib.access.use(nil, "ox_inventory"), or switch to mode = "ace".')
+                badEnv(('access.mode for %s is "item", but no supported inventory was detected, so NO player can pass this gate.\n  Fix: start your inventory before %s, or pin it with nlib.access.use(nil, "ox_inventory"), or switch to mode = "ace".')
                     :format(label, RESOURCE))
             end
         elseif mode == 'custom' then
@@ -344,14 +344,14 @@ function Gate:evaluate(src)
     -- lock the demo out of a feature with no way to tell why from in-game.
     -- Gate:report() surfaces it as `demo = true` so a diagnostic never mistakes
     -- this for a gate that genuinely evaluates open.
-    if tlib.demo.active() then return true end
+    if nlib.demo.active() then return true end
     if self.broken then return false end
 
     for _, mode in ipairs(self.modes) do
         if mode == 'everyone' then
             return true
         elseif mode == 'ace' then
-            if tlib.permission.has(src, self.block.ace) then return true end
+            if nlib.permission.has(src, self.block.ace) then return true end
         elseif mode == 'job' then
             local held = access.jobs(src)
             for name, minimum in pairs(self.block.job) do
@@ -395,7 +395,7 @@ function Gate:allowed(src)
     -- profiler once attributed ~5.2 ms to one permission resolution. 50 ms,
     -- because a privileged action waits on this.
     local value = self:evaluate(src)
-    tlib.telemetry.record('access:evaluate', 50, ((GetGameTimer and GetGameTimer()) or 0) - now)
+    nlib.telemetry.record('access:evaluate', 50, ((GetGameTimer and GetGameTimer()) or 0) - now)
     self.memo[key] = { at = now, value = value }
     return value
 end
@@ -443,7 +443,7 @@ function Gate:report()
         broken    = self.broken,
         -- Reported separately from `modes` so a diagnostic can tell "open
         -- because demo mode is on" from "configured open".
-        demo      = tlib.demo.active(),
+        demo      = nlib.demo.active(),
         framework = access.framework(),
         inventory = access.inventory(),
         ace       = self.block.ace,
@@ -483,8 +483,8 @@ function Gate:describe()
     local line = ('%s: %s'):format(self.label, table.concat(parts, ' OR '))
     if self.broken then line = line .. '  [DISABLED -- config errors above]' end
     -- Last, and phrased as an override, because it is: the configured rule above
-    -- is still what this gate will decide by the moment tlib_demo goes away.
-    if tlib.demo.active() then line = line .. '  [OVERRIDDEN -- demo mode grants everyone]' end
+    -- is still what this gate will decide by the moment nlib_demo goes away.
+    if nlib.demo.active() then line = line .. '  [OVERRIDDEN -- demo mode grants everyone]' end
     return line
 end
 
@@ -522,7 +522,7 @@ function access.gate(block, opts)
         -- Namespaced by resource: FiveM net event names are global, so two
         -- resources both using key 'access' would otherwise answer each other's
         -- clients.
-        event  = ('%s:tlib:access:%s'):format(RESOURCE, key),
+        event  = ('%s:nlib:access:%s'):format(RESOURCE, key),
     }, Gate)
 
     -- Self-sweeping on disconnect; see `liveGates`. Registered here rather than

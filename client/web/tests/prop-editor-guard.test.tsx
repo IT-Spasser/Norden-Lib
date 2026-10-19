@@ -78,7 +78,7 @@ const { closePropEditor, propEditorState } = HAS_PROP_EDITOR
   ? await import("../../../internal/shared-ts/prop-editor/store")
   : { closePropEditor: (() => {}) as never, propEditorState: {} as never };
 
-const PREFIX = "tlibtest";
+const PREFIX = "nlibtest";
 /** The editor namespaces everything it sends; a bare name would never match. */
 const CANCEL = `${PREFIX}:propEditorCancel`;
 
@@ -90,11 +90,11 @@ beforeEach(() => {
   sent = [];
   realFetch = globalThis.fetch;
   (window as unknown as { GetParentResourceName: () => string }).GetParentResourceName = () =>
-    "tlib-test";
+    "nlib-test";
   globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     const href = typeof url === "string" ? url : url instanceof URL ? url.href : url.url;
     sent.push({
-      event: href.replace("https://tlib-test/", ""),
+      event: href.replace("https://nlib-test/", ""),
       data: init?.body ? JSON.parse(String(init.body)) : undefined,
     });
     return new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } });
@@ -161,7 +161,7 @@ const keepBtn = (c: HTMLElement) => q<HTMLButtonElement>(c, "[data-prop-editor-k
 const discardBtn = (c: HTMLElement) => q<HTMLButtonElement>(c, "[data-prop-editor-discard]");
 const cancelBtn = (c: HTMLElement) => q<HTMLButtonElement>(c, "[data-prop-editor-cancel]");
 const field = (c: HTMLElement, label: string) => {
-  const rows = [...c.querySelectorAll("label, .tlib-pe-field, div")];
+  const rows = [...c.querySelectorAll("label, .nlib-pe-field, div")];
   for (const row of rows) {
     if (row.textContent?.trim().startsWith(label)) {
       const el = row.querySelector("input");
@@ -203,7 +203,7 @@ describeWithPropEditor("the editor mounts at all", () => {
     expect(undo!.disabled).toBe(true);
     // And the shared hint strip, with its size as a class rather than an
     // arbitrary utility that `unoMerge` can drop.
-    const hint = q(container, ".tlib-undo-hint");
+    const hint = q(container, ".nlib-undo-hint");
     expect(hint).not.toBeNull();
     expect(hint!.getAttribute("class")).not.toMatch(/text-\[/);
   });

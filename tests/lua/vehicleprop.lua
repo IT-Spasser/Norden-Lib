@@ -16,7 +16,7 @@
 --     changes a model.
 --
 -- The module is loaded FOR REAL against host stubs, with the REAL
--- `tlib.propeditor` under it, rather than being re-implemented here. A suite
+-- `nlib.propeditor` under it, rather than being re-implemented here. A suite
 -- that reimplements its subject asserts that two copies agree and notices
 -- nothing when the shipped one changes.
 --
@@ -231,7 +231,7 @@ function DecorGetBool(e, name)
     return rec ~= nil and rec.decor ~= nil and rec.decor[name] == true
 end
 
-tlib = {
+nlib = {
     platform = { setInputMode = function() end, setKeepInputActive = function() end },
 }
 -- The REAL drivenprop, not a stub, for the same reason the propeditor below is
@@ -239,8 +239,8 @@ tlib = {
 -- driving its matrix, and shares the editor's driver. A stub would let the
 -- attached path be taken for a scaled placement — the one measured failure this
 -- whole mechanism exists to avoid — and nothing here would see it.
-tlib.drivenprop = dofile('shared/imports/drivenprop/shared.lua')
-tlib.propeditor = dofile('shared/imports/propeditor/client.lua')
+nlib.drivenprop = dofile('shared/imports/drivenprop/shared.lua')
+nlib.propeditor = dofile('shared/imports/propeditor/client.lua')
 
 local VehicleProp = dofile('shared/imports/vehicleprop/shared.lua')
 

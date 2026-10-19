@@ -7,7 +7,7 @@
  * answer for the preset and the `unocss` version THIS bundle ships, which is
  * the whole point of it.
  *
- * tLib's root `check:classes` is `cd client/web && bun run check:classes`, which
+ * NLib's root `check:classes` is `cd client/web && bun run check:classes`, which
  * dispatches here, because this directory owns that `uno.config.ts`.
  * `runDeadClassCheck` also carries the two CSS-contract gates — surface.css
  * collisions and blurred box-shadows — that every consumer inherits.
@@ -18,18 +18,18 @@ import config from "../uno.config.ts";
 
 /**
  * Class names carried for other people to style against, not for us to style.
- * tLib ships a NUI that server owners theme with their own CSS, so these hooks
+ * NLib ships a NUI that server owners theme with their own CSS, so these hooks
  * are part of the public surface and are expected to match no rule here --
  * deleting them because nothing in this repo styles them would break consumers.
  *
- * `tlib-` is matched as a namespace rather than enumerated. The enumerated
- * version listed `tlib-nui-toast` and so passed, while its sibling
- * `tlib-nui-toasts` one line away was reported as dead -- the list silently
+ * `nlib-` is matched as a namespace rather than enumerated. The enumerated
+ * version listed `nlib-nui-toast` and so passed, while its sibling
+ * `nlib-nui-toasts` one line away was reported as dead -- the list silently
  * went stale every time a hook was added. Most of the namespace is declared in
  * nui.css and needs no entry here; this covers the handful that are pure
  * consumer hooks.
  */
-const THEMING_HOOKS = [/^tlib-/, "mp-preview", "weapon-stats"];
+const THEMING_HOOKS = [/^nlib-/, "mp-preview", "weapon-stats"];
 
 /**
  * `cssRoots` reaches outside `src` because the stylesheets that declare these

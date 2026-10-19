@@ -95,9 +95,9 @@ try {
   }
   // Local bridge: actual renderer and validator, deterministic rows/replies, no game.
   await page.addInitScript(() => {
-    (window as any).GetParentResourceName = () => "tLib";
+    (window as any).GetParentResourceName = () => "NLib";
   });
-  await page.route("https://tlib/**", async (route: any) => {
+  await page.route("https://nlib/**", async (route: any) => {
     const event = new URL(route.request().url()).pathname;
     let reply: any = { ok: true };
     if (event === "/menu_ready" || event === "/menu_resync") reply.snapshot = fixture;
@@ -194,7 +194,7 @@ try {
   });
   await send("menu:branding", { themes: { menus: { main: { theme: "menu-hsl" } } } });
   await page.waitForTimeout(100);
-  const theme = await page.locator(".tlib-menu").evaluate((el: HTMLElement) => ({
+  const theme = await page.locator(".nlib-menu").evaluate((el: HTMLElement) => ({
     text: el.style.getPropertyValue("--text"),
     border: el.style.getPropertyValue("--border"),
   }));
@@ -225,7 +225,7 @@ try {
   await page.waitForTimeout(100);
   assert.equal(
     await page
-      .locator(".tlib-menu")
+      .locator(".nlib-menu")
       .evaluate((el: HTMLElement) => el.style.getPropertyValue("--text")),
     ""
   );
@@ -324,7 +324,7 @@ try {
       .evaluate((el: Element) => getComputedStyle(el).fontSize);
 
   assert.equal(
-    await page.locator(".tlib-menu").getAttribute("data-skin"),
+    await page.locator(".nlib-menu").getAttribute("data-skin"),
     "default",
     "default skin with no theme"
   );
@@ -335,9 +335,9 @@ try {
   assert.equal(await chevrons(), 1, "default marks a submenu with one chevron");
   // One implementation: the row's checkbox IS the class a dialog's Ark checkbox
   // wears, and the slider IS the shared native-range dressing.
-  assert.equal(await page.locator(".toggle.tlib-nui-checkbox-control").count(), 1);
+  assert.equal(await page.locator(".toggle.nlib-nui-checkbox-control").count(), 1);
   assert.equal((await box(".toggle")).width, 17, "shared 17px checkbox");
-  assert.equal(await page.locator(".row-slider input.tlib-nui-range").count(), 1);
+  assert.equal(await page.locator(".row-slider input.nlib-nui-range").count(), 1);
   assert.equal((await box(".row-slider input")).height, 6, "shared 6px slider track");
   {
     const stops = await trackStops();
@@ -359,9 +359,9 @@ try {
           .replace(/^["']|["']$/g, "")
       );
   assert.equal(
-    await firstFace(".tlib-menu"),
+    await firstFace(".nlib-menu"),
     "Hanken Grotesk",
-    "the menu draws the one face tLib ships"
+    "the menu draws the one face NLib ships"
   );
   assert.equal(
     await firstFace("body"),
@@ -382,7 +382,7 @@ try {
   await page.waitForTimeout(100);
   assert.equal(
     await page
-      .locator(".tlib-menu")
+      .locator(".nlib-menu")
       .evaluate((el: HTMLElement) => el.style.getPropertyValue("--nui-accent")),
     "#ff00aa"
   );
@@ -399,7 +399,7 @@ try {
 
   await send("menu:branding", { themes: { menus: { main: { skin: "vmenu" } } } });
   await page.waitForTimeout(100);
-  assert.equal(await page.locator(".tlib-menu").getAttribute("data-skin"), "vmenu");
+  assert.equal(await page.locator(".nlib-menu").getAttribute("data-skin"), "vmenu");
   assert.equal((await box(".menu-panel")).width, 431, "vMenu 1080p width");
   assert.equal((await box(".menu-row")).height, 38, "vMenu 1080p row");
   assert.equal((await box(".menu-brand")).height, 107, "vMenu brand band");
@@ -431,7 +431,7 @@ try {
   await send("menu:branding", {});
   await page.waitForTimeout(100);
   assert.equal(
-    await page.locator(".tlib-menu").getAttribute("data-skin"),
+    await page.locator(".nlib-menu").getAttribute("data-skin"),
     "default",
     "clearing branding returns to the default skin"
   );

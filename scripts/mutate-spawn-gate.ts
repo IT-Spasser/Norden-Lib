@@ -119,7 +119,7 @@ const MUTATIONS: Mutation[] = [
   },
   {
     name: "prepend-position",
-    proves: "tLib's script goes in FRONT of the caller's arguments",
+    proves: "NLib's script goes in FRONT of the caller's arguments",
     from: "  let argv = [...prefix, ...matched.argv];",
     to: "  let argv = [...matched.argv, ...prefix];",
   },

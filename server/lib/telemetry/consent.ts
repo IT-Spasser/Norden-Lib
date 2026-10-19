@@ -8,8 +8,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { fGetConvar, fGetCurrentResourceName, fGetResourcePath } from "./fivem";
 
-/** The convar. Same `tlib_` grammar and truthiness as `tlib_demo`. */
-export const TELEMETRY_CONVAR = "tlib_telemetry";
+/** The convar. Same `nlib_` grammar and truthiness as `nlib_demo`. */
+export const TELEMETRY_CONVAR = "nlib_telemetry";
 
 /** The stored switch. Must never appear in a release archive. */
 export const CONSENT_FILE = "telemetry-consent.json";
@@ -17,9 +17,9 @@ export const CONSENT_FILE = "telemetry-consent.json";
 /**
  * An override for the ingest credential, so a dev run can point at a local
  * worker. Not a customer-facing setting: the shipped build authenticates with
- * `TLIB_PUBLIC_KEY` like every other tWeb call.
+ * `NLIB_PUBLIC_KEY` like every other tWeb call.
  */
-export const TELEMETRY_KEY_CONVAR = "tlib_telemetry_key";
+export const TELEMETRY_KEY_CONVAR = "nlib_telemetry_key";
 
 export type ConsentSource = "convar" | "switch" | "default";
 
@@ -108,7 +108,7 @@ export function setStoredSwitch(enabled: boolean): SetConsentResult {
     return {
       ok: false,
       reason: "write-failed",
-      detail: "could not resolve tLib's own resource path",
+      detail: "could not resolve NLib's own resource path",
       consent: current,
     };
   }

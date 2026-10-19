@@ -1,7 +1,7 @@
 -- Standalone from resource root:
 --   bunx --bun fengari tests/lua/engine-catalog.lua
 --
--- Oracle for tLib's catalog and snapshot hydration.
+-- Oracle for NLib's catalog and snapshot hydration.
 --
 -- This is the file the compact wire format rests on. The server sends one bit per
 -- row against a signature the client already holds, so everything here is about a
@@ -20,7 +20,7 @@
 
 
 assert(loadfile('shared/lib/menu/schema.lua', 't', _G),
-    'shared/lib/menu/schema.lua not found -- run this suite from the tLib resource root')()
+    'shared/lib/menu/schema.lua not found -- run this suite from the NLib resource root')()
 assert(loadfile('shared/lib/menu/catalog.lua', 't', _G))()
 
 local S, K = MenuSchema, MenuCatalog

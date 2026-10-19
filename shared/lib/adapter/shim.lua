@@ -3,7 +3,7 @@
 
 -- IT NOW ACTUALLY WRAPS. IT DID NOT, AND THE NAME SAID IT DID. The long
 -- version of why is on the twin in shared/imports/platform/client.lua, which a
--- consumer VM loads; this is tLib's own copy and the two must not diverge.
+-- consumer VM loads; this is NLib's own copy and the two must not diverge.
 --
 -- FiveM infers the resource from the manifest; the argument is retained for
 -- callers and used in the error line.

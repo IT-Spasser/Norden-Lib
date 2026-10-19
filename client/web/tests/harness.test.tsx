@@ -1,7 +1,7 @@
 /**
  * The harness, asserting itself.
  *
- * tLib had ZERO component tests before this directory existed, so the first
+ * NLib had ZERO component tests before this directory existed, so the first
  * thing that needs proving is not a component — it is that a component test here
  * can fail. Every one of these cases corresponds to a state the harness was
  * measured to be in during its construction, where some suites were green and

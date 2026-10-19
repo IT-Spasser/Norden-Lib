@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 /**
- * Sweep every sibling resource's `tlib_modules` block against what tLib
+ * Sweep every sibling resource's `nlib_modules` block against what NLib
  * actually provides.
  *
- * ## Why this lives in tLib and not in each resource
+ * ## Why this lives in NLib and not in each resource
  *
- * Same reason as `secrets:provision:check`: only tLib can see every sibling. A
+ * Same reason as `secrets:provision:check`: only NLib can see every sibling. A
  * per-resource copy of this would be eleven copies of one rule, which is eleven
  * chances for one to be the stale one — and a stale gate is silent.
  *
@@ -21,7 +21,7 @@
  *     `.build/dist` each hold a `data.json` older than the `fxmanifest.lua`
  *     beside it, i.e. a leftover from a build that predates the exclusion. That
  *     is a true finding about a directory and a false finding about a release.
- *   · Failing tLib's regression chain on a months-old build artifact is exactly
+ *   · Failing NLib's regression chain on a months-old build artifact is exactly
  *     how a gate earns a skip flag. The place a staged-tree check can actually
  *     STOP something is inside the build that produced the tree.
  *
@@ -40,8 +40,8 @@ import {
 } from "../shared/ts/build/runtime-state-contract.ts";
 import { siblingResources } from "./siblings.ts";
 
-const TLIB = resolve(import.meta.dir, "..");
-const SIBLINGS = resolve(TLIB, "..");
+const NLIB = resolve(import.meta.dir, "..");
+const SIBLINGS = resolve(NLIB, "..");
 const strict = process.argv.includes("--strict");
 
 /**
@@ -61,23 +61,23 @@ function die(message: string): never {
   process.exit(2);
 }
 
-const available = availableModules(TLIB);
+const available = availableModules(NLIB);
 if (available.length === 0) {
   die(
-    `tLib provides no modules at all, which cannot be true — ${join(TLIB, "shared/imports")} ` +
+    `NLib provides no modules at all, which cannot be true — ${join(NLIB, "shared/imports")} ` +
       "is empty or missing. Every declared name in every sibling would read as a ghost."
   );
 }
 
-const resources = siblingResources(TLIB);
+const resources = siblingResources(NLIB);
 
-// Zero is not "too few", it is "not applicable". tLib ships standalone under
+// Zero is not "too few", it is "not applicable". NLib ships standalone under
 // MIT and a clone of it alone has no siblings to sweep; the floor below is for
 // the case it was written for — siblings ARE there and the discovery rule
 // stopped matching most of them.
 if (resources.length === 0) {
   console.log(
-    `check:runtime-state: skipped — no sibling resource is checked out beside tLib in ` +
+    `check:runtime-state: skipped — no sibling resource is checked out beside NLib in ` +
       `${SIBLINGS}. This sweep is estate-wide and has nothing to read in a standalone clone.`
   );
   process.exit(0);
@@ -92,8 +92,8 @@ if (resources.length < MIN_RESOURCES) {
 }
 
 console.log(
-  `check:runtime-state — tlib_modules across ${resources.length} resources, ` +
-    `${available.length} modules available in tLib\n`
+  `check:runtime-state — nlib_modules across ${resources.length} resources, ` +
+    `${available.length} modules available in NLib\n`
 );
 
 let hard = 0;
@@ -102,7 +102,7 @@ const serverOnlyNotes: string[] = [];
 
 for (const resource of resources) {
   const root = join(SIBLINGS, resource);
-  const result = checkDeclaredModules({ root, tlib: TLIB });
+  const result = checkDeclaredModules({ root, nlib: NLIB });
 
   const hardFindings = failing(result.findings, false);
   const softFindings = result.findings.filter((f) => f.soft);
@@ -145,10 +145,10 @@ if (hard > 0 || (strict && soft > 0)) {
 }
 
 console.log(
-  `\nPASS: ${resources.length} resources, no declared tLib module is missing from tLib` +
+  `\nPASS: ${resources.length} resources, no declared NLib module is missing from NLib` +
     (soft > 0
       ? `. ${soft} soft finding(s) reported and NOT failed — a consumer may legitimately ` +
-        "declare a module it never names itself, because a tLib module it does use needs " +
+        "declare a module it never names itself, because a NLib module it does use needs " +
         "that one loaded eagerly. Pass --strict to fail on them."
       : ".")
 );

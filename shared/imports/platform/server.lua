@@ -1,9 +1,9 @@
--- Platform adapter for consumer resource VMs. tLib's own VM has an equivalent
+-- Platform adapter for consumer resource VMs. NLib's own VM has an equivalent
 -- surface in shared/lib/adapter/; the two are separate copies because a consumer's
--- natives must be invoked from the consumer's VM, not through a tLib export.
+-- natives must be invoked from the consumer's VM, not through a NLib export.
 
 if type(GetCurrentResourceName) ~= "function" or type(IsDuplicityVersion) ~= "function" then
-    error("[tLib] Unsupported runtime: only the FiveM platform adapter is available", 0)
+    error("[NLib] Unsupported runtime: only the FiveM platform adapter is available", 0)
 end
 
 local platform = { _engine = "fivem" }

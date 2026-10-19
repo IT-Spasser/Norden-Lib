@@ -1,19 +1,19 @@
 ---
 title: "Exports"
-description: "Every Lua export tLib registers, which side it lives on, and what it returns."
+description: "Every Lua export NLib registers, which side it lives on, and what it returns."
 order: 2
-group: "tLib"
+group: "NLib"
 published: true
 ---
 
-Call every export as `exports['tLib']:FunctionName(...)`. Each section says which side it is
+Call every export as `exports['NLib']:FunctionName(...)`. Each section says which side it is
 registered on.
 
 ---
 
 ## Menu System
 
-**Client and server.** One NUI menu shared by every resource. tLib owns the screen, the
+**Client and server.** One NUI menu shared by every resource. NLib owns the screen, the
 keyboard and the permission check; you declare pages and handle rows.
 
 Pages register on the **server**, and every open is answered with that player's
@@ -26,7 +26,7 @@ Pass `declaredOwner` as its own argument, never as a call in the last slot.
 `f(json.decode(x))` expands to *two* values and the second lands in `declaredOwner`.
 </Callout>
 
-[Menu Consumers](/docs/tLib/menu-consumers) builds one end to end.
+[Menu Consumers](/docs/NLib/menu-consumers) builds one end to end.
 
 ### Server — declaring the tree
 
@@ -88,11 +88,11 @@ Unscoped: the screen belongs to the player.
 
 #### `SubmitFeedback`
 
-For a resource whose settings live in a tLib **dialog**. A menu already grows a "Send
+For a resource whose settings live in a NLib **dialog**. A menu already grows a "Send
 feedback" row on its owner's root page.
 
 ```lua
-local sent = exports['tLib']:SubmitFeedback(message, function(result)
+local sent = exports['NLib']:SubmitFeedback(message, function(result)
     if result.ok then return end
     -- result.error == 'rate-limited' | 'invalid' | 'unreachable'
 end)
@@ -129,7 +129,7 @@ end)
 Every `kind` on one page, in that order:
 
 <ZoomableImage
-  src="/assets/tLib/menu--controls.png"
+  src="/assets/NLib/menu--controls.png"
   width={1600}
   height={900}
   alt="A menu page with one row of every kind"
@@ -138,7 +138,7 @@ Every `kind` on one page, in that order:
 A namespace or page `theme` reskins the same definition:
 
 <ZoomableImage
-  src="/assets/tLib/menu--controls-vmenu.png"
+  src="/assets/NLib/menu--controls-vmenu.png"
   width={1600}
   height={900}
   alt="The same menu page under a different theme"
@@ -162,7 +162,7 @@ A default `md` dialog, with a required `text`, a two-option `select` as a segmen
 and a `checkbox`:
 
 <ZoomableImage
-  src="/assets/tLib/dialog--standard.png"
+  src="/assets/NLib/dialog--standard.png"
   width={1600}
   height={900}
   alt="A medium dialog with a required text field, a segmented select and a checkbox"
@@ -177,13 +177,13 @@ and a `checkbox`:
 | `submitLabel` | `string` | `"Submit"` | Submit button label. |
 | `cancelLabel` | `string` | `"Cancel"` | Cancel button label. |
 | `size` | `string` | `"md"` | `"sm"`, `"md"` or `"lg"`. |
-| `theme` | `string` | — | Id of a registered tLib theme. |
+| `theme` | `string` | — | Id of a registered NLib theme. |
 | `blur` | `boolean` | `false` | Blur the scene behind the dialog. |
 | `resetState` | `boolean` | `false` | Open at the defaults, not where the player left it. |
 | `fields` | `table[]` | — | Field definitions. |
 
 A dialog reopens **where the player left it** — selected tab, scroll position, dragged panel
-position — per dialog id. Values and validation state are never kept, and a tLib restart or
+position — per dialog id. Values and validation state are never kept, and a NLib restart or
 a reconnect forgets the rest. `resetState = true` opts out.
 
 ### Field types
@@ -236,7 +236,7 @@ is colour only, so a button that cannot be undone wants both:
 ```
 
 <ZoomableImage
-  src="/assets/tLib/dialog--button-confirm.png"
+  src="/assets/NLib/dialog--button-confirm.png"
   width={1600}
   height={900}
   alt="The confirm question raised by that button, with Confirm and Cancel"
@@ -246,7 +246,7 @@ One of each type in an `lg` dialog. A `select` with two options renders as a seg
 control:
 
 <ZoomableImage
-  src="/assets/tLib/dialog--every-field.png"
+  src="/assets/NLib/dialog--every-field.png"
   width={1600}
   height={1018}
   alt="A dialog showing one of every field type"
@@ -254,11 +254,11 @@ control:
 
 ### Events
 
-`tLib:dialog:opened` `(dialogId)` · `tLib:dialog:submitted` `(dialogId, values)`, keyed by
-field `id` · `tLib:dialog:cancelled` `(dialogId)`
+`NLib:dialog:opened` `(dialogId)` · `NLib:dialog:submitted` `(dialogId, values)`, keyed by
+field `id` · `NLib:dialog:cancelled` `(dialogId)`
 
 ```lua
-local dialogId = exports['tLib']:ShowDialog('my_dialog', {
+local dialogId = exports['NLib']:ShowDialog('my_dialog', {
     title = 'Player Info',
     fields = {
         { id = 'name', type = 'text', label = 'Name', required = true },
@@ -270,7 +270,7 @@ local dialogId = exports['tLib']:ShowDialog('my_dialog', {
     },
 })
 
-AddEventHandler('tLib:dialog:submitted', function(id, values)
+AddEventHandler('NLib:dialog:submitted', function(id, values)
     if id == dialogId then print(values.name, values.age, values.role) end
 end)
 ```
@@ -303,21 +303,21 @@ updates keep the deadline. Limits: 32 active per producer, 256 total.
 Each type carries its own icon and colour. Newest sits at the bottom:
 
 <ZoomableImage
-  src="/assets/tLib/toast--stack.png"
+  src="/assets/NLib/toast--stack.png"
   width={1600}
   height={900}
   alt="Five stacked toasts, one of each type"
 />
 
-Events: `tLib:toast:shown` `(id, toastType, title, owner)` · `tLib:toast:updated`
-`(id, patch, owner)` · `tLib:toast:dismissed` `(id, owner)` · `tLib:toast:dismissedAll`
+Events: `NLib:toast:shown` `(id, toastType, title, owner)` · `NLib:toast:updated`
+`(id, patch, owner)` · `NLib:toast:dismissed` `(id, owner)` · `NLib:toast:dismissedAll`
 `(owner)`
 
 ```lua
-exports['tLib']:ShowToast(nil, 'success', 'Saved', 'Your settings have been saved.')
+exports['NLib']:ShowToast(nil, 'success', 'Saved', 'Your settings have been saved.')
 
-local toastId = exports['tLib']:ShowToast(nil, 'loading', 'Saving...', 'Please wait.')
-exports['tLib']:UpdateToast(toastId, { type = 'success', title = 'Done', description = 'Save complete.' })
+local toastId = exports['NLib']:ShowToast(nil, 'loading', 'Saving...', 'Please wait.')
+exports['NLib']:UpdateToast(toastId, { type = 'success', title = 'Done', description = 'Save complete.' })
 ```
 
 ---
@@ -344,7 +344,7 @@ themes all three surfaces.
 | `font` | `string` | Font-family string; sets `--font-sans`. |
 | `fontSize` | `string` | Base font-size percentage, e.g. `"87.5%"`. |
 
-Events: `tLib:theme:added`, `tLib:theme:removed`, `tLib:theme:set` — each `(id)`.
+Events: `NLib:theme:added`, `NLib:theme:removed`, `NLib:theme:set` — each `(id)`.
 
 ---
 
@@ -365,14 +365,14 @@ and hides it alongside every other resource's HUD.
 
 `options` is `{ label, width, height, canHide?, canScale?, minScale?, maxScale?, persist?,
 minVisiblePixels?, minVisibleFraction?, defaults = { x, y, scale, visible, anchor },
-layout? }`. Layouts persist per server endpoint; without one they are session-only and tLib
+layout? }`. Layouts persist per server endpoint; without one they are session-only and NLib
 says so at startup. For a `persist` component the record is written before `fn` runs, so
 `true` means the position survived.
 
 One editor, not one per resource:
 
 <ZoomableImage
-  src="/assets/tLib/layout--editor.png"
+  src="/assets/NLib/layout--editor.png"
   width={1600}
   height={900}
   alt="The shared HUD layout editor with three registered components"
@@ -382,7 +382,7 @@ One editor, not one per resource:
 **Registration and `SetHudLayout` are both refused while the editor is open.**
 `SetHudLayout` answers `false, 'Close the layout editor first'`; handle it, never retry in a
 loop. `RegisterHudComponent` you *must* come back from, or a resource starting mid-edit
-never registers. Retry on close, or register through `@tLib/shared/imports/hud/client.lua`,
+never registers. Retry on close, or register through `@NLib/shared/imports/hud/client.lua`,
 which does it for you.
 </Callout>
 
@@ -392,7 +392,7 @@ which does it for you.
 widget **is now**. Pass both, always:
 
 ```lua
-exports['tLib']:RegisterHudComponent('radio', {
+exports['NLib']:RegisterHudComponent('radio', {
     label = 'Radio', width = 300, height = 440, persist = false,
     defaults = factoryPlacement,   -- where Reset puts it
     layout   = savedPlacement,     -- where it is
@@ -400,10 +400,10 @@ exports['tLib']:RegisterHudComponent('radio', {
 ```
 
 With `persist = false` you own the storage, and passing the saved position as `defaults`
-makes Reset restore the placement the player is escaping. Pin `tlib_min_version '1.0'`, the
+makes Reset restore the placement the player is escaping. Pin `nlib_min_version '1.0'`, the
 first release carrying `layout`.
 
-Every layout tLib is handed — saved record, `layout`, `defaults` — is validated
+Every layout NLib is handed — saved record, `layout`, `defaults` — is validated
 independently and falls through to the next when unusable, then clamped against the live
 resolution so at least `minVisiblePixels` (96) or `minVisibleFraction` (0.4) stays on
 screen. That runs on **registration**.
@@ -419,7 +419,7 @@ Dividing `x` by the viewport *width* is wrong. At 3440x1440 it places the widget
 further from the anchor than the editor's outline, and drags stop being 1:1.
 </Callout>
 
-If a player loses their HUD, `/tlibhud reset` restores every component to its factory
+If a player loses their HUD, `/nlibhud reset` restores every component to its factory
 placement and clears the saved layout — editor open or shut, whichever resource opened it.
 
 ---
@@ -427,11 +427,11 @@ placement and clears the saved layout — editor open or shut, whichever resourc
 ## Keybind registry
 
 **Client.** The only place two *different* resources' bindings are visible at once — a
-resource's own `tlib.platform.keybindConflicts()` sees only its own VM.
+resource's own `nlib.platform.keybindConflicts()` sees only its own VM.
 
 | Export | Description |
 | --- | --- |
-| `ReportKeybind(entry)` | Record one bind: `{ token, resource?, label?, default?, group? }`. `tlib.platform.bindKey` calls it for you. |
+| `ReportKeybind(entry)` | Record one bind: `{ token, resource?, label?, default?, group? }`. `nlib.platform.bindKey` calls it for you. |
 | `GetKeybinds()` | Every bind so far, as `{ resource, token, label, default, group }`. |
 | `GetKeybindConflicts()` | `{ { group, key, claims = { … } }, … }`. |
 
@@ -440,7 +440,7 @@ Only `token` is required; `resource` defaults to `?`, `label` to the token, `gro
 a bind missing from `GetKeybinds()`. An entry with no `default` never counts as a collision,
 and a conflict needs **more than one resource**.
 
-tLib prints its report ten seconds after start, once; a bind reported later is recorded but
+NLib prints its report ten seconds after start, once; a bind reported later is recorded but
 misses it, so call `GetKeybindConflicts()` yourself after that. Nothing here reassigns a
 key — act on a conflict by changing a **default** and shipping it.
 
@@ -475,12 +475,12 @@ number in the arguments is the level; everything else is `tostring`'d and space-
 | `SetLogLevel(level)` | Set the global minimum. |
 
 ```lua
-local log = exports['tLib']:CreateLogger('myresource', print)
+local log = exports['NLib']:CreateLogger('myresource', print)
 log('Server started')           -- INFO
 log('Something went wrong', 4)  -- ERROR
 
 -- Log() returns the line and leaves printing to you:
-local line = exports['tLib']:Log('myresource', { 'Something went wrong', 4 })
+local line = exports['NLib']:Log('myresource', { 'Something went wrong', 4 })
 if line then print(line) end
 ```
 
@@ -489,7 +489,7 @@ if line then print(line) end
 ## HTTP Helper
 
 **Server.** Non-blocking requests through FiveM's `PerformHttpRequest`. Not related to
-tLib's public HTTP routing hub.
+NLib's public HTTP routing hub.
 
 | Export | Description |
 | --- | --- |
@@ -507,7 +507,7 @@ Redirects are followed. There are no timeout or TLS-verification options. `callb
 response, so check the status.
 
 ```lua
-exports['tLib']:Fetch({ url = 'https://example.com/api', method = 'GET' },
+exports['NLib']:Fetch({ url = 'https://example.com/api', method = 'GET' },
     function(status, body, headers, err)
         if status ~= 200 then return print('Request failed:', status, err) end
         print('Body:', body)
@@ -518,8 +518,8 @@ exports['tLib']:Fetch({ url = 'https://example.com/api', method = 'GET' },
 
 ## Permissions
 
-**Client and server.** Levels: `0` none, `1` admin (`tlib.admin`), `2` superadmin
-(`tlib.superadmin`).
+**Client and server.** Levels: `0` none, `1` admin (`nlib.admin`), `2` superadmin
+(`nlib.superadmin`).
 
 | Export | Side | Description |
 | --- | --- | --- |
@@ -537,8 +537,8 @@ exports['tLib']:Fetch({ url = 'https://example.com/api', method = 'GET' },
 
 ## Diagnostics consent
 
-**Server.** Both exports cross as a JSON string. See `tlib_telemetry` in
-[Convars](/docs/tLib/convars#diagnostics) for what is collected.
+**Server.** Both exports cross as a JSON string. See `nlib_telemetry` in
+[Convars](/docs/NLib/convars#diagnostics) for what is collected.
 
 | Export | Description |
 | --- | --- |
@@ -546,11 +546,11 @@ exports['tLib']:Fetch({ url = 'https://example.com/api', method = 'GET' },
 | `SetTelemetryConsent(enabled)` | `{ ok = true, consent }`, or `{ ok = false, reason, detail }`. |
 
 ```lua
-local c = json.decode(exports['tLib']:GetTelemetryConsent())
+local c = json.decode(exports['NLib']:GetTelemetryConsent())
 ```
 
 <Callout type="warning">
-**Render a switch only when `locked` is false.** `locked` is true when `tlib_telemetry` is
+**Render a switch only when `locked` is false.** `locked` is true when `nlib_telemetry` is
 set, and then the convar is the answer — a switch offering one is a control that lies. Show
 `convarValue` and the `convar` name instead. `source` is `convar`, `switch` or `default`.
 </Callout>
@@ -564,10 +564,10 @@ and nobody else, which reads as "the switch does nothing". It refuses with
 
 - There is **no `provisioned` field**; never render a "cannot transmit" state.
 - It is **not permission-gated**. Gate it at your own call site.
-- **Never put it on an unauthenticated surface.** tLib's hub binds `0.0.0.0` with no auth on
+- **Never put it on an unauthenticated surface.** NLib's hub binds `0.0.0.0` with no auth on
   its index, so it calls neither export.
 
-`tlib_telemetry_status` in the server console prints the same answer plus the queue depth
+`nlib_telemetry_status` in the server console prints the same answer plus the queue depth
 and whether the transport has given up.
 
 ---
@@ -593,10 +593,10 @@ Starting those engines is a separate, gated surface — see [Child processes](#c
 **Server.** One line covers a whole box, however many resources on it ship a local engine:
 
 ```cfg
-add_unsafe_child_process_permission tLib
+add_unsafe_child_process_permission NLib
 ```
 
-tLib makes the call, so no other resource needs its own grant.
+NLib makes the call, so no other resource needs its own grant.
 
 | Export | Description |
 | --- | --- |
@@ -614,7 +614,7 @@ it is the binary's own directory. `env` names must be on the program's allowlist
 `LD_PRELOAD` cannot be set. `mode` is `lines` (default) or `bytes`, which returns stdout
 base64 with nothing dropped and keeps stdin open.
 
-**The caller names a program, never a path.** tLib's catalog declares which resources may
+**The caller names a program, never a path.** NLib's catalog declares which resources may
 spawn, which programs each may run, where those live and what their arguments may look like.
 It resolves the executable inside the calling resource, rebuilds the argv from a declared
 shape, and execs with **no shell**. The catalog declares a binary per platform, so the
@@ -629,9 +629,9 @@ nothing branches on it.
 
 ### Lifecycle
 
-A child belongs to **tLib's** runtime, not its owner's. tLib reaps it when the owning
+A child belongs to **NLib's** runtime, not its owner's. NLib reaps it when the owning
 resource stops (including the stop half of a restart), when the owner calls `SpawnUnserve`,
-and when tLib stops. A caller restarting is **kill-and-respawn, not reuse**.
+and when NLib stops. A caller restarting is **kill-and-respawn, not reuse**.
 
 <Callout type="warning">
 **Watch for orphans.** A leftover PocketBase holds its HTTP port and locks its SQLite
@@ -651,14 +651,14 @@ containment and argument shape, not integrity.
 | Export | Side | Description |
 | --- | --- | --- |
 | `GenerateId()` | Both | A unique id string; the generator behind dialogs and toasts. |
-| `Platform()` | Client | tLib's platform adapter as a table of callable references. |
+| `Platform()` | Client | NLib's platform adapter as a table of callable references. |
 | `CreateDiscovery(opts)` | Server | Scan resources for tagged config files, load and save them, and pick up late starters. |
 | `CreateServerSettings(opts)` | Server | Admin-configurable settings for one resource, persisted to a JSON file inside it. |
 | `CommunityConfigsImport(...)` / `CommunityConfigsUpload(...)` | Server | Community configs API proxy; the consumer repeats no HTTP boilerplate and never sees the server hash. |
 | `CommunityConfigsPeek(id, cb)` | Server | `Import`'s payload without incrementing the import counter. Use it to render a listing. |
 | `CommunityConfigsList(opts, cb)` | Server | Browse published configs. `{ script, configType, key?, limit? }`; first two required, `limit` default `30`. `cb(ok, items, err)`, `items` decoded. |
 | `CommunityConfigsMatch(opts, cb)` | Server | **Candidates** by model fingerprint. `{ fp, script?, configType?, key?, limit? }`; `fp` required, `configType` default `led_layout`. Each item carries the publisher's own `fp` — comparing it is yours to do. |
-| `IsDemoMode()` | Server | `true` while `tlib_demo` is on. The export behind `tlib.demo.active()`. |
+| `IsDemoMode()` | Server | `true` while `nlib_demo` is on. The export behind `nlib.demo.active()`. |
 
 <Callout type="warning">
 **Call the community-config exports from the game server, never from your NUI.** `/api/v1`
@@ -668,7 +668,7 @@ the browser *after* the request already succeeded.
 
 `CreateDiscovery` needs `resourceName = GetCurrentResourceName()` when called at module init
 time: `GetInvokingResource()` is `nil` during top-level execution, and without the name the
-file I/O targets tLib instead of you.
+file I/O targets NLib instead of you.
 
 ---
 
@@ -685,11 +685,11 @@ returns `false`, and into a resource that does not exist **raises**. Node's `fs`
 same. Reads are unrestricted.
 </Callout>
 
-So the destination performs the write: tLib calls the target's own `WriteResourceFile`
+So the destination performs the write: NLib calls the target's own `WriteResourceFile`
 export. Nothing is reported as exported unless the file landed.
 
 <Callout type="warning">
-**No `server.cfg` line changes this — do not add one.** `add_filesystem_permission tLib
+**No `server.cfg` line changes this — do not add one.** `add_filesystem_permission NLib
 write *` looks like the fix and does nothing: the sandbox is not asking about permission, it
 is asking which resource is writing. `--allow-fs-write` is a server *launch argument*. If
 that line is in your config, delete it.
@@ -698,14 +698,14 @@ that line is in your config, delete it.
 The target decides which path you get:
 
 - **It runs its own code.** Any resource whose server bundle calls
-  `registerWriteResourceFile()` from `tLib/shared/ts/fs/server.ts` accepts the export
-  directly. tLib writes the JSON in and adds the metadata line to its `fxmanifest.lua`.
-- **It is a plain asset pack.** No scripts, no bundle, no runtime to write with. tLib writes
+  `registerWriteResourceFile()` from `NLib/shared/ts/fs/server.ts` accepts the export
+  directly. NLib writes the JSON in and adds the metadata line to its `fxmanifest.lua`.
+- **It is a plain asset pack.** No scripts, no bundle, no runtime to write with. NLib writes
   the **finished file** into its own directory and prints these steps to the player in chat
   and to the server console:
 
 ```
-1. Copy tLib/export-staging/<target-resource>/<file>.json  ->  <target-resource>/<file>.json
+1. Copy NLib/export-staging/<target-resource>/<file>.json  ->  <target-resource>/<file>.json
 2. Add this line to <target-resource>/fxmanifest.lua:  tels_config 'tels.json'
 3. Restart <target-resource> (or the server).
 ```

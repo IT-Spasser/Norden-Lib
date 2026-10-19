@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "tlib-ui",
+      "name": "nlib-ui",
       "dependencies": {
         "@ark-ui/solid": "6.0.0-next.0",
         "@solid-primitives/i18n": "^2.2.1",

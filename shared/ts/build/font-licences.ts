@@ -7,8 +7,8 @@
 //
 //   · `copyFontLicences` copies `OFL-*.txt` out of a resource's OWN font
 //     directory into its build output. Correct, and blind to a font that comes
-//     from somewhere else -- `tLib/shared/css/fonts/` now supplies Hanken
-//     Grotesk to seven resources, and its licence sits in tLib where no
+//     from somewhere else -- `NLib/shared/css/fonts/` now supplies Hanken
+//     Grotesk to seven resources, and its licence sits in NLib where no
 //     consumer's copier looks.
 //   · `scripts/font-licences.test.ts` asserts the invariant over
 //     `client/ui/assets` in the WORKING TREE. That is the build output, not the
@@ -100,7 +100,7 @@ export interface FontLicenceResult {
  *
  * @param distDir     The staged tree about to be zipped.
  * @param licenceDirs Directories to look for `OFL-*.txt` in, most specific
- *                    first: the resource's own font source, then tLib's.
+ *                    first: the resource's own font source, then NLib's.
  *
  * A directory that already contains a `LICENSES.md` is taken as covering the
  * fonts in it and is left alone. That is tUnit's `web/fonts/`, where three
@@ -110,7 +110,7 @@ export interface FontLicenceResult {
 export function stageFontLicences(distDir: string, licenceDirs: string[]): FontLicenceResult {
   const available = new Map<string, string>();
   // Later directories must not shadow earlier ones: the resource's own copy of a
-  // licence wins over tLib's, so a resource pinning an older version of a face
+  // licence wins over NLib's, so a resource pinning an older version of a face
   // ships the text that matches it.
   for (const dir of licenceDirs) {
     if (!existsSync(dir)) continue;

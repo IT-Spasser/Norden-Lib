@@ -1,8 +1,8 @@
 -- Platform UI abstractions over FiveM NUI.
 
-local log = Logger.create('tLib/adapter/ui')
+local log = Logger.create('NLib/adapter/ui')
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     -- NUI is global -- there is no per-instance browser handle, and the page is
     -- declared by ui_page in fxmanifest.lua. createUI returns a sentinel so call
     -- sites can still nil-check a handle.
@@ -10,7 +10,7 @@ if _TLIB_IS_FIVEM then
     -- Lua runs before the browser finishes loading the JS bundle, and
     -- SendNUIMessage is fire-and-forget, so anything sent before the JS listeners
     -- exist is lost. sendUIEvent therefore buffers until the page posts
-    -- '__tlib_nui_ready', then flushes in order. Subsystems that need to defer
+    -- '__nlib_nui_ready', then flushes in order. Subsystems that need to defer
     -- work register through Platform.onNUIReady.
     local _nuiReady    = false
     local _nuiQueue    = {}
@@ -18,9 +18,9 @@ if _TLIB_IS_FIVEM then
 
     -- This is a shared_script and the server loads this branch too, but the NUI
     -- natives only exist on the client.
-    if _TLIB_SIDE == 'client' then
-        RegisterNuiCallbackType('__tlib_nui_ready')
-        AddEventHandler('__cfx_nui:__tlib_nui_ready', function(_, resultCallback)
+    if _NLIB_SIDE == 'client' then
+        RegisterNuiCallbackType('__nlib_nui_ready')
+        AddEventHandler('__cfx_nui:__nlib_nui_ready', function(_, resultCallback)
             -- A table, not an encoded string: see onUIRequest below.
             resultCallback({ ok = true })
             if _nuiReady then return end
@@ -97,7 +97,7 @@ if _TLIB_IS_FIVEM then
 
     -- mode 1 shows the cursor and gives the UI input, mode 0 returns it to the game.
     function Platform.setInputMode(ui, mode)
-        _TLIB_NUI_FOCUSED = (mode == 1)
+        _NLIB_NUI_FOCUSED = (mode == 1)
         if mode == 1 then
             SetNuiFocus(true, true)
         else
@@ -127,7 +127,7 @@ if _TLIB_IS_FIVEM then
     function Platform.destroyUI(ui)
         -- Pages cannot be destroyed at runtime; ask it to hide so it stops
         -- intercepting input.
-        SendNUIMessage({ type = '_tlib_destroy' })
+        SendNUIMessage({ type = '_nlib_destroy' })
     end
 else
     Platform.createUI          = Platform._stub('createUI')

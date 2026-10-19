@@ -42,7 +42,7 @@ const EXCLUDED_DIRS = [
 
 /**
  * A licence or copyright notice in the first 2 KB means a third-party file whose
- * header is not ours to edit. Deliberately not the word "vendored": tLib's own
+ * header is not ours to edit. Deliberately not the word "vendored": NLib's own
  * `deck/` modules describe which of their files get vendored into the Stream
  * Deck plugins, and matching that prose exempted four of our own files.
  */

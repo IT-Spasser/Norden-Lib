@@ -178,7 +178,7 @@ export const PREVIEW_FRAME_STYLE: Record<string, string> = {
  *
  * It is a frame URL and not a document because, unlike a `ui` item, nothing here
  * reads or rewrites the markup: the panel is an application, and the host that
- * owns it serves it. Which is also why the URL is the HOST's to supply — tLib has
+ * owns it serves it. Which is also why the URL is the HOST's to supply — NLib has
  * no business naming tRadio.
  */
 export const PANEL_PREVIEW_CHANNEL = "tradio-panel-preview";

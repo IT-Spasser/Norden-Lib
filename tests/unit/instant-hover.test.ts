@@ -1,5 +1,5 @@
 /**
- * The one-of-many surfaces in tLib have NO hover/active colour transition.
+ * The one-of-many surfaces in NLib have NO hover/active colour transition.
  *
  * The rule, in the owner's words: a lone button or two may fade, but a *list* of
  * buttons whose tint fades in and out behind the cursor makes the whole app feel
@@ -7,7 +7,7 @@
  * row, its hover has to land on the frame the cursor arrives, not 100-200ms later.
  *
  * Why this is asserted and not just commented. These classes are consumed through
- * `@tlib/internal` by tELS, tUnit, tRadio, tAFK and tCAD, so one `transition-colors`
+ * `@nlib/internal` by tELS, tUnit, tRadio, tAFK and tCAD, so one `transition-colors`
  * put back here for "polish" re-slows six products at once, in a repo whose own
  * tests would all still pass. Nothing else reads the decision.
  *
@@ -96,10 +96,10 @@ describeWithUiKit("the repeated primitives tint instantly", () => {
   });
 
   test("the export dropdown's rows declare no colour transition", () => {
-    // `tlib-export-row` renders inside a `<For>`; the trigger beside it sits in
+    // `nlib-export-row` renders inside a `<For>`; the trigger beside it sits in
     // the prop-editor's icon toolbar. Both are one-of-many.
     const src = read(`${UI}/export-badge.tsx`);
-    for (const handle of ["tlib-export-row ", "tlib-export-trigger "]) {
+    for (const handle of ["nlib-export-row ", "nlib-export-trigger "]) {
       const start = src.indexOf(handle);
       expect(start).toBeGreaterThan(-1);
       expect(src.slice(start, src.indexOf("`}", start))).not.toMatch(COLOUR_TRANSITION);

@@ -59,7 +59,7 @@ local state = {
 local listeners = {}
 
 local function platform()
-    return tlib.platform
+    return nlib.platform
 end
 
 local function emptyState()
@@ -209,7 +209,7 @@ function occupancy.startReporting()
     if occupancy._reporting then return end
     occupancy._reporting = true
     occupancy.onChange(function()
-        TriggerServerEvent('tlib:occupancy:moved')
+        TriggerServerEvent('nlib:occupancy:moved')
     end)
 end
 

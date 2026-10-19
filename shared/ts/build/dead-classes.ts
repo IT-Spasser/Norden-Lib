@@ -13,7 +13,7 @@ import {
  *
  * UnoCSS has no failure mode for a class it does not recognise — it emits
  * nothing, so a typo or a wrong-preset spelling looks normal in source and does
- * nothing in the browser. Measured: `bg-linear-to-r` (Wind4-only) left tLib's
+ * nothing in the browser. Measured: `bg-linear-to-r` (Wind4-only) left NLib's
  * colour-picker hue track with no gradient, and 271 Tailwind-v4 spellings across
  * the four Wind4 projects meant no form primitive had invalid-state styling.
  *
@@ -31,7 +31,7 @@ export interface DeadClassOptions {
   roots: string[];
   /**
    * Directories to scan for .css files. Every `.class-name` selector found is
-   * treated as defined, so hand-written CSS (tLib's `tlib-nui-*` family, the
+   * treated as defined, so hand-written CSS (NLib's `nlib-nui-*` family, the
    * radio's `lcd-*`) needs no entry in any list.
    */
   cssRoots?: string[];

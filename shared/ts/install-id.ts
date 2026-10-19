@@ -8,7 +8,7 @@
  * hashing `sv_licenseKey` is reversible by whoever holds the licence keys, and
  * would put a credential on a path that reports to a website.
  *
- * `tlib_telemetry` does not govern it. Deleting it is not an opt-out either: it
+ * `nlib_telemetry` does not govern it. Deleting it is not an opt-out either: it
  * is minted whenever a request needs one, so deletion only makes this install
  * look like a new one.
  */
@@ -20,7 +20,7 @@ const ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
 export const INSTALL_ID_LENGTH = 25;
 
 /**
- * The document the id lives in, relative to tLib's own resource root. Not a file
+ * The document the id lives in, relative to NLib's own resource root. Not a file
  * of its own: `R-DATA-FILE` already keeps this basename out of a release at any
  * depth, so the id survives an update and a fresh install mints a new one.
  */
@@ -76,14 +76,14 @@ function defaultRandom(n: number): Uint8Array {
 
 /**
  * A seam, and not for testability: this module is compiled into every consumer's
- * server bundle, so a static import of the reader would give each of them tLib's
- * filesystem access and a DIFFERENT id resolved from its own directory. tLib's
+ * server bundle, so a static import of the reader would give each of them NLib's
+ * filesystem access and a DIFFERENT id resolved from its own directory. NLib's
  * `server/main.ts` installs the real resolver at boot; a bundle without one omits
  * the header rather than inventing a second id.
  */
 let resolver: (() => string) | null = null;
 
-/** Install the real resolver. Called once, from tLib's `server/main.ts`. */
+/** Install the real resolver. Called once, from NLib's `server/main.ts`. */
 export function setInstallIdResolver(fn: (() => string) | null): void {
   resolver = fn;
 }

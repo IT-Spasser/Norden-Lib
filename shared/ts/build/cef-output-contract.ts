@@ -23,7 +23,7 @@
  *
  * A GREEN RESULT IN A MODERN HEADLESS CHROME SAYS NOTHING ABOUT ANY OF THIS, which
  * is the whole problem: a visual A/B, a screenshot diff and a Lighthouse run are
- * all blind to it. tLib does ship a real Chromium 103 harness and a visual check
+ * all blind to it. NLib does ship a real Chromium 103 harness and a visual check
  * there is better EVIDENCE -- it is not better as a GATE, because it costs a
  * browser launch per run and can only see the rules the one page it loads uses.
  *

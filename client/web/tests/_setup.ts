@@ -1,5 +1,5 @@
 /**
- * tLib's DOM test preload. Referenced by `client/web/bunfig.toml`'s
+ * NLib's DOM test preload. Referenced by `client/web/bunfig.toml`'s
  * `[test] preload` and reached through `bun run test:dom` from the repo root.
  *
  * A preload rather than a per-file import because module top-level code runs

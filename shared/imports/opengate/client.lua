@@ -1,9 +1,9 @@
 --[[
-    tLib/shared/imports/opengate — the CLIENT half of "may I open my panel?".
+    NLib/shared/imports/opengate — the CLIENT half of "may I open my panel?".
 
     Usage in a consumer (client scripts):
 
-        local panel = tlib.opengate.panel({
+        local panel = nlib.opengate.panel({
             key      = 'settings',
             onOpen   = function(data) openSettingsDialog(data) end,
             onDenied = function() chatLine("You don't have permission to use this.") end,
@@ -48,7 +48,7 @@
 
      Every reply is server-only
 
-    All three handlers go through `tlib.net.fromServer`, so a local
+    All three handlers go through `nlib.net.fromServer`, so a local
     `TriggerEvent` cannot open the panel or fake a denial. That closes a real
     gap: tRadar guards `tradar:openSettings` and `tradar:configBroken` and does
     NOT guard `tradar:accessDenied`, three lines further down the same file.
@@ -86,7 +86,7 @@ function Panel:reopen()
     if not self.granted then
         if not self.warnedReopen then
             self.warnedReopen = true
-            print(('^3[%s] tlib.opengate(%q): reopen() with no previous open — ignored. ' ..
+            print(('^3[%s] nlib.opengate(%q): reopen() with no previous open — ignored. ' ..
                    'It replays a grant; it cannot create one. Call open().^7')
                 :format(RESOURCE, self.key))
         end
@@ -110,20 +110,20 @@ function OpenGate.panel(opts)
 
     local key = opts.key or 'settings'
     assert(type(key) == 'string' and key ~= '',
-        'tlib.opengate.panel: key must be a non-empty string')
+        'nlib.opengate.panel: key must be a non-empty string')
     assert(type(opts.onOpen) == 'function',
-        'tlib.opengate.panel: onOpen must be a function taking (payload)')
+        'nlib.opengate.panel: onOpen must be a function taking (payload)')
     -- Required, unlike onBroken. Every panel can be denied, and a denial the
     -- player is never told about is §2.13's defect: they press the key, nothing
     -- happens, and they report it as broken.
     assert(type(opts.onDenied) == 'function',
-        'tlib.opengate.panel: onDenied must be a function — a silent denial reads as a bug')
+        'nlib.opengate.panel: onDenied must be a function — a silent denial reads as a bug')
     assert(opts.onBroken == nil or type(opts.onBroken) == 'function',
-        'tlib.opengate.panel: onBroken must be a function')
+        'nlib.opengate.panel: onBroken must be a function')
 
     local self = setmetatable({
         key     = key,
-        base    = ('%s:tlib:opengate:%s'):format(RESOURCE, key),
+        base    = ('%s:nlib:opengate:%s'):format(RESOURCE, key),
         onOpen  = opts.onOpen,
         granted = false,
         payload = nil,
@@ -132,20 +132,20 @@ function OpenGate.panel(opts)
     local onBroken = opts.onBroken
     local warnedBroken = false
 
-    tlib.net.fromServer(self.base .. ':open', function(data)
+    nlib.net.fromServer(self.base .. ':open', function(data)
         self.granted, self.payload = true, data
         self.onOpen(data)
     end)
 
-    tlib.net.fromServer(self.base .. ':denied', function()
+    nlib.net.fromServer(self.base .. ':denied', function()
         opts.onDenied()
     end)
 
-    tlib.net.fromServer(self.base .. ':broken', function()
+    nlib.net.fromServer(self.base .. ':broken', function()
         if onBroken then return onBroken() end
         if warnedBroken then return end
         warnedBroken = true
-        print(('^1[%s] tlib.opengate(%q): the server reported a BROKEN CONFIG and this ' ..
+        print(('^1[%s] nlib.opengate(%q): the server reported a BROKEN CONFIG and this ' ..
                'panel has no `onBroken` handler, so the player was told nothing. ' ..
                'Deliberately not routed to onDenied: "not allowed" and "the config is ' ..
                'broken" send them to two different people.^7'):format(RESOURCE, key))

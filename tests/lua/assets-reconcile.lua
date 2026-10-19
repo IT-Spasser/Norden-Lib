@@ -4,7 +4,7 @@
 -- cancelled out and applied neither.
 local scanReply = nil
 GetCurrentResourceName = function() return 'tELS' end
-exports = { tLib = { ScanResourceFiles = function(_, _, _) return scanReply end } }
+exports = { NLib = { ScanResourceFiles = function(_, _, _) return scanReply end } }
 json = { decode = function(text)
     -- Enough of a decoder for the shapes ScanResourceFiles emits.
     if text == 'BAD' then error('not json') end
@@ -59,10 +59,10 @@ scanReply = 'BAD'
 files, reason = assets.scan('layouts/sounds')
 assert(files == nil and reason == 'undecodable', 'an undecodable reply is a failure')
 
-exports.tLib.ScanResourceFiles = function() error('export not registered yet') end
+exports.NLib.ScanResourceFiles = function() error('export not registered yet') end
 files, reason = assets.scan('layouts/sounds')
 assert(files == nil and reason == 'unavailable',
-    'tLib starting late reads as "could not look", never as "empty"')
+    'NLib starting late reads as "could not look", never as "empty"')
 
 -- sync() must refuse to prune on a failed scan.
 tracked = { { filename = 'a.wav', slug = 'a' } }

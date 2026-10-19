@@ -14,15 +14,15 @@
 import { scrubIdentifiers } from "./scrub";
 
 /** The product name tWeb's taxonomy declares for this estate — one for all twelve. */
-export const DIAG_PRODUCT = "tlib";
+export const DIAG_PRODUCT = "nlib";
 
-/** Every event name tLib emits. An undeclared name is refused per event. */
+/** Every event name NLib emits. An undeclared name is refused per event. */
 export const DIAG_EVENTS = [
-  "tlib.error_reported",
-  "tlib.warning_reported",
-  "tlib.crash_reported",
-  "tlib.slow_operation",
-  "tlib.environment_reported",
+  "nlib.error_reported",
+  "nlib.warning_reported",
+  "nlib.crash_reported",
+  "nlib.slow_operation",
+  "nlib.environment_reported",
 ] as const;
 
 export type DiagEventName = (typeof DIAG_EVENTS)[number];
@@ -310,7 +310,7 @@ export function gpuModelFor(raw: unknown): string {
  * The context every row carries. Built once and reused — it is identical for every
  * event from one VM, and re-deriving it is how a hardware read reaches a hot path.
  *
- * There is no `tlibVersion`: tWeb declares no slot and the store is append-only, so
+ * There is no `nlibVersion`: tWeb declares no slot and the store is append-only, so
  * a collector bug is attributable to a resource version only.
  */
 export interface DiagContext {
@@ -334,7 +334,7 @@ export interface DiagEvent {
   dimensions: Record<string, string>;
   measures: Record<string, number>;
   /**
-   * `tlib.error_reported` ONLY, and never inside `dimensions`. Already scrubbed: a
+   * `nlib.error_reported` ONLY, and never inside `dimensions`. Already scrubbed: a
    * non-zero `redactions` count on a stored stack is a bug here.
    */
   stack?: string;

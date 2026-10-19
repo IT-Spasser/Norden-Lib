@@ -6,7 +6,7 @@
 -- -- to every player, about an admin action -- and in three of the four
 -- resources nothing anywhere registered the event. tELS deleted its copy
 -- rather than fix it; the honest fix needed the installing admin's id, which
--- tLib now carries as `meta.src`.
+-- NLib now carries as `meta.src`.
 --
 -- Two properties of the fixed version matter and both are asserted below:
 -- the send is TARGETED at `meta.src` and never at -1, and the server log is
@@ -22,7 +22,7 @@
 --   MKT_CONTROL=1 bunx --bun --package fengari-node-cli fengari \
 --       scripts/run-lua-suite.lua tests/lua/marketplace-standard-types.lua
 --
--- Run from the tLib resource root.
+-- Run from the NLib resource root.
 
 local CONTROL = os.getenv('MKT_CONTROL') == '1'
 
@@ -36,7 +36,7 @@ local clientEvents = {}      -- { event, target, payload }
 local notes, warns = {}, {}
 
 exports = {
-    tLib = {
+    NLib = {
         RegisterMarketplaceType = function(_self, kind, opts)
             registerCalls = registerCalls + 1
             local mode = registerFails[kind]
@@ -83,14 +83,14 @@ must(registered.ui == 'layouts', 'the install path was not passed through')
 must(#warns == 0, 'a successful registration warned anyway')
 
 -- The Node bridge answers `false` rather than raising when the consumer has not
--- opted into `tlib_module { 'marketplace' }`. A `false` and a throw are the same
+-- opted into `nlib_module { 'marketplace' }`. A `false` and a throw are the same
 -- operator-visible condition and must get the same message.
 reset()
 registerFails.sound = 'false'
 must(marketplace.registerType('sound', 'layouts/sounds', warn) == false,
     'a refused registration reported success')
 must(#warns == 1, 'a refused registration did not warn')
-must(warns[1]:find('tlib_module', 1, true),
+must(warns[1]:find('nlib_module', 1, true),
     'the warning did not name the fxmanifest line to add -- two of the four '
     .. 'hand-written copies logged a message that named nothing to do')
 must(warns[1]:find('sound', 1, true), 'the warning did not say which type failed')
@@ -99,7 +99,7 @@ reset()
 registerFails.ui = 'throw'
 must(marketplace.registerType('ui', 'layouts', warn) == false,
     'a throwing registration was reported as success')
-must(#warns == 1 and warns[1]:find('tlib_module', 1, true),
+must(#warns == 1 and warns[1]:find('nlib_module', 1, true),
     'a throwing registration did not produce the same warning as a refused one')
 
 -- No `warn` at all must not raise: a resource with no logger still has to boot.

@@ -33,7 +33,7 @@ which is how the duplication started.
 
 `cardStatsOf` takes `CardCounts` rather than an item because tELS's marketplace
 tab merges two catalogues — `tels_community_configs` for LED layouts and vehicle
-setups, tLib's for HUD layouts and sound packs — into one `CardView` so its card
+setups, NLib's for HUD layouts and sound packs — into one `CardView` so its card
 never branches on provenance. Forcing that shape to satisfy `MarketplaceItem`
 would mean inventing `size_bytes`, `slug` and `created_at` for a community config
 that has none, and a card then prints a confident `0B` for something nobody
@@ -231,7 +231,7 @@ blanks the entire screen of every older skin.
 
 ## Why browse goes through Lua
 
-The NUI used to `fetch` the catalogue directly. CEF's origin is `cfx-nui-tLib`
+The NUI used to `fetch` the catalogue directly. CEF's origin is `cfx-nui-NLib`
 and the marketplace host sends no `Access-Control-Allow-Origin` on that route, so
 the browser fetched it and refused to hand over the body — every browse failed.
 Being a public read-only endpoint is not what makes a response readable
@@ -271,7 +271,7 @@ only size gate that should exist.
 and from nowhere else. `server/sv_marketplace.lua` is the only place it should be
 filled in.
 
-- The outbound credential is `TLIB_PUBLIC_KEY`, public by design and shared by
+- The outbound credential is `NLIB_PUBLIC_KEY`, public by design and shared by
   every install. With `x-install-id` beside it, the request identifies an
   *install* and says nothing about a person.
 - The person is named by that argument. Resolved from the `source` of a net event

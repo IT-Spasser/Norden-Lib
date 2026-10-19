@@ -1,4 +1,4 @@
--- shared/imports/diag: `tlib.diag.command`, and the redactor that is now a
+-- shared/imports/diag: `nlib.diag.command`, and the redactor that is now a
 -- default rather than something four resources forgot.
 --
 -- Eight resources had hand-written `<resource>_diag`. Four of them had NO
@@ -18,7 +18,7 @@
 --   DIAG_CONTROL=1 bunx --bun --package fengari-node-cli fengari \
 --       scripts/run-lua-suite.lua tests/lua/diag-command.lua   # must exit 1
 --
--- Run from the tLib resource root.
+-- Run from the NLib resource root.
 
 local CONTROL = os.getenv('DIAG_CONTROL') == '1'
 
@@ -39,8 +39,8 @@ function TriggerClientEvent(event, target, payload)
 end
 
 local resourceMeta = {
-    tProbe = { version = '2.1.0', tlib_min_version = '1.0' },
-    tLib   = { version = '1.0.0' },
+    tProbe = { version = '2.1.0', nlib_min_version = '1.0' },
+    NLib   = { version = '1.0.0' },
 }
 function GetResourceMetadata(resource, key)
     local entry = resourceMeta[resource]
@@ -48,7 +48,7 @@ function GetResourceMetadata(resource, key)
     return entry[key]
 end
 
-local resourceStates = { tProbe = 'started', tLib = 'started', tDB = 'stopped' }
+local resourceStates = { tProbe = 'started', NLib = 'started', tDB = 'stopped' }
 function GetResourceState(name)
     -- The real native raises on a name it has never heard of, which is what
     -- Diag.resourceState's pcall is for. Reproduced, or that pcall is untested.
@@ -57,7 +57,7 @@ function GetResourceState(name)
     return state
 end
 
-local convars = { tlib_http_port = '30120' }
+local convars = { nlib_http_port = '30120' }
 function GetConvar(name, default)
     local v = convars[name]
     if v == nil then return default end
@@ -70,9 +70,9 @@ end
 -- which resolves to whatever `print` is at that moment -- so a naive hijack eats
 -- the failure message and a broken suite exits 1 with no output at all. `fail`
 -- below restores the real print first. This is the trap tCAD's runner fixed and
--- tLib's has not.
+-- NLib's has not.
 local realPrint = print
-local verbose = os.getenv('TLIB_TEST_VERBOSE') == '1'
+local verbose = os.getenv('NLIB_TEST_VERBOSE') == '1'
 print = function(s)
     printed[#printed + 1] = tostring(s)
     if verbose then realPrint(s) end
@@ -293,13 +293,13 @@ Diag.command({
     secrets = { 'sharedKey' },
     redact = not CONTROL,
     report = function(ctx)
-        ctx.line('tProbe %s  tLib %s', ctx.meta('tProbe'), ctx.meta('tLib'))
+        ctx.line('tProbe %s  NLib %s', ctx.meta('tProbe'), ctx.meta('NLib'))
         ctx.line('tDB %s', ctx.resourceState('tDB'))
         -- A dependency that is not installed at all. The native raises; the
         -- report must not.
         ctx.line('oxmysql %s', ctx.resourceState('oxmysql'))
-        ctx.line('port %s', ctx.convarSet('tlib_http_port'))
-        ctx.line('public url %s', ctx.convarSet('tlib_http_public_url'))
+        ctx.line('port %s', ctx.convarSet('nlib_http_port'))
+        ctx.line('public url %s', ctx.convarSet('nlib_http_public_url'))
         ctx.section('config')
         for _, key in ipairs(ctx.configKeys()) do ctx.kv(key, config[key]) end
         ctx.section('credentials')

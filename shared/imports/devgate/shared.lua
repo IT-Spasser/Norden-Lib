@@ -1,15 +1,15 @@
 --[[
-    tLib/shared/imports/devgate — the internal-feature gate.
+    NLib/shared/imports/devgate — the internal-feature gate.
 
     One call per resource, and the resource names its own convar:
 
-        local isInternal = tlib.devgate('your_convar_name')
+        local isInternal = nlib.devgate('your_convar_name')
 
         if isInternal() then
             RegisterCommand(...)        -- registration, not behaviour
         end
 
-    tLib provides the mechanism and never the name. That split is the whole
+    NLib provides the mechanism and never the name. That split is the whole
     point: the name is a string in the consumer's own file, so putting the call
     in a script that is NOT in that resource's `escrow_ignore` means the switch
     is encrypted in the shipped build. A customer cannot read it out, so there is
@@ -51,7 +51,7 @@ end
 --- switched off, which is the one failure this module cannot report later.
 local function gate(_, name)
     if type(name) ~= 'string' or name == '' then
-        error('tlib.devgate needs a convar name', 2)
+        error('nlib.devgate needs a convar name', 2)
     end
     return function() return read(name) end
 end

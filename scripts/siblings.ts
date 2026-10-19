@@ -1,9 +1,9 @@
 /**
- * Which sibling resources are checked out beside tLib.
+ * Which sibling resources are checked out beside NLib.
  *
- * tLib is published standalone under MIT, and several gates in this directory
- * are estate-wide by design: they exist because tLib is the only repo that can
- * see every sibling. A clone of tLib on its own has none of them, and each of
+ * NLib is published standalone under MIT, and several gates in this directory
+ * are estate-wide by design: they exist because NLib is the only repo that can
+ * see every sibling. A clone of NLib on its own has none of them, and each of
  * those gates would otherwise either die (`found 0 sibling resource(s)`) or
  * report a pass over nothing.
  *
@@ -24,20 +24,20 @@ import { join, resolve } from "node:path";
 
 /**
  * Sibling resource directory names, sorted. A resource is a directory beside
- * tLib named `t<Capital>...` that has an `fxmanifest.lua` — the manifest is
+ * NLib named `t<Capital>...` that has an `fxmanifest.lua` — the manifest is
  * what distinguishes a resource from a notes folder or a stray checkout.
  */
-export function siblingResources(tlibRoot: string): string[] {
-  const siblings = resolve(tlibRoot, "..");
+export function siblingResources(nlibRoot: string): string[] {
+  const siblings = resolve(nlibRoot, "..");
   if (!existsSync(siblings)) return [];
   return readdirSync(siblings, { withFileTypes: true })
-    .filter((e) => e.isDirectory() && /^t[A-Z]/.test(e.name) && e.name !== "tLib")
+    .filter((e) => e.isDirectory() && /^t[A-Z]/.test(e.name) && e.name !== "NLib")
     .map((e) => e.name)
     .filter((name) => existsSync(join(siblings, name, "fxmanifest.lua")))
     .sort();
 }
 
-/** True when nothing but tLib is checked out — a standalone public clone. */
-export function isStandaloneClone(tlibRoot: string): boolean {
-  return siblingResources(tlibRoot).length === 0;
+/** True when nothing but NLib is checked out — a standalone public clone. */
+export function isStandaloneClone(nlibRoot: string): boolean {
+  return siblingResources(nlibRoot).length === 0;
 }

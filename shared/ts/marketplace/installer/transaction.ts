@@ -9,7 +9,7 @@ export function cleanup(p: string): void {
   try {
     fs.rmSync(p, { recursive: true, force: true });
   } catch (err) {
-    console.warn(`[tLib/marketplace] retained transaction ${p}: ${String(err)}`);
+    console.warn(`[NLib/marketplace] retained transaction ${p}: ${String(err)}`);
   }
 }
 

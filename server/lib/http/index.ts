@@ -1,8 +1,8 @@
-// index.ts — starts the router at tLib boot.
+// index.ts — starts the router at NLib boot.
 //
 // Unlike realtime (which opened its port lazily on first use), the router binds
 // EAGERLY. server/marketplace/index.ts:52-62 already documents why: a consumer
-// resource's Lua can run before tLib's own onResourceStart handler does. A
+// resource's Lua can run before NLib's own onResourceStart handler does. A
 // backend calling RegisterWebApp into a router that has not been installed yet
 // would lose its mount, and the failure would look like a routing bug.
 //
@@ -21,7 +21,7 @@ import { HttpReadiness } from "./status";
 let router: Router | null = null;
 
 function log(level: "info" | "warn" | "error", msg: string): void {
-  const prefix = "[tLib/http]";
+  const prefix = "[NLib/http]";
   if (level === "error") console.error(`${prefix} ${msg}`);
   else if (level === "warn") console.warn(`${prefix} ${msg}`);
   else console.log(`${prefix} ${msg}`);
@@ -52,14 +52,14 @@ export function installHttp(): void {
   const readiness = new HttpReadiness(cfg.publicUrlOverride, cfg.port, (status) => {
     // Server-local notification only. Subscribe then query GetHttpStatus so a
     // consumer starting after this notification cannot miss readiness.
-    // The hub URL goes to tLib's STARTUP BANNER, not to its own log line.
-    // tLib already draws a banner, and this was one of six lines it printed
+    // The hub URL goes to NLib's STARTUP BANNER, not to its own log line.
+    // NLib already draws a banner, and this was one of six lines it printed
     // around it at boot. A failure still logs loudly -- an operator who cannot
     // reach the hub needs the reason in front of them, and a banner row that
     // silently reads nothing is not that.
-    if (status.ready) fEmit("tlib:vcInfo:hub", status.publicUrl);
+    if (status.ready) fEmit("nlib:vcInfo:hub", status.publicUrl);
     else if (status.publicUrlState === "failed") log("warn", status.error!);
-    fEmit("tLib:http:status", status);
+    fEmit("NLib:http:status", status);
   });
   registerBridge(() => readiness.snapshot(), log);
 
@@ -68,7 +68,7 @@ export function installHttp(): void {
   );
   router = installedRouter;
 
-  // tLib's own in-process mounts (realtime at /rt).
+  // NLib's own in-process mounts (realtime at /rt).
   registerInProcess(log);
   router.start();
 
@@ -76,7 +76,7 @@ export function installHttp(): void {
   // Invalid overrides retain the documented detection fallback, but say so.
   if (readiness.snapshot().publicUrlState === "resolving") {
     if (cfg.publicUrlOverride) {
-      log("warn", "Invalid tlib_http_public_url; attempting public IP detection instead");
+      log("warn", "Invalid nlib_http_public_url; attempting public IP detection instead");
     }
     resolvePublicIP().then(
       (ip) => readiness.resolveAddress(ip),

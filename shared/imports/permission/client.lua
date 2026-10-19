@@ -1,19 +1,19 @@
 --[[
-    tLib/shared/imports/permission — the CLIENT half.
+    NLib/shared/imports/permission — the CLIENT half.
 
     Usage in a consumer (client scripts):
 
-        tlib.permission.onChange(function(isAdmin) hudIsAdmin = isAdmin end)
+        nlib.permission.onChange(function(isAdmin) hudIsAdmin = isAdmin end)
 
-        if tlib.permission.isAdmin() then addAdminTab() end
+        if nlib.permission.isAdmin() then addAdminTab() end
 
      What this replaces
 
     Three resources carried the SAME six lines, byte for byte, and a fourth
     forgot them:
 
-        RegisterNetEvent("tLib:receiveAdminPermission")
-        AddEventHandler("tLib:receiveAdminPermission", function(result)
+        RegisterNetEvent("NLib:receiveAdminPermission")
+        AddEventHandler("NLib:receiveAdminPermission", function(result)
             if source ~= 65535 then return end
             local level = type(result) == "number" and result or (result == true and 1 or 0)
             isAdmin = level >= 1
@@ -21,30 +21,30 @@
 
     tELS/client/cl_lights.lua, tRadar/client/cl_hud.lua and
     tDetector/client/cl_hud.lua each had it. tAFK had none, so revoking a
-    player's `tlib.admin` on a running server left their /tafk panel drawing the
+    player's `nlib.admin` on a running server left their /tafk panel drawing the
     admin section for the rest of the session — the panel lying about what the
     player could do. A copy nobody can forget is the whole point.
 
      The wire event is NOT part of this interface
 
-     `tLib:receiveAdminPermission` appears exactly once below and must never
+     `NLib:receiveAdminPermission` appears exactly once below and must never
     appear in a consumer again. Those three copies are the only thing blocking
-    the rename to `tlib:permission:receive`: once the only files naming it are
-    tLib's own (client/cl_permission.lua, server/sv_permission.lua) and this
+    the rename to `nlib:permission:receive`: once the only files naming it are
+    NLib's own (client/cl_permission.lua, server/sv_permission.lua) and this
     module, the rename is an internal edit. Callers see `onChange`, `isAdmin`,
     `level` and `refresh`, and nothing about how the answer arrives.
 
      Why there is a seed and not just a handler
 
-    tLib's server sends this only in answer to `requestAdminPermission`, and
-    tLib's own client asks once, at ITS resource start. A consumer that starts
+    NLib's server sends this only in answer to `requestAdminPermission`, and
+    NLib's own client asks once, at ITS resource start. A consumer that starts
     later — or this module loading lazily on a consumer's first `onChange` —
     has already missed that reply, and a handler alone would then report 0 until
-    something happened to re-ask. So the level is seeded from tLib's own client
+    something happened to re-ask. So the level is seeded from NLib's own client
     cache via `GetPermissionLevel`, which is the same number the reply carries.
 
     The export call is pcall'd because it crosses a resource boundary at load
-    scope. `dependency 'tLib'` makes that ordering normal rather than
+    scope. `dependency 'NLib'` makes that ordering normal rather than
     guaranteed, and an uncaught error here would abort the consumer's whole file
     — the failure tRadar and tDetector both document at the top of their
     cl_hud.lua, where neither surface then initialises and nothing in the log
@@ -54,8 +54,8 @@
      A number, and only a number
 
     The three copies all accepted a boolean as well, labelled "old servers sent
-    a boolean", and so did tLib's own cl_permission.lua until 2026-10-12. All of
-    them are gone: tLib's client and server ship in one resource and cannot
+    a boolean", and so did NLib's own cl_permission.lua until 2026-10-12. All of
+    them are gone: NLib's client and server ship in one resource and cannot
     disagree about the shape, and every tagged release v0.1..v0.6 sends
     Permission.getPlayerLevel, which has always returned a number. Anything that
     is not a number is level 0 — which is also the right answer for a spoofed
@@ -64,7 +64,7 @@
      Not the same interface as the server half
 
     `shared/imports/permission/server.lua` answers ABOUT a player —
-    `tlib.permission.isAdmin(src)`. This one answers about THIS player and takes
+    `nlib.permission.isAdmin(src)`. This one answers about THIS player and takes
     no argument. Same asymmetry `access` has between its two halves, and for the
     same reason: there is only one player on this side.
 
@@ -76,10 +76,10 @@
 
 local Permission = {}
 
-local tLibName = (type(tlib) == 'table' and tlib.name) or 'tLib'
+local NLibName = (type(nlib) == 'table' and nlib.name) or 'NLib'
 
-local WIRE_RECEIVE = 'tLib:receiveAdminPermission'
-local WIRE_REQUEST = 'tLib:requestAdminPermission'
+local WIRE_RECEIVE = 'NLib:receiveAdminPermission'
+local WIRE_REQUEST = 'NLib:requestAdminPermission'
 
 -- A server-triggered net event always reaches the client with source == 65535.
 -- A local TriggerEvent — another resource, a cheat menu — does not, and without
@@ -109,7 +109,7 @@ RegisterNetEvent(WIRE_RECEIVE, function(result)
     deliver(result)
 end)
 
-local seedOk, seeded = pcall(function() return exports[tLibName]:GetPermissionLevel() end)
+local seedOk, seeded = pcall(function() return exports[NLibName]:GetPermissionLevel() end)
 if seedOk and type(seeded) == 'number' then
     level, answered = seeded, true
 else
@@ -130,7 +130,7 @@ end
 --- Ask the server for a fresh answer. Every `onChange` listener hears the result
 --- if it differs. Call it after anything that could plausibly change the
 --- outcome; nothing needs to be called on a normal grant or revoke, because
---- tLib's server pushes those.
+--- NLib's server pushes those.
 function Permission.refresh()
     TriggerServerEvent(WIRE_REQUEST)
 end

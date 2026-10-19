@@ -37,7 +37,7 @@ local function host()
         CreateThreadNow = function(fn) fn() end,
         Wait = function(ms) return coroutine.yield(ms) end,
     }
-    env.GetCurrentResourceName = function() return 'tLib' end
+    env.GetCurrentResourceName = function() return 'NLib' end
     env.IsDuplicityVersion = function() return false end
     env.SetNuiFocus = function(a, b)
         env.calls[#env.calls + 1] = { 'SetNuiFocus', a, b }

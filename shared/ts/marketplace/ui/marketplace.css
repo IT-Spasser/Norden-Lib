@@ -78,7 +78,7 @@
   min-width: 100px;
   flex: 1;
 }
-.mp-search .tlib-nui-input {
+.mp-search .nlib-nui-input {
   padding-left: 34px;
 }
 .mp-search-icon {
@@ -291,7 +291,7 @@
    These components are meant to be mounted inside a host resource's own
    editor chrome, so they must not name a host token. They used to: the TSX
    carried `text-[hsl(var(--muted-foreground))]` and friends, which renders
-   only because tLib's own tokens happen to be bare HSL triplets. Mount the
+   only because NLib's own tokens happen to be bare HSL triplets. Mount the
    same component where tokens hold complete colours — tRadio's admin builds
    UnoCSS with colorSyntax: "value" — and `hsl(#1a1a1a)` is invalid, so the
    declaration is dropped and the text falls back to whatever it inherited.
@@ -315,7 +315,7 @@
   border: 1px solid var(--nui-border);
   background: var(--nui-inset);
 }
-/* The audio scrub bar is the same object as .tlib-nui-slider-track/-range — a
+/* The audio scrub bar is the same object as .nlib-nui-slider-track/-range — a
    filled share of a rounded track — so it uses the same two tokens. The fill
    was --primary, which is stock *blue*: it ignored a registered theme accent
    and clashed with every other control, all of which are neutral until a theme
@@ -326,7 +326,7 @@
 .mp-scrub-fill {
   background: var(--nui-accent);
 }
-/* Mounted inside a tLib dialog tab panel. The dialog already supplies the
+/* Mounted inside a NLib dialog tab panel. The dialog already supplies the
    surface, the border, the padding and the close affordance, so the embed
    drops all four and only keeps the internal rules between its own sections.
    min() rather than a height media query on purpose: CEF 103 does not parse

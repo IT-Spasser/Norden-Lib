@@ -1,15 +1,15 @@
 -- Reconciles a stored registry of dropped-in asset files against what is
 -- actually on disk.
 --
---   local files, reason = tlib.assets.scan('layouts/sounds', { extensions = tlib.assets.AUDIO })
---   local list, changed = tlib.assets.reconcile(installedSounds, files)
+--   local files, reason = nlib.assets.scan('layouts/sounds', { extensions = nlib.assets.AUDIO })
+--   local list, changed = nlib.assets.reconcile(installedSounds, files)
 --
 --   -- or both at once, which refuses to prune when the folder cannot be read:
---   local list, changed, reason = tlib.assets.sync(installedSounds, 'layouts/sounds',
---                                                  { extensions = tlib.assets.AUDIO })
+--   local list, changed, reason = nlib.assets.sync(installedSounds, 'layouts/sounds',
+--                                                  { extensions = nlib.assets.AUDIO })
 --
 -- Only scan (and therefore sync) is server-only; it needs a directory listing,
--- which comes from tLib's Node bundle. reconcile is pure and runs anywhere.
+-- which comes from NLib's Node bundle. reconcile is pure and runs anywhere.
 --
 -- This exists because every resource shipping an operator-droppable asset
 -- folder wrote the same loop, and two of them wrote the same bug into it: they
@@ -42,7 +42,7 @@ end
 --- reported "no files" rather than "I could not look" is indistinguishable
 --- from the operator having deleted everything.
 ---
---- The pcalls stay deliberately. An export missing because tLib's bundle has
+--- The pcalls stay deliberately. An export missing because NLib's bundle has
 --- not registered yet must read as "I could not look", never as "empty".
 --- @return string[]|nil, string|nil
 function assets.scan(subdir, opts)
@@ -50,7 +50,7 @@ function assets.scan(subdir, opts)
     local resourceName = opts.resource or GetCurrentResourceName()
 
     local ok, encoded = pcall(function()
-        return exports.tLib:ScanResourceFiles(resourceName, subdir)
+        return exports.NLib:ScanResourceFiles(resourceName, subdir)
     end)
     if not ok or type(encoded) ~= "string" then
         return nil, "unavailable"
@@ -127,7 +127,7 @@ end
 --- scan + reconcile, refusing to prune when the folder could not be read.
 ---
 --- On a scan failure the caller's existing list is returned unchanged with
---- `changed = false` and the reason, so a boot where tLib started late cannot
+--- `changed = false` and the reason, so a boot where NLib started late cannot
 --- wipe a registry off disk.
 --- @return table, boolean, string|nil
 function assets.sync(tracked, subdir, opts)

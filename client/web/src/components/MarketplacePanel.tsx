@@ -8,16 +8,16 @@
  * dialog tab declared `view: "marketplace"`. That header file explains the
  * split and why browse/preview/install go through Lua rather than fetch.
  *
- * This path stays because it is still how `exports.tLib:OpenMarketplace` opens
+ * This path stays because it is still how `exports.NLib:OpenMarketplace` opens
  * the marketplace with no host dialog around it — tRadio's in-game path.
  */
 
-import type { OpenData } from "@tlib/shared/marketplace/ui";
+import type { OpenData } from "@nlib/shared/marketplace/ui";
 // Lucide comes from `lucide-solid/icons/*` here, never `~icons/lucide`.
 //
 // Both resolve the same icon set, and this app had four imports in the virtual
 // form against seven files in the package form -- the "dependency inconsistency
-// to fix" that `@tlib/internal/ui/meta.ts` names. One app, one spelling.
+// to fix" that `@nlib/internal/ui/meta.ts` names. One app, one spelling.
 //
 // `lucide-solid` is the one chosen FOR THIS APP, not for the repo: deep per-icon
 // paths are already the documented rule in `menu/components/lucide.ts` (the
@@ -69,7 +69,7 @@ export default function MarketplacePanel() {
         }}
       >
         <div
-          class="tlib-nui-surface mp-panel tlib-nui-lit"
+          class="nlib-nui-surface mp-panel nlib-nui-lit"
           role="dialog"
           aria-label="Marketplace"
           onClick={(e) => e.stopPropagation()}

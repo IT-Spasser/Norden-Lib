@@ -2,7 +2,7 @@
  * Generate server/lib/http/icons.json from the Lucide set.
  *
  * The hub renders an icon per registered app, chosen by name at runtime, so
- * tLib cannot know at build time which ones it needs — it ships the whole set.
+ * NLib cannot know at build time which ones it needs — it ships the whole set.
  *
  * Two transforms keep that affordable. Every Lucide icon carries the same five
  * presentation attributes on its elements; those INHERIT in SVG, so they are

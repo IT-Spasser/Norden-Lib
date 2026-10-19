@@ -14,7 +14,7 @@
  * invariant when editing this file is that **the only path that leaves the page
  * is `flush()`** — nothing else may call `fetchNui`.
  *
- * `console.warn` is deliberately NOT hooked, and neither is `tlib.logger`: a log
+ * `console.warn` is deliberately NOT hooked, and neither is `nlib.logger`: a log
  * line has no stable identifier, so it cannot be grouped. A warning is reported
  * when our code says it is one, with a code.
  *
@@ -53,7 +53,7 @@ import { createTimers, type TimedOutlier, type Timers } from "./timed";
  * since each NUI posts to its own resource. A direct POST to the website is not an
  * option: a NUI fetch to a third-party origin is CORS-blocked in CEF.
  */
-export const DIAG_NUI_CALLBACK = "tlib:diagnostics";
+export const DIAG_NUI_CALLBACK = "nlib:diagnostics";
 
 /** How often a non-empty buffer is handed to Lua. */
 export const FLUSH_INTERVAL_MS = 15_000;
@@ -180,7 +180,7 @@ export function installDiagnostics(opts: InstallOptions): Diagnostics {
     if (!admit(hash)) return hash;
 
     pushEvent({
-      event: "tlib.error_reported",
+      event: "nlib.error_reported",
       at: Date.now(),
       dimensions: compact({
         errorKind: ctx.kind ?? "nui_error",
@@ -215,7 +215,7 @@ export function installDiagnostics(opts: InstallOptions): Diagnostics {
     // for it to go. Said out loud rather than silently dropped.
     if (message) console.warn(`[${opts.resource}] ${id}: ${scrub(message)}`);
     pushEvent({
-      event: "tlib.warning_reported",
+      event: "nlib.warning_reported",
       at: Date.now(),
       dimensions: compact({
         warningKind: kind ?? "unknown",
@@ -228,7 +228,7 @@ export function installDiagnostics(opts: InstallOptions): Diagnostics {
 
   function reportOutlier(outlier: TimedOutlier): void {
     pushEvent({
-      event: "tlib.slow_operation",
+      event: "nlib.slow_operation",
       at: Date.now(),
       dimensions: compact({
         operation: slug(outlier.operation, DIMENSION_CAPS.operation),
@@ -253,7 +253,7 @@ export function installDiagnostics(opts: InstallOptions): Diagnostics {
     // renderer death stay in the F8 banner. Emitted on the NEXT start, so tWeb's
     // `late` clock verdict is normal here rather than a fault.
     pushEvent({
-      event: "tlib.crash_reported",
+      event: "nlib.crash_reported",
       at: Date.now(),
       dimensions: compact({ crashKind: crashKindFor(crash.verdict), surface }),
       // Seconds, not milliseconds: the range is 0–604800, so ms would clamp to the
@@ -280,7 +280,7 @@ export function installDiagnostics(opts: InstallOptions): Diagnostics {
   // still empty here, and that dimension is what makes an install count possible.
   const environment = environmentRow(hardware);
   pushEvent({
-    event: "tlib.environment_reported",
+    event: "nlib.environment_reported",
     at: Date.now(),
     dimensions: compact({ ...environment.dimensions, surface }),
     measures: environment.measures,
@@ -338,7 +338,7 @@ export function installDiagnostics(opts: InstallOptions): Diagnostics {
    * message plumbing; `setEnabled` stays public for a consumer that wants to
    * decide for itself, last writer wins.
    */
-  const unsubscribeConsent = onNuiEvent<{ enabled?: unknown }>("tlib:diag:consent", (data) => {
+  const unsubscribeConsent = onNuiEvent<{ enabled?: unknown }>("nlib:diag:consent", (data) => {
     const next = (data as { enabled?: unknown } | undefined)?.enabled === true;
     // Not via the returned handle — it does not exist yet on this line, and going
     // through a closure would make the subscription depend on construction order.

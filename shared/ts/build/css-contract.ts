@@ -22,10 +22,10 @@ import { join, resolve, sep } from "node:path";
 export const SURFACE_CSS = resolve(import.meta.dir, "../../css/surface.css");
 
 /**
- * tLib's own `shared/css` directory. Every CSS file under it is skipped on the
+ * NLib's own `shared/css` directory. Every CSS file under it is skipped on the
  * CONSUMER side of gate 1, because it is the definition side.
  */
-const TLIB_SHARED_CSS = resolve(import.meta.dir, "../../css");
+const NLIB_SHARED_CSS = resolve(import.meta.dir, "../../css");
 
 export interface CssRule {
   /** The selector list, whitespace-collapsed. */
@@ -141,7 +141,7 @@ export function cssRules(css: string, file = "<string>"): CssRule[] {
 /**
  * The class names a selector list actually STYLES -- the rightmost compound of
  * each comma-separated selector, and nothing else. This distinction is the whole
- * accuracy of gate 1: `.panel { }` redefines tLib's panel, while
+ * accuracy of gate 1: `.panel { }` redefines NLib's panel, while
  * `.panel .toolbar { }` styles something INSIDE a panel and is the correct way
  * to use the shared recipe. Pseudo-classes and attribute selectors are stripped
  * from the compound first.
@@ -260,9 +260,9 @@ function localCssFiles(cssRoots: string[]): string[] {
   for (const root of cssRoots) {
     for (const file of walkCss(root)) {
       const full = resolve(file);
-      // tLib's own shared/css is the definition side, never a collision with
+      // NLib's own shared/css is the definition side, never a collision with
       // itself; `${sep}` so a sibling directory named `cssX` cannot match.
-      if (full === TLIB_SHARED_CSS || full.startsWith(TLIB_SHARED_CSS + sep)) continue;
+      if (full === NLIB_SHARED_CSS || full.startsWith(NLIB_SHARED_CSS + sep)) continue;
       if (seen.has(full)) continue;
       seen.add(full);
       files.push(full);

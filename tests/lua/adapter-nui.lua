@@ -39,8 +39,8 @@ end
 
 -- The host, as the client side of a FiveM resource
 
-_TLIB_IS_FIVEM = true
-_TLIB_SIDE = 'client'
+_NLIB_IS_FIVEM = true
+_NLIB_SIDE = 'client'
 
 Logger = { create = function() return function() end end }
 
@@ -77,15 +77,15 @@ json = {
 Platform = { _stub = function(name) return function() error('stub ' .. name, 0) end end }
 
 assert(loadfile(UI, 't', _G),
-    'shared/lib/adapter/ui.lua not found -- run this suite from the tLib resource root')()
+    'shared/lib/adapter/ui.lua not found -- run this suite from the NLib resource root')()
 
 -- The ready handshake
 
-check(declared['__tlib_nui_ready'] == 1, 'the ready callback is declared to the host exactly once')
-check(handlers['__tlib_nui_ready'] ~= nil, 'the ready callback is registered')
+check(declared['__nlib_nui_ready'] == 1, 'the ready callback is declared to the host exactly once')
+check(handlers['__nlib_nui_ready'] ~= nil, 'the ready callback is registered')
 
 local readyReply
-handlers['__tlib_nui_ready'](nil, function(result) readyReply = result end)
+handlers['__nlib_nui_ready'](nil, function(result) readyReply = result end)
 equal(type(readyReply), 'table', 'the ready handshake answers with a table, not an encoded string')
 check(Platform.isNUIReady(), 'the handshake marks the page ready')
 
@@ -151,9 +151,9 @@ equal(encodeCalls, 0, 'the adapter never encodes a reply itself -- resultCallbac
 -- reply path cannot be "tidied" into changing the message envelope the renderer
 -- listens for.
 sent = {}
-Platform.sendUIEvent({}, 'tlib:menu:snapshot', { version = 1 })
+Platform.sendUIEvent({}, 'nlib:menu:snapshot', { version = 1 })
 equal(#sent, 1, 'a send after the page is ready goes straight out')
-equal(sent[1].name, 'tlib:menu:snapshot', 'the envelope names the event')
+equal(sent[1].name, 'nlib:menu:snapshot', 'the envelope names the event')
 equal(type(sent[1].args), 'table', 'the payload travels in args')
 equal(sent[1].args[1].version, 1, 'the payload is args[1], not flattened into the envelope')
 

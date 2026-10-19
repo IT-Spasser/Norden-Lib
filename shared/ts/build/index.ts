@@ -139,12 +139,12 @@ export {
 export type { StandardBuildOptions } from "./resource.ts";
 export { buildStandardResource, runStandardBuild } from "./resource.ts";
 /**
- * The release-artifact contract for runtime state, plus the tlib_modules
+ * The release-artifact contract for runtime state, plus the nlib_modules
  * inventory check. Deliberately separate from `manifest-coverage.ts`: that one
  * answers "is everything the manifest names staged", and this one answers the
  * opposite question, "is anything staged that must never be" — plus the one
  * question neither the manifest nor the staging list can answer, which is
- * whether a declared tLib module exists at all.
+ * whether a declared NLib module exists at all.
  *
  * It carries two floors, `R-FILE-FLOOR` and `R-MANIFEST-FLOOR`, because "no
  * data.json in the staged tree" and "no staged tree" are otherwise the same

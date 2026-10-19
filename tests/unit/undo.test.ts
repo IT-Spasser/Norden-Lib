@@ -12,7 +12,7 @@
  *    in the tree that ever pinned that rule down.
  *
  * 2. **The nested-editor case is a real pairing, not a thought experiment.**
- *    tRadio's settings app hosts tLib's shared `PropEditor` inside itself. The
+ *    tRadio's settings app hosts NLib's shared `PropEditor` inside itself. The
  *    module-level singleton this replaced would have given them one stack, so
  *    the test asserts two histories stay independent AND that one Ctrl+Z
  *    reaches only the inner one.
@@ -114,7 +114,7 @@ const ctrlY = { key: "y", ctrlKey: true } as const;
 
 describe("UndoHistory — instance scoping", () => {
   test("two histories are independent, which the module singleton could not be", () => {
-    // The concrete case: tRadio's settings app hosting tLib's shared PropEditor.
+    // The concrete case: tRadio's settings app hosting NLib's shared PropEditor.
     const outer = createUndoHistory({ label: "tradio-settings" });
     const inner = createUndoHistory({ label: "prop-editor" });
     const outerBox = box({ value: 10, name: "settings" });

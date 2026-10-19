@@ -1,4 +1,4 @@
-/* The tLib surface theme — the one token sheet every resource's NUI imports.
+/* The NLib surface theme — the one token sheet every resource's NUI imports.
    Rules that are not visible here: docs/internal/theming-tokens.md */
 
 /* Fixes the layer order regardless of where either layer is opened. Must stay above
@@ -12,15 +12,15 @@
 
 /* THE INTERFACE FACE, SHIPPED WITH THE TOKENS THAT ASSUME IT.
 
-   It used to live only in tLib's own app, which overrode --font-sans to name
+   It used to live only in NLib's own app, which overrode --font-sans to name
    it. This sheet is the one every consumer imports, and it said nothing — so
-   every tLib dialog, menu and toast drew Hanken Grotesk while every resource's
+   every NLib dialog, menu and toast drew Hanken Grotesk while every resource's
    own NUI drew whatever it had, and the typeface changed the moment a player
    went from /tels to the LED editor or /tafk to the sequence editor. Eight
    resources were on the wrong side of that; the one that was not had been fixed
    by hand, which is the tell.
 
-   Here and not in fonts.css because fonts.css is imported by tLib alone —
+   Here and not in fonts.css because fonts.css is imported by NLib alone —
    consumers import THIS file. Same bargain surface.css is imported on above:
    adopting the tokens adopts what they assume.
 
@@ -106,19 +106,19 @@
      without any rule needing a second spelling.
 
      It lives here, on :root in the sheet every consumer's NUI imports, and NOT
-     on `.tlib-menu` where it started: declared on a subtree it governs only that
+     on `.nlib-menu` where it started: declared on a subtree it governs only that
      subtree, and a menu-scoped copy would have SHADOWED a root value for the one
      surface that already had the mechanism. Dialog, toast and marketplace had no
      escape hatch at all.
 
      The writer is `UIEffects.setReduceMotion` on the Lua side, fed by the
-     `tlib_reduce_motion` convar and by a per-player toggle. A consumer with its
+     `nlib_reduce_motion` convar and by a per-player toggle. A consumer with its
      own ui_page owns its own document, so it applies the same answer to its own
-     root — `exports.tLib:GetReduceMotion()` and the `tlib:reduceMotion` event
+     root — `exports.NLib:GetReduceMotion()` and the `nlib:reduceMotion` event
      are how it reads it. See docs/internal/theming-tokens.md. */
   --motion: 1;
 
-  /* The face above. Consumers inherit it by importing this sheet; tLib's own
+  /* The face above. Consumers inherit it by importing this sheet; NLib's own
      global.css no longer needs to say it. */
   --font-sans: "Hanken Grotesk", Inter, "Segoe UI", Arial, sans-serif;
 }
@@ -130,7 +130,7 @@
 
 /* For a transparent overlay page, where --background is never painted and a --card panel
    would read flat. Shifts the whole ladder up one step instead of raising --card. */
-.tlib-overlay {
+.nlib-overlay {
   /* Same hue and the same lightnesses as :root above — an overlay palette that
      stayed achromatic while the base one gained a tint would read as a colder
      panel floating on a warmer page, which is the exact inconsistency the

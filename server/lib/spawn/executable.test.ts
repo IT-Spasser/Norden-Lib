@@ -65,7 +65,7 @@ describe("the mode bit on Linux", () => {
   });
 
   it("fixes the loader, which is what the loader form actually execs", () => {
-    // The whole reason this lives in tLib rather than in each product: with a
+    // The whole reason this lives in NLib rather than in each product: with a
     // bundled loader the product's own binary is an *argument*, and the file
     // handed to execve is one the product never names.
     const loader =

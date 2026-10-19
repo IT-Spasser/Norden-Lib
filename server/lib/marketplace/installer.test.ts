@@ -56,7 +56,7 @@ function patchCentral(data: Buffer, field: number, value: number): Buffer {
   return out;
 }
 beforeEach(() => {
-  root = fs.mkdtempSync(path.join(os.tmpdir(), "tlib-installer-test-"));
+  root = fs.mkdtempSync(path.join(os.tmpdir(), "nlib-installer-test-"));
   limit = 5 * 1024 * 1024;
   installPath = "assets";
   validator = undefined;
@@ -261,7 +261,7 @@ describe("marketplace installer isolation and ownership", () => {
     // Every other refusal in `owned()` is a sentence an operator can act on.
     // This one was a bare SyntaxError — `Unexpected token } in JSON at position
     // 42` — surfaced verbatim in the admin panel as the reason the install
-    // failed, naming neither the file nor the fact that it is tLib's own
+    // failed, naming neither the file nor the fact that it is NLib's own
     // bookkeeping rather than anything the operator installed.
     expect(install(bundle(), "ui").ok).toBe(true);
     fs.writeFileSync(file(".marketplace-demo.json"), '{"version":1,');

@@ -233,7 +233,7 @@ describe("auto-repeat", () => {
 
 describe("nesting — the live tRadio case", () => {
   test("the deeper scope owns the press and the host never sees it", () => {
-    // tRadio's settings app hosts tLib's shared PropEditor inside itself. Two
+    // tRadio's settings app hosts NLib's shared PropEditor inside itself. Two
     // raw window listeners means one Ctrl+Z undoes in BOTH, so the player sees
     // the prop move and something in the host change at once.
     const host = counter("host");

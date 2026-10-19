@@ -48,7 +48,7 @@ end
 -- context.lua and actions.lua are client-side files and return immediately on any
 -- other side. The registry is shared, so declaring the client side here drives all
 -- four in one state.
-_TLIB_SIDE = 'client'
+_NLIB_SIDE = 'client'
 
 local clock = 0
 Platform = {
@@ -67,7 +67,7 @@ Platform = {
 }
 
 assert(loadfile('shared/lib/menu/schema.lua', 't', _G),
-    'shared/lib/menu/schema.lua not found -- run this suite from the tLib resource root')()
+    'shared/lib/menu/schema.lua not found -- run this suite from the NLib resource root')()
 assert(loadfile('server/lib/menu/registry.lua', 't', _G))()
 assert(loadfile('client/lib/menu/context.lua', 't', _G))()
 assert(loadfile('client/lib/menu/actions.lua', 't', _G))()

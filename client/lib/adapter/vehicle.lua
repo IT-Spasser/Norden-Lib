@@ -1,6 +1,6 @@
 -- vehicle platform abstractions (FiveM)
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getPlayerVehicle()
         local ped = PlayerPedId()
         if not IsPedInAnyVehicle(ped, false) then return nil end
@@ -11,7 +11,7 @@ else
     Platform.getPlayerVehicle = Platform._stub('getPlayerVehicle')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getVehicleSpeed(vehicle)
         if not vehicle or vehicle == 0 then return 0 end
         return GetEntitySpeed(vehicle)
@@ -20,7 +20,7 @@ else
     Platform.getVehicleSpeed = Platform._stub('getVehicleSpeed')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getVehiclePlate(vehicle)
         if not vehicle or vehicle == 0 then return '' end
         -- Trim the trailing spaces FiveM pads plate strings with.
@@ -31,7 +31,7 @@ else
     Platform.getVehiclePlate = Platform._stub('getVehiclePlate')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.setVehiclePlate(vehicle, plate)
         if not vehicle or vehicle == 0 then return end
         SetVehicleNumberPlateText(vehicle, tostring(plate or ''))
@@ -40,7 +40,7 @@ else
     Platform.setVehiclePlate = Platform._stub('setVehiclePlate')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getVehicleNetId(vehicle)
         if not vehicle or vehicle == 0 then return nil end
         return VehToNet(vehicle)
@@ -49,7 +49,7 @@ else
     Platform.getVehicleNetId = Platform._stub('getVehicleNetId')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     -- model   → model name string or hash integer.
     -- coords  → table {x, y, z}.
     -- heading → yaw in degrees.
@@ -90,7 +90,7 @@ else
     Platform.spawnVehicle = Platform._stub('spawnVehicle')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.deleteVehicle(vehicle)
         if not vehicle or vehicle == 0 then return end
         SetEntityAsMissionEntity(vehicle, true, true)
@@ -100,7 +100,7 @@ else
     Platform.deleteVehicle = Platform._stub('deleteVehicle')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.setVehicleEngineOn(vehicle, state, instantly)
         if not vehicle or vehicle == 0 then return end
         -- The 4th arg (forceInstant) matches common FiveM usage.
@@ -110,7 +110,7 @@ else
     Platform.setVehicleEngineOn = Platform._stub('setVehicleEngineOn')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getVehicleClass(vehicle)
         if not vehicle or vehicle == 0 then return nil end
         return GetVehicleClass(vehicle)
@@ -121,7 +121,7 @@ end
 
 -- seatIndex: -1 = driver, 0 = front passenger, 1+ = rear seats.
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.isVehicleSeatFree(vehicle, seatIndex)
         if not vehicle or vehicle == 0 then return nil end
         return IsVehicleSeatFree(vehicle, seatIndex)
@@ -130,7 +130,7 @@ else
     Platform.isVehicleSeatFree = Platform._stub('isVehicleSeatFree')
 end
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.getVehicleNumberOfPassengers(vehicle)
         if not vehicle or vehicle == 0 then return 0 end
         return GetVehicleNumberOfPassengers(vehicle)

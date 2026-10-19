@@ -3,10 +3,10 @@
 --
 -- Oracle for the registration count limits and the studio exemption from them.
 --
--- Why this suite exists: the limits used to be unowned. Nothing in tLib tested
+-- Why this suite exists: the limits used to be unowned. Nothing in NLib tested
 -- them, and the only thing that ever hit one was tMenu's catalog-capacity suite
 -- discovering it had grown past 240 pages -- which read like tMenu's bug and was
--- actually tLib refusing a registration for a reason it could not defend. The
+-- actually NLib refusing a registration for a reason it could not defend. The
 -- numbers are courtesy guardrails against wire cost, not crash boundaries: the
 -- real ceiling is shared/lib/menu/schema.lua's snapshotTransport, which chunks at 64 KB
 -- and only refuses past 16 MB. So an owner may be exempted from the counts.
@@ -27,7 +27,7 @@
 
 Platform = { now = function() return 0 end }
 assert(loadfile('shared/lib/menu/schema.lua', 't', _G),
-    'shared/lib/menu/schema.lua not found -- run this suite from the tLib resource root')()
+    'shared/lib/menu/schema.lua not found -- run this suite from the NLib resource root')()
 assert(loadfile('server/lib/menu/registry.lua', 't', _G))()
 
 local R = MenuRegistry

@@ -2,15 +2,15 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
--- The technical name, not a retail title: tLib is a public developer library.
+-- The technical name, not a retail title: NLib is a public developer library.
 -- Set explicitly so StudioBranding.displayName is not reading a fallback.
-name 'tLib'
+name 'NLib'
 author 'Tommy Johnston'
 author 'TIMMYG Studios'
-description 'tLib — shared UI and utility library (FiveM)'
+description 'Nordic Lib (NLib) — shared UI and utility library (FiveM)'
 
--- 0.6 is the only tLib ever released, so a pin below `1.0` is meaningless and
--- every consumer pins `tlib_min_version '1.0'`. Nothing between the two was
+-- 0.6 is the only NLib ever released, so a pin below `1.0` is meaningless and
+-- every consumer pins `nlib_min_version '1.0'`. Nothing between the two was
 -- tagged: 0.6.0, 0.12.0 through 0.17.0 and this 1.0.0 exist only as values on
 -- this line, which is why a consumer installed against the public v0.6 zip
 -- fails the gate in imports.lua rather than running degraded.
@@ -24,7 +24,7 @@ version '1.0.0'
 -- keeps its own name under each tree's lib/, so the blocks below stay the single
 -- authority on what runs where.
 --
--- imports.lua stays at the root: consumers name it as '@tLib/imports.lua' in
+-- imports.lua stays at the root: consumers name it as '@NLib/imports.lua' in
 -- their own manifests, so that path is a contract, not a convention.
 
 shared_scripts {
@@ -38,7 +38,7 @@ shared_scripts {
     -- Before lifecycle.lua, which wraps it as Platform.isStudioResource. Shared
     -- because a consumer VM loads this exact file via shared/imports/versioncheck.
     'shared/sh_branding.lua',
-    -- The one definition of the studio API host and of tlib_api_base_url's
+    -- The one definition of the studio API host and of nlib_api_base_url's
     -- normalisation. Shared because client/cl_marketplace.lua, server/
     -- sv_marketplace.lua and a consumer VM (via shared/imports/versioncheck)
     -- all need the same answer.
@@ -125,7 +125,7 @@ files {
     'imports.lua',
     -- Read by a consumer's versioncheck module via LoadResourceFile.
     'shared/sh_branding.lua',
-    -- Same: a consumer VM loads this to resolve tlib_api_base_url.
+    -- Same: a consumer VM loads this to resolve nlib_api_base_url.
     'shared/sh_api.lua',
     'shared/imports/**/*.lua',
     'client/ui/index.html',

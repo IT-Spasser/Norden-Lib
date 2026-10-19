@@ -4,10 +4,10 @@
  *
  * Why this is shared
  *
- * `@tlib/internal/prop-editor` is one component mounted by three resources, and its
+ * `@nlib/internal/prop-editor` is one component mounted by three resources, and its
  * chrome is drawn entirely from token NAMES (`bg-card`, `text-muted-foreground`,
  * `--radius`). The VALUES behind those names are per-resource — tRadio declares
- * its own set on `.radio-settings-root`, tRadar and tDetector inherit tLib's from
+ * its own set on `.radio-settings-root`, tRadar and tDetector inherit NLib's from
  * `theme-tokens.css` on `:root` — so "the editor, themed as tRadar" is a
  * genuinely different and genuinely interesting picture from "the editor, themed
  * as tRadio". Shooting all three is how "one shared look, per-resource token
@@ -54,7 +54,7 @@
  * is the cached Chromium 103 from `nui-chromium.ts`, and the blank-canvas check
  * decodes the captured PNG **in the page** — the shot is served back to the
  * browser from the output folder and read with `getImageData`, rather than
- * pulling `sharp` into tLib and into every consumer that shoots a gallery.
+ * pulling `sharp` into NLib and into every consumer that shoots a gallery.
  */
 
 import fs from "node:fs";
@@ -76,7 +76,7 @@ export const GALLERY_VEHICLE_MATRIX = {
 /** Where the prop sits on the dash, in vehicle-local metres/degrees — a plausible saved placement. */
 export const GALLERY_PROP_DATA = { x: 0.02, y: -0.28, z: 0.42, rx: -2.5, ry: 0, rz: 12 };
 
-/** `<prefix>:propEditorInit` exactly as `tlib.propeditor`'s `open` builds it. Flat, not nested. */
+/** `<prefix>:propEditorInit` exactly as `nlib.propeditor`'s `open` builds it. Flat, not nested. */
 export interface PropEditorGalleryInit {
   vehicleModel: string;
   vehicleDisplayName: string;
@@ -171,7 +171,7 @@ export interface PropEditorGalleryView {
  * Remove button renders unconditionally. The last two shots are therefore
  * expected to be identical to the first, and the run SAYS so at the end rather
  * than implying three looks. They are here because this gallery was the
- * before/after net for moving the editor into tLib, and it stays as the net for
+ * before/after net for moving the editor into NLib, and it stays as the net for
  * the next change: if Remove ever starts or stops being gated on `hasExisting`,
  * that pair is where it shows.
  */
@@ -224,7 +224,7 @@ export interface PropEditorGalleryOptions {
   resourceRoot: string;
   /** Flat destination folder. Shots for the views being taken are replaced. */
   outDir: string;
-  /** `locale:init` payload, for a host that translates through tLib's locale store. */
+  /** `locale:init` payload, for a host that translates through NLib's locale store. */
   locale?: unknown;
   /** Views on top of `SHARED_PROP_EDITOR_VIEWS` — a state only this host can reach. */
   extraViews?: PropEditorGalleryView[];
@@ -515,7 +515,7 @@ export async function renderPropEditorGallery(
     // Every caption in this editor goes through the host's translator, which for a
     // dictionary-backed host returns the KEY NAME when the dictionary is empty — so
     // without this the gallery would be a faithful photograph of `prop_editor_btn_save`.
-    // Hosts with no locale file fall through to tLib's English defaults and pass none.
+    // Hosts with no locale file fall through to NLib's English defaults and pass none.
     if (locale !== undefined) await post(browser, { action: "locale:init", strings: locale });
 
     // Prove WebGL before spending a run on it, and say which rasteriser drew the art.

@@ -75,7 +75,7 @@ export interface DialogTab {
    * Render a built-in view in this tab's panel instead of the dialog's fields.
    *
    * `"marketplace"` mounts `components/marketplace/MarketplaceBrowser`, fed by
-   * the `marketplaceData` NUI message (`exports.tLib:ProvideMarketplaceData`).
+   * the `marketplaceData` NUI message (`exports.NLib:ProvideMarketplaceData`).
    * That is how a consumer gets the browser INSIDE its own settings dialog
    * rather than closing the dialog and opening the standalone modal over it.
    *

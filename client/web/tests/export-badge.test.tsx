@@ -23,7 +23,7 @@
  *    spelling, which is exactly the shape `unocss-merge` 0.10.0 silently breaks
  *    and which no other check in the repo can see (every class involved is real
  *    and resolves to CSS; only the merged output is wrong).
- *  - **That the sizes are legible in CEF, or that `--tlib-pe-u` resolves.** Both
+ *  - **That the sizes are legible in CEF, or that `--nlib-pe-u` resolves.** Both
  *    pixel questions. What IS asserted is the absence of an arbitrary
  *    `text-[Npx]` beside a text colour, which is the `unoMerge` collision the
  *    sizes were moved into `export-badge.css` to make structurally impossible.
@@ -191,7 +191,7 @@ describeWithUiKit("the badge at rest", () => {
   test("renders a trigger, no source chip, and a closed picker", async () => {
     const h = await mount();
     expect(trigger(h.container)).not.toBeNull();
-    expect(q(h.container, ".tlib-export-chip")).toBeNull();
+    expect(q(h.container, ".nlib-export-chip")).toBeNull();
     expect(panel()).toBeNull();
     expect(rows()).toHaveLength(0);
     // Nothing is requested until the picker opens: a resource can start or stop
@@ -201,7 +201,7 @@ describeWithUiKit("the badge at rest", () => {
 
   test("the source chip names the resource the config came from", async () => {
     const h = await mount({ externalSource: "mrp_vehicles" });
-    const chip = q(h.container, ".tlib-export-chip");
+    const chip = q(h.container, ".nlib-export-chip");
     expect(chip).not.toBeNull();
     expect(chip!.textContent).toContain("mrp_vehicles");
   });
@@ -239,17 +239,17 @@ describeWithUiKit("the badge at rest", () => {
     // `[data-x="true"]` selector is dead. `data-edge` carries a string union for
     // that reason and `export-badge.css` selects on the VALUE.
     const top = await mount();
-    expect(q(top.container, ".tlib-export-badge")!.getAttribute("data-edge")).toBe("top");
+    expect(q(top.container, ".nlib-export-badge")!.getAttribute("data-edge")).toBe("top");
     cleanup();
     const bottom = await mount({ edge: "bottom" });
-    expect(q(bottom.container, ".tlib-export-badge")!.getAttribute("data-edge")).toBe("bottom");
+    expect(q(bottom.container, ".nlib-export-badge")!.getAttribute("data-edge")).toBe("bottom");
   });
 
   test("a caller's class is appended rather than replacing the recipe", async () => {
     const h = await mount({ class: "ml-auto" });
-    const cls = q(h.container, ".tlib-export-badge")!.getAttribute("class")!;
+    const cls = q(h.container, ".nlib-export-badge")!.getAttribute("class")!;
     expect(cls).toContain("ml-auto");
-    expect(cls).toContain("tlib-export-badge");
+    expect(cls).toContain("nlib-export-badge");
     expect(cls).toContain("items-center");
   });
 });
@@ -295,8 +295,8 @@ describeWithUiKit("the picker", () => {
     // The third renders a spacer rather than nothing — without it the names in
     // that row sit 10px left of every other row's.
     const last = rows().at(-1)!;
-    expect(last.querySelector(".tlib-export-row-gutter")).not.toBeNull();
-    expect(rows()[1]!.querySelector(".tlib-export-row-gutter")).toBeNull();
+    expect(last.querySelector(".nlib-export-row-gutter")).not.toBeNull();
+    expect(rows()[1]!.querySelector(".nlib-export-row-gutter")).toBeNull();
   });
 
   test("the filter narrows the list, case-insensitively", async () => {
@@ -412,7 +412,7 @@ describeWithUiKit("the focus affordance", () => {
    * focus must be an `outline`. And an outline assembled through `cn()` loses a
    * token silently: `unocss-merge` 0.10.0 files a POSITIVE outline-offset into
    * the outline COLOUR's group and annihilates one of the pair (`cn.ts`, Gap 4).
-   * The negative spelling escapes that, with or without tLib's shield — which is
+   * The negative spelling escapes that, with or without NLib's shield — which is
    * what a SHARED component needs, since tWeb, tCinematics and every
    * `internal/*` project reach `unoMerge` directly.
    *
@@ -464,7 +464,7 @@ describeWithUiKit("the focus affordance", () => {
 describeWithUiKit("sizes are classes, not mergeable utilities", () => {
   test("no arbitrary text size anywhere in the badge or its picker", async () => {
     // `unoMerge` files an arbitrary `text-[Npx]` and a text colour into ONE
-    // conflict group and drops one of them. tLib's `cn` shields that pair, but
+    // conflict group and drops one of them. NLib's `cn` shields that pair, but
     // a shared component must not rest on the shield — so the sizes live in
     // `export-badge.css` and there is nothing left to collide.
     const h = await mount({ externalSource: "mrp_vehicles" });
@@ -494,8 +494,8 @@ describeWithUiKit("sizes are classes, not mergeable utilities", () => {
 
   test("the chip and the trigger carry their size classes", async () => {
     const h = await mount({ externalSource: "mrp_vehicles" });
-    expect(q(h.container, ".tlib-export-chip")).not.toBeNull();
-    expect(trigger(h.container).getAttribute("class")).toContain("tlib-export-trigger");
+    expect(q(h.container, ".nlib-export-chip")).not.toBeNull();
+    expect(trigger(h.container).getAttribute("class")).toContain("nlib-export-trigger");
   });
 });
 

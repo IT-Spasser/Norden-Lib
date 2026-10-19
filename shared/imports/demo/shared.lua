@@ -1,13 +1,13 @@
 --[[
-    tLib/shared/imports/demo — the demo-server switch.
+    NLib/shared/imports/demo — the demo-server switch.
 
     Usage:
-        if tlib.demo.active() then ... end
-        if tlib.demo.dropWrite('data.json') then return true end   -- server
+        if nlib.demo.active() then ... end
+        if nlib.demo.dropWrite('data.json') then return true end   -- server
 
      What demo mode is
 
-    One convar, `tlib_demo`, that turns a server into a throwaway showroom:
+    One convar, `nlib_demo`, that turns a server into a throwaway showroom:
 
       * every access gate and every permission check answers YES, so a visitor
         can open the admin surfaces and drive every feature;
@@ -34,7 +34,7 @@
 
      It is not a security feature, it is the absence of one
 
-    Demo mode is fail-OPEN by design and it is the only thing in tLib that is.
+    Demo mode is fail-OPEN by design and it is the only thing in NLib that is.
     Everything else here -- `access`, `permission`, the marketplace admin rule --
     fails closed on purpose, and demo mode deliberately overrides all of them.
     Turning it on makes every connected player a superadmin. That is the point,
@@ -42,29 +42,29 @@
     woven through them: one branch, easy to read, impossible to half-apply.
 
     Never set it on a server whose data you care about or whose players you do
-    not. tLib says so on every start, in red, and keeps saying it -- see
+    not. NLib says so on every start, in red, and keeps saying it -- see
     server/sv_demo.lua.
 
      Reading it
 
     The convar is authoritative on the server and is read directly there. A
     client VM can only see a convar set with `setr`, so rather than make `setr`
-    load-bearing, tLib pushes the state to clients and this module listens. The
+    load-bearing, NLib pushes the state to clients and this module listens. The
     convar is still used as the client's opening guess so the very first frame is
     usually right; the push corrects it either way.
 ]]
 
 local demo = {}
 
-local CONVAR = 'tlib_demo'
-local CHANGED = 'tlib:demo:changed'
-local REQUEST = 'tlib:demo:request'
+local CONVAR = 'nlib_demo'
+local CHANGED = 'nlib:demo:changed'
+local REQUEST = 'nlib:demo:request'
 
 local IS_SERVER = IsDuplicityVersion and IsDuplicityVersion() or false
 
 --- Truthy convar spellings. `ConvertToBool` does not exist in every runtime this
 --- module is loaded into (the off-FiveM Lua suites have no natives at all), and
---- an owner who writes `setr tlib_demo true` must not silently get a live server.
+--- an owner who writes `setr nlib_demo true` must not silently get a live server.
 local function truthy(value)
     if value == nil then return false end
     value = tostring(value):lower()
@@ -78,10 +78,10 @@ local function fromConvar()
 end
 
 --- The live answer. On the server this is the convar unless a runtime toggle has
---- overridden it; on the client it is whatever tLib last pushed.
+--- overridden it; on the client it is whatever NLib last pushed.
 local state = fromConvar()
 
---- nil = follow the convar. Set by the `tlib_demo` console command so an operator
+--- nil = follow the convar. Set by the `nlib_demo` console command so an operator
 --- can flip a running server without editing server.cfg -- see server/sv_demo.lua.
 local override = nil
 
@@ -98,7 +98,7 @@ function demo.active()
     return state
 end
 
---- Apply a state pushed by tLib (or by the console command, in tLib's own VM).
+--- Apply a state pushed by NLib (or by the console command, in NLib's own VM).
 --- Internal; consumers call `active()`.
 --- @param value boolean|nil  nil on the server means "stop overriding, follow the convar"
 function demo.set(value)
@@ -124,8 +124,8 @@ end
 --- session and the next start reads the shipped file back.
 ---
 ---     function saveData(json)
----         if tlib.demo.dropWrite('data.json') then return true end
----         return tlib.fs.writeResourceFile('data.json', json)
+---         if nlib.demo.dropWrite('data.json') then return true end
+---         return nlib.fs.writeResourceFile('data.json', json)
 ---     end
 ---
 --- Report success to the caller when this returns true. The write did what the
@@ -148,7 +148,7 @@ function demo.noteDropped(what)
     local key = tostring(what or '?')
     if noted[key] then return end
     noted[key] = true
-    print(('^3[tLib] demo mode: not writing "%s" — this server resets on restart^7'):format(key))
+    print(('^3[NLib] demo mode: not writing "%s" — this server resets on restart^7'):format(key))
 end
 
 -- Transport

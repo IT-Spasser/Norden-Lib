@@ -41,18 +41,18 @@ function cleanOutDir(): Plugin {
 export default defineConfig(({ command }) => ({
   define: {
     __MENU_PREVIEW__:
-      command === "serve" && process.env.TLIB_MENU_PREVIEW
-        ? JSON.stringify(JSON.parse(readFileSync(process.env.TLIB_MENU_PREVIEW, "utf8")))
+      command === "serve" && process.env.NLIB_MENU_PREVIEW
+        ? JSON.stringify(JSON.parse(readFileSync(process.env.NLIB_MENU_PREVIEW, "utf8")))
         : "undefined",
   },
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
-      // tLib reaches its own shared/ts by the same specifier every other resource uses.
+      // NLib reaches its own shared/ts by the same specifier every other resource uses.
       // It used to be the one tree doing it with relative paths, which meant a file moved
       // between client/web and shared/ts needed its importers rewritten here and nowhere
-      // else, and made shared code look like tLib-internal code at the import site.
-      "@tlib/shared": resolve(__dirname, "../../shared/ts"),
+      // else, and made shared code look like NLib-internal code at the import site.
+      "@nlib/shared": resolve(__dirname, "../../shared/ts"),
     },
     // shared/ts has its own solid-js (bun auto-installs peerDependencies), so without this
     // the alias above puts two copies of the runtime in the bundle and any component here

@@ -2,7 +2,7 @@
 /*
  * SOLID 1 -> 2 COMPATIBILITY LAYER  ·  THE `solid-js/store` SHIM
  *
- * One shared copy, kept in tLib and consumed by five projects. `README.md` in
+ * One shared copy, kept in NLib and consumed by five projects. `README.md` in
  * this directory documents the layer as a whole: what it solves, what each of
  * the five modules does, how a project adopts it, what `vendorPackages` is for
  * and how to derive one, and the debug environment variables. Read that first.
@@ -23,7 +23,7 @@
  *
  * FORMATTING
  *
- * `tLib/biome.json` excludes this directory, deliberately. biome and the
+ * `NLib/biome.json` excludes this directory, deliberately. biome and the
  * consumers' formatter (oxfmt, via `vp fmt`) disagree on import order and line
  * breaking here — measured, biome wants to rewrite all seven files — and the
  * churn would bury the annotations that are the only record of why each shim

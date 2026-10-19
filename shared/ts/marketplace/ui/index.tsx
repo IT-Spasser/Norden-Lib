@@ -2,7 +2,7 @@
 //
 // Why these are parts and not a panel
 //
-// tLib also ships a whole marketplace dialog (`MarketplacePanel` in its own
+// NLib also ships a whole marketplace dialog (`MarketplacePanel` in its own
 // app), and tDetector and tRadar currently open it over their HUD editors. That
 // is the model this module exists to replace: opening a dialog on top of what is
 // already an editor is the wrong shape, and the marketplace is supposed to feel

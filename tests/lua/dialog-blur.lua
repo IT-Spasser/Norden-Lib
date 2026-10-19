@@ -1,4 +1,4 @@
--- Run from tLib root with the existing scripts/run-lua-suite.lua Fengari runner.
+-- Run from NLib root with the existing scripts/run-lua-suite.lua Fengari runner.
 -- Real dialog/state, dialog/exports, ui-effects and NUI/lifecycle/shutdown adapters.
 local checks = 0
 local function eq(actual, expected, message)
@@ -6,9 +6,9 @@ local function eq(actual, expected, message)
     assert(actual == expected, message .. ': expected ' .. tostring(expected) .. ', got ' .. tostring(actual))
 end
 local function host(fivem)
-    _TLIB_IS_FIVEM, _TLIB_SIDE = fivem, 'client'
-    _TLIB_SHUTDOWN_REGISTERED, _TLIB_RESOURCE_STOP_REGISTERED = nil, nil
-    _TLIB_NUI_FOCUSED, _TLIB_UI_FOCUSED = false, false
+    _NLIB_IS_FIVEM, _NLIB_SIDE = fivem, 'client'
+    _NLIB_SHUTDOWN_REGISTERED, _NLIB_RESOURCE_STOP_REGISTERED = nil, nil
+    _NLIB_NUI_FOCUSED, _NLIB_UI_FOCUSED = false, false
     Logger = { create = function() return function() end end }
     local h = { events = {}, exports = {}, fades = {}, timers = {}, messages = {}, notifications = {}, commands = {}, owner = 'consumer', focused = false }
     function AddEventHandler(name, fn)
@@ -19,8 +19,8 @@ local function host(fivem)
         for _, fn in ipairs(h.events[name] or {}) do fn(...) end
     end
     function h.nui(name, data) h.emit('__cfx_nui:' .. name, data, function() end) end
-    function h.ready() h.nui('__tlib_nui_ready', {}) end
-    function GetCurrentResourceName() return 'tLib' end
+    function h.ready() h.nui('__nlib_nui_ready', {}) end
+    function GetCurrentResourceName() return 'NLib' end
     function GetInvokingResource() return h.owner end
     function RegisterNuiCallbackType() end
     function SendNUIMessage(message) h.messages[#h.messages + 1] = message end
@@ -160,8 +160,8 @@ eq(h.focused, false, 'consumer shutdown unlocks input')
 eq(DialogState.get('owner-stop'), nil, 'consumer shutdown removes dialog')
 
 h.show('shutdown')
-h.emit('onResourceStop', 'tLib')
-eq(#h.fades, 6, 'tLib shutdown releases active blur once')
+h.emit('onResourceStop', 'NLib')
+eq(#h.fades, 6, 'NLib shutdown releases active blur once')
 eq(h.fades[6][2], 0, 'shutdown uses immediate fade-out')
 eq(next(h.timers), nil, 'shutdown clears watchdog timers')
 eq(UIEffects.acquireBlur('editor'), nil, 'shutdown refuses new leases')
@@ -175,9 +175,9 @@ h.ready()
 eq(#h.fades, 0, 'consumer stop before readiness blocks delayed acquire')
 h = host(true)
 h.show('pending-shutdown')
-h.emit('onResourceStop', 'tLib')
+h.emit('onResourceStop', 'NLib')
 h.ready()
-eq(#h.fades, 0, 'tLib stop before readiness blocks delayed acquire')
+eq(#h.fades, 0, 'NLib stop before readiness blocks delayed acquire')
 
 h = host(false)
 h.manual = true
@@ -189,7 +189,7 @@ eq(UIEffects.acquireBlur('editor'), nil, 'missing native is safe')
 TriggerScreenblurFadeIn = function() error('native unavailable') end
 eq(UIEffects.acquireBlur('editor'), nil, 'throwing native cannot break focus flow')
 eq(#h.fades, 0, 'failed acquisition never owns blur')
-h.emit('onResourceStop', 'tLib')
+h.emit('onResourceStop', 'NLib')
 eq(#h.fades, 0, 'shutdown never fades unrelated blur without ownership')
 
 h = host(true)
@@ -215,7 +215,7 @@ h = host(true)
 h.manual = true
 TriggerScreenblurFadeIn = function() return false end
 eq(UIEffects.acquireBlur('editor'), nil, 'native refusal does not create a lease')
-h.emit('onResourceStop', 'tLib')
+h.emit('onResourceStop', 'NLib')
 eq(#h.fades, 0, 'refused fade-in never causes fade-out')
 
 h = host(true)
@@ -224,12 +224,12 @@ local token = UIEffects.acquireBlur('editor')
 TriggerScreenblurFadeOut = function() error('transient failure') end
 UIEffects.releaseBlur(token)
 TriggerScreenblurFadeOut = function(ms) table.insert(h.fades, { 'out', ms }) end
-h.emit('onResourceStop', 'tLib')
+h.emit('onResourceStop', 'NLib')
 eq(#h.fades, 2, 'shutdown retries previously failed fade-out')
 eq(h.fades[2][2], 0, 'failed normal fade-out retry is immediate')
 
 h = host(true)
-_TLIB_SIDE = 'server'
+_NLIB_SIDE = 'server'
 eq(UIEffects.acquireBlur('editor'), nil, 'server never calls screen natives')
 -- Instance lifecycle, owner checks, callable funcrefs and schema validation.
 h = host(true)
@@ -382,7 +382,7 @@ h.owner = 'consumer'
 h.show('event-owner', { fields = { { id = 'x', type = 'checkbox' } },
     onChange = function() error('stale callback must not run') end })
 h.notify = function(name)
-    if name == 'tLib:dialog:changed' then h.show('event-new', {}) end
+    if name == 'NLib:dialog:changed' then h.show('event-new', {}) end
 end
 h.nui('dialogChange', { id = 'event-owner', fieldId = 'x', value = true })
 eq(DialogState.get('event-owner'), nil, 'event reentry terminates previous instance')
@@ -453,7 +453,7 @@ for _, ending in ipairs({ 'submit', 'cancel', 'close', 'idle', 'owner-stop', 'sh
     elseif ending == 'close' then h.exports.CloseDialog('clear-lifecycle')
     elseif ending == 'idle' then h.timeout(300000)
     elseif ending == 'owner-stop' then h.emit('onResourceStop', 'consumer')
-    else h.emit('onResourceStop', 'tLib') end
+    else h.emit('onResourceStop', 'NLib') end
     h.ready()
     eq(calls, 0, ending .. ': opt-out lifecycle never acquires blur')
     eq(#h.fades, 0, ending .. ': opt-out lifecycle never fades')

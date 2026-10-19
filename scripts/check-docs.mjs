@@ -8,7 +8,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const SLUG = "tLib";
+const SLUG = "NLib";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const CONTENT_DIR = path.join(ROOT, "docs", "content");
 const PUBLIC_DIR = path.join(ROOT, "docs", "public");
@@ -19,8 +19,8 @@ const assetRe = new RegExp(`/assets/${SLUG}/([A-Za-z0-9._-]+)`, "g");
 const docsLinkRe = new RegExp(`\\]\\((/docs/${SLUG}/[A-Za-z0-9/_-]+)(#([A-Za-z0-9._-]+))?\\)`, "g");
 // A /docs link that does NOT carry the group segment. It 404s on the site, and
 // the group-scoped regex above cannot see it, so it reads as zero findings.
-// Four of these shipped in tLib at once.
-const bareDocsLinkRe = /\]\((\/docs\/(?!tLib\/)[A-Za-z0-9/_-]+)(#[A-Za-z0-9._-]+)?\)/g;
+// Four of these shipped in NLib at once.
+const bareDocsLinkRe = /\]\((\/docs\/(?!NLib\/)[A-Za-z0-9/_-]+)(#[A-Za-z0-9._-]+)?\)/g;
 
 const errors = [];
 const warnings = [];

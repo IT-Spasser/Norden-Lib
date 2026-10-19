@@ -2,7 +2,7 @@
  * One owner of Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y for the whole page.
  *
  * Deliberately the same shape as `escape-layer.ts`, for the same reason: tRadio's
- * settings app hosts tLib's shared `PropEditor` inside itself, so two raw
+ * settings app hosts NLib's shared `PropEditor` inside itself, so two raw
  * listeners means one Ctrl+Z undoes in both. Resolution is `depth` first, then
  * newest-registered-first; `active()` lets a mounted but hidden editor stand down.
  *

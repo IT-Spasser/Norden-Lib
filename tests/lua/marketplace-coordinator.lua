@@ -3,7 +3,7 @@ local handlers, net, timers, dispatched, replies, hooks = {}, {}, {}, {}, {}, {}
 local invoking, register, now, allowed, dispatchError = nil, nil, 0, true, false
 -- Per-ACE grants. `allowed` stays the blanket switch every existing case uses;
 -- `aces` overrides it for the cases that care WHICH permission is held, which
--- is the whole point of the marketplace no longer inlining `tlib.admin`.
+-- is the whole point of the marketplace no longer inlining `nlib.admin`.
 local aces = nil
 Logger = { create = function() return function() end end }
 Platform = {
@@ -17,7 +17,7 @@ Platform = {
 -- every case written before this check existed still reads as a straight-line
 -- dispatch; the other modes drive the new cases at the bottom of this file.
 local ownership = { mode = 'ok', pending = nil, calls = 0, last = nil }
-exports = { tLib = {
+exports = { NLib = {
     mpRegisterType = function() return true end,
     mpAssertItemResource = function(_, resource, slug, cb)
         ownership.calls = ownership.calls + 1
@@ -30,7 +30,7 @@ exports = { tLib = {
     end,
 } }
 function GetInvokingResource() return invoking end
-function GetCurrentResourceName() return 'tLib' end
+function GetCurrentResourceName() return 'NLib' end
 function GetGameTimer() return now end
 function GetConvar(_, default) return default end
 function IsPlayerAceAllowed(_, key)
@@ -44,7 +44,7 @@ function TriggerClientEvent(event, target, payload)
     replies[#replies + 1] = { event = event, target = target, p = payload }
 end
 function TriggerEvent(event, payload, ...)
-    if event:match('^tlib:marketplace:do') then
+    if event:match('^nlib:marketplace:do') then
         if dispatchError then error('dispatch failure') end
         dispatched[#dispatched + 1] = { event = event, p = payload }
     -- The varargs matter: a lifecycle hook is `(itemType, slug, meta)`, so the
@@ -55,9 +55,9 @@ end
 -- Loaded FIRST, exactly as fxmanifest's server_scripts orders them. The
 -- marketplace's admin gate is `Permission.isPlayerAdmin` now, so stubbing the
 -- gate here instead would test the stub; this loads the real rule.
-_TLIB_IS_FIVEM = true
+_NLIB_IS_FIVEM = true
 -- shared_scripts run before server_scripts. The real StudioApi, not a stub: it
--- is the one definition of the download host and of how tlib_api_base_url is
+-- is the one definition of the download host and of how nlib_api_base_url is
 -- normalised, and stubbing it here would let the two drift apart unseen.
 dofile('shared/sh_api.lua')
 dofile('server/sv_permission.lua')
@@ -73,14 +73,14 @@ local function reg(resource, kind, opts)
 end
 local function req(action, resource, kind, slug, version, player)
     source = player or 1
-    handlers['tlib:marketplace:' .. action](resource, kind, slug, version)
+    handlers['nlib:marketplace:' .. action](resource, kind, slug, version)
 end
 local function last() return dispatched[#dispatched].p end
 local function result(token, resource, ok, extra)
     invoking = resource
     local value = { token = token, ok = ok ~= false, slug = 'forged', resource = 'forged' }
     for key, item in pairs(extra or {}) do value[key] = item end
-    handlers['tlib:marketplace:agentResult'](value)
+    handlers['nlib:marketplace:agentResult'](value)
 end
 local function advance(ms)
     now = now + ms
@@ -100,7 +100,7 @@ local function rejected(action, resource, kind, slug, version)
     eq(type(p.resource), 'string'); eq(type(p.type), 'string')
 end
 
-eq(net['tlib:marketplace:agentResult'], nil, 'results local only')
+eq(net['nlib:marketplace:agentResult'], nil, 'results local only')
 eq(reg(nil), false)
 eq(reg('a', '../bad'), false)
 eq(reg('a'), true); eq(reg('a', 'sound'), true); eq(reg('b'), true)
@@ -133,7 +133,7 @@ eq(a ~= b and b ~= sound, true, 'isolated tuple locks')
 local r = #replies
 result(a, 'b'); eq(#replies, r, 'wrong producer ignored')
 result(a, ''); eq(#replies, r, 'empty producer not nil')
-invoking = 'a'; handlers['tlib:marketplace:agentResult']({ token = a, ok = 'yes' })
+invoking = 'a'; handlers['nlib:marketplace:agentResult']({ token = a, ok = 'yes' })
 eq(#replies, r, 'malformed result ignored')
 result(a, 'a'); eq(#replies, r + 1)
 eq(replies[#replies].p.resource, 'a'); eq(replies[#replies].p.type, 'ui')
@@ -199,7 +199,7 @@ req('install', 'a', 'ui', 'dispatch'); eq(replies[#replies].p.ok, false)
 dispatchError = false
 req('install', 'a', 'ui', 'dispatch'); result(last().token, 'a')
 req('install', 'a', 'ui', 'shutdown'); local shutdown = last().token
-handlers.onResourceStop('tLib'); eq(replies[#replies].p.token, shutdown)
+handlers.onResourceStop('NLib'); eq(replies[#replies].p.token, shutdown)
 eq(replies[#replies].p.ok, false)
 -- Inspection shares authority/lifecycle fencing but never emits mutation hooks.
 reg('a', 'ui', { installPath = 'layouts', onInstall = cb, onUninstall = cb })
@@ -209,7 +209,7 @@ for _, id in ipairs({ '', '../bad', string.rep('a', 129) }) do
     rejected('inspect', 'a', 'ui', 'item', id)
 end
 req('inspect', 'a', 'ui', 'item', 'view-2'); local inspectionToken = last().token
-eq(dispatched[#dispatched].event, 'tlib:marketplace:doInspect:a')
+eq(dispatched[#dispatched].event, 'nlib:marketplace:doInspect:a')
 eq(last().url, nil, 'inspection cannot download a package')
 local hookCount, callbackCount = #hooks, calls
 r = #replies; result(inspectionToken, 'b'); eq(#replies, r, 'wrong inspection producer ignored')
@@ -222,7 +222,7 @@ local function inspected(changes)
         inspection = { resourceName = 'forged', type = 'forged', slug = 'forged',
             status = 'unverified', lock = 'absent', policyAvailable = false, path = '/private/root' } }
     for key, item in pairs(changes or {}) do value[key] = item end
-    invoking = 'a'; handlers['tlib:marketplace:agentResult'](value)
+    invoking = 'a'; handlers['nlib:marketplace:agentResult'](value)
 end
 req('inspect', 'a', 'ui', 'callback', 'view-success'); inspected()
 local inspectedReply = replies[#replies].p
@@ -252,28 +252,28 @@ source = 42; handlers.playerDropped(); r = #replies
 result(inspectionToken, 'a'); eq(#replies, r, 'inspection never replies to recycled player ID')
 req('inspect', 'a', 'ui', 'stop-inspect', 'view-5'); inspectionToken = last().token
 handlers.onResourceStop('a'); eq(replies[#replies].p.token, inspectionToken); eq(replies[#replies].p.ok, false)
--- The admin gate is tLib's rule, not a bare `tlib.admin` ACE
--- The gate used to inline `IsPlayerAceAllowed(src, 'tlib.admin')`, which denies
--- a player holding only `tlib.superadmin` — while sv_permission.lua, and so
--- exports.tLib:IsPlayerAdmin and every other admin surface in tLib, grants one.
+-- The admin gate is NLib's rule, not a bare `nlib.admin` ACE
+-- The gate used to inline `IsPlayerAceAllowed(src, 'nlib.admin')`, which denies
+-- a player holding only `nlib.superadmin` — while sv_permission.lua, and so
+-- exports.NLib:IsPlayerAdmin and every other admin surface in NLib, grants one.
 -- These pin all three gates onto the shared rule. `aces` grants exactly one
 -- permission at a time, so a gate that still spelled the ACE inline fails the
 -- superadmin cases and only those.
 eq(reg('a'), true) -- the inspect cases above stopped resource 'a'
 local d = #dispatched
-aces = { ['tlib.superadmin'] = true }
+aces = { ['nlib.superadmin'] = true }
 req('install', 'a', 'ui', 'perm-super')
 eq(#dispatched, d + 1, 'superadmin may install')
 result(last().token, 'a')
 
-aces = { ['tlib.admin'] = true }
+aces = { ['nlib.admin'] = true }
 d = #dispatched
 req('install', 'a', 'ui', 'perm-admin')
 eq(#dispatched, d + 1, 'admin may still install')
 result(last().token, 'a')
 
 -- The inspection re-check on the way back out takes the same rule.
-aces = { ['tlib.superadmin'] = true }
+aces = { ['nlib.superadmin'] = true }
 d = #dispatched
 req('inspect', 'a', 'ui', 'perm-inspect', 'view-super')
 eq(#dispatched, d + 1, 'superadmin may inspect')
@@ -292,8 +292,8 @@ aces = nil
 -- The gap these pin: the coordinator keys registrations `resource:type` and
 -- writes into that resource's own registered installPath, so a tELS item could
 -- never land in tRadar's DIRECTORY. The item's own `resource` field was the
--- unenforced half — `tlib:marketplace:install('tRadar','ui','<a-tELS-slug>')`
--- passed every check above and tLib fetched and installed it.
+-- unenforced half — `nlib:marketplace:install('tRadar','ui','<a-tELS-slug>')`
+-- passed every check above and NLib fetched and installed it.
 eq(reg('a'), true)
 
 -- The check is asked at all, and asked about the right tuple.

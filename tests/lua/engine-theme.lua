@@ -4,12 +4,12 @@
 -- Oracle for per-namespace menu theming.
 --
 -- The feature: a resource that creates menus can make them look like its own, and
--- tLib supplies the default for anything that does not. There are three layers --
+-- NLib supplies the default for anything that does not. There are three layers --
 -- interface default, namespace theme, per-page override -- and the two that live
 -- on the server are what this suite covers.
 --
 -- Two things are being held down here. The first is the validator, which is an
--- allowlist mirroring tLib/client/web/src/menu/branding.ts: the accent is written into a CSS custom
+-- allowlist mirroring NLib/client/web/src/menu/branding.ts: the accent is written into a CSS custom
 -- property and the banner into an <img src>, so the rejections matter more than the
 -- acceptances and are enumerated one by one. The second is that a theme is scoped
 -- like everything else in this engine -- a resource themes its own namespace, not
@@ -18,7 +18,7 @@
 
 Platform = { now = function() return 0 end }
 assert(loadfile('shared/lib/menu/schema.lua', 't', _G),
-    'shared/lib/menu/schema.lua not found -- run this suite from the tLib resource root')()
+    'shared/lib/menu/schema.lua not found -- run this suite from the NLib resource root')()
 assert(loadfile('server/lib/menu/registry.lua', 't', _G))()
 
 local S = MenuSchema

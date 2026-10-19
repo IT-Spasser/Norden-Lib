@@ -107,7 +107,7 @@ end
 --- operating" and is nil for a rear passenger, which is the opposite of what
 --- rule 1 needs.
 local function defaultAboard()
-    local occupancy = tlib.occupancy
+    local occupancy = nlib.occupancy
     if type(occupancy) ~= "table" or type(occupancy.cabin) ~= "function" then return nil end
     return occupancy.cabin()
 end
@@ -139,7 +139,7 @@ function screentarget.create(opts)
 
     local hasScreen = opts.hasScreen
     if type(hasScreen) ~= "function" then
-        error("tlib.screentarget.create requires a hasScreen(vehicle) function", 2)
+        error("nlib.screentarget.create requires a hasScreen(vehicle) function", 2)
     end
 
     local self = {}

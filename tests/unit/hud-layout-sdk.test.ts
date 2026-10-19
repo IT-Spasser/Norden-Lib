@@ -16,7 +16,7 @@ beforeAll(async () => {
     },
   });
   await import("../../client/web/src/hud-layout-sdk");
-  sdk = (globalThis.window as any).tLibHudLayout;
+  sdk = (globalThis.window as any).NLibHudLayout;
 });
 afterAll(() =>
   Object.assign(globalThis, {
@@ -43,7 +43,7 @@ function element() {
     setAttribute: () => {},
   };
 }
-const send = (data: unknown) => listeners.get("message")!({ data: { tlibHud: data } });
+const send = (data: unknown) => listeners.get("message")!({ data: { nlibHud: data } });
 test("consumer wrapper uses the editor geometry without touching child content", () => {
   const el = element();
   const detach = sdk.attach("radio", el);

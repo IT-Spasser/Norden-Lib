@@ -63,7 +63,7 @@ end
 -- overlay derives its key set from it, and stubbing it would make this suite
 -- assert that a stub was told the right answer.
 local Diag = dofile('shared/imports/diag/shared.lua')
-tlib = { diag = Diag }
+nlib = { diag = Diag }
 
 local Secrets = dofile('shared/imports/secrets/server.lua')
 
@@ -214,4 +214,4 @@ if failures > 0 then
     realPrint(('FAILED: %d assertion(s) in secrets-overlay'):format(failures))
     os.exit(1)
 end
-print('PASS: tlib.secrets sidecar overlay, convar precedence, sandbox and derivation')
+print('PASS: nlib.secrets sidecar overlay, convar precedence, sandbox and derivation')

@@ -3,7 +3,7 @@
 
 ThemeExports  = {}
 
-local log     = Logger.create('tLib/theme')
+local log     = Logger.create('NLib/theme')
 
 local ui      = nil
 local _themes = {}
@@ -35,7 +35,7 @@ function ThemeExports.register(webui)
     ui = webui
 
     local function registerExport(name, fn)
-        Platform.export('tLib', name, fn)
+        Platform.export('NLib', name, fn)
     end
 
     -- Register a theme, or replace one with the same id.
@@ -79,7 +79,7 @@ function ThemeExports.register(webui)
         _themes[id] = def
         Platform.sendUIEvent(ui, 'addTheme', def)
 
-        Platform.TriggerEvent('tLib:theme:added', id)
+        Platform.TriggerEvent('NLib:theme:added', id)
         return true
     end)
 
@@ -95,7 +95,7 @@ function ThemeExports.register(webui)
 
         _themes[id] = nil
         Platform.sendUIEvent(ui, 'removeTheme', { id = id })
-        Platform.TriggerEvent('tLib:theme:removed', id)
+        Platform.TriggerEvent('NLib:theme:removed', id)
         return true
     end)
 
@@ -106,7 +106,7 @@ function ThemeExports.register(webui)
 
         if id == '' then
             Platform.sendUIEvent(ui, 'setTheme', { id = '' })
-            Platform.TriggerEvent('tLib:theme:set', '')
+            Platform.TriggerEvent('NLib:theme:set', '')
             return true
         end
 
@@ -118,7 +118,7 @@ function ThemeExports.register(webui)
         end
 
         Platform.sendUIEvent(ui, 'setTheme', { id = id })
-        Platform.TriggerEvent('tLib:theme:set', id)
+        Platform.TriggerEvent('NLib:theme:set', id)
         return true
     end)
 

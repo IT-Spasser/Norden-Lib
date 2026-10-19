@@ -1,8 +1,8 @@
--- tLib/shared/lib/adapter/shutdown.lua
+-- NLib/shared/lib/adapter/shutdown.lua
 -- resource shutdown / cleanup hooks
 
 
-local log = Logger.create('tLib/adapter/shutdown')
+local log = Logger.create('NLib/adapter/shutdown')
 
 local _shutdownCallbacks = {}
 
@@ -19,10 +19,10 @@ local function _runShutdown()
     end
 end
 
-if _TLIB_IS_FIVEM then
-    if not _TLIB_SHUTDOWN_REGISTERED then
-        _TLIB_SHUTDOWN_REGISTERED = true
-        local resourceName = GetCurrentResourceName and GetCurrentResourceName() or 'tLib'
+if _NLIB_IS_FIVEM then
+    if not _NLIB_SHUTDOWN_REGISTERED then
+        _NLIB_SHUTDOWN_REGISTERED = true
+        local resourceName = GetCurrentResourceName and GetCurrentResourceName() or 'NLib'
         AddEventHandler('onResourceStop', function(res)
             if res == resourceName then
                 _runShutdown()

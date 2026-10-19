@@ -4,7 +4,7 @@
  * vocabulary. Connect, auth, heartbeat, reconnect and SUB tracking are handled
  * internally; a consumer supplies credentials and receives events.
  *
- * The constants below mirror `tLib/server/realtime/protocol.ts` v1 and change
+ * The constants below mirror `NLib/server/realtime/protocol.ts` v1 and change
  * with it.
  */
 
@@ -29,7 +29,7 @@ export type RealtimeState = "idle" | "connecting" | "authing" | "open" | "closin
 export interface RealtimeConnectOptions {
   /** `ws://host:port` from the customer server's session-mint response. */
   url: string;
-  /** Short-lived token from tLib's `issueToken` Lua export. One-shot. */
+  /** Short-lived token from NLib's `issueToken` Lua export. One-shot. */
   token: string;
   /** Default true. Exponential backoff between the two bounds below. */
   autoReconnect?: boolean;

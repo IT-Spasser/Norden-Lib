@@ -22,7 +22,7 @@ export function resolveKvpPrefix(candidates: string[]): string | null {
 function resolvePrefix(): string | null {
   if (_resolved) return _prefix;
   _resolved = true;
-  _prefix = resolveKvpPrefix([GetConvar("tlib_community_id", ""), GetConvar("sv_projectName", "")]);
+  _prefix = resolveKvpPrefix([GetConvar("nlib_community_id", ""), GetConvar("sv_projectName", "")]);
   return _prefix;
 }
 
@@ -35,7 +35,7 @@ export interface KvpScope {
   /** The community prefix. Already sanitized; `null` means none. */
   community?: string | null;
   /**
-   * This server's tag, as `tlib.kvp.serverTag()` computes it. `null` or `""`
+   * This server's tag, as `nlib.kvp.serverTag()` computes it. `null` or `""`
    * means no server has been resolved, in which case a `serverScoped` key is
    * left UNSCOPED rather than gaining a bare trailing underscore — a dev session
    * or an environment that never received a tag then keeps what the player tuned
@@ -56,7 +56,7 @@ export interface KvpScope {
  * key Lua never loaded". Agreement by inspection, across two runtimes, over
  * strings that are already persisted on players' machines.
  *
- * `tLib/tests/unit/kvp-prefix.test.ts` pins these against the same vectors
+ * `NLib/tests/unit/kvp-prefix.test.ts` pins these against the same vectors
  * `tests/lua/kvp-views.lua` pins the Lua side against.
  */
 export function composeKvpKey(key: string, scope: KvpScope = {}, serverScoped = false): string {

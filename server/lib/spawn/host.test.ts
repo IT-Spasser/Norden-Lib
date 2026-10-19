@@ -2,7 +2,7 @@
  * Reaping, with real processes.
  *
  * Mocks would prove nothing here. The claim under test is "a child started from
- * tLib's VM actually dies when its owner stops", and the failure it guards
+ * NLib's VM actually dies when its owner stops", and the failure it guards
  * against — an orphaned PocketBase holding port 8090 and a locked SQLite file —
  * is only visible if something really was running and really stopped. So these
  * spawn the test runner itself and then check the PID with signal 0.
@@ -127,7 +127,7 @@ describe("reaping", () => {
     await until(() => !alive(theirs.pid));
   });
 
-  it("kills everything when tLib itself stops", async () => {
+  it("kills everything when NLib itself stops", async () => {
     const host = quiet();
     const a = JSON.parse(host.serve(plan(SLEEPER), "tDB", "pocketbase")) as { pid: number };
     const b = JSON.parse(host.serve(plan(SLEEPER), "tAI", "llama")) as { pid: number };

@@ -1,16 +1,16 @@
--- tLib/shared/lib/adapter/events.lua
+-- NLib/shared/lib/adapter/events.lua
 -- platform event system abstractions
 
 
-local log = Logger.create('tLib/adapter/events')
+local log = Logger.create('NLib/adapter/events')
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.TriggerEvent(name, ...)
         TriggerEvent(name, ...)
     end
 
     -- Both return the handler cookie. They used to discard it, which made every
-    -- registration permanent for the lifetime of THIS resource -- and tLib
+    -- registration permanent for the lifetime of THIS resource -- and NLib
     -- registers handlers on behalf of its consumers, so a consumer restarting
     -- left its old handlers live in here answering with its old state. Anything
     -- registered for someone else has to be removable.

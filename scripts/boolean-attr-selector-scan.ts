@@ -238,7 +238,7 @@ function rendererOf(file: string, src: string): "solid" | "react" {
  * A test or a fixture renders shapes the app never renders. `solid-2-aria-attributes.test.tsx`
  * deliberately passes `asBool(false)` to `aria-invalid` to PROVE the Solid 2
  * behaviour — and that one line made tWeb's entirely-correct `aria-[invalid=true]:`
- * variant report dead. Tests are still scanned for SELECTORS (tLib's own browser
+ * variant report dead. Tests are still scanned for SELECTORS (NLib's own browser
  * test was the one real finding in this sweep); they are only disregarded as
  * evidence of what the app emits.
  */
@@ -352,7 +352,7 @@ function collectProducers(files: { file: string; src: string }[]): Producers {
         fromTest,
       });
     }
-    // Spread-object form: `"data-x": expr,` — how tRadio's User and tLib's
+    // Spread-object form: `"data-x": expr,` — how tRadio's User and NLib's
     // nui-field hand attributes to a child, and invisible to the JSX pattern.
     for (const m of src.matchAll(/["'](data|aria)-([a-zA-Z0-9-]+)["']\s*:/g)) {
       const colon = (m.index ?? 0) + m[0].length - 1;
@@ -461,7 +461,7 @@ function walk(dir: string, acc: string[] = []): string[] {
  * Highest solid-js major declared under the root. 0 when Solid is not used.
  *
  * Its own walk, because a project's solid-js dependency is rarely in the root
- * package.json — tLib declares it in `shared/ts` and `client/web`, and reading
+ * package.json — NLib declares it in `shared/ts` and `client/web`, and reading
  * only the root would see major 0 and downgrade every finding to `latent`.
  */
 function solidMajorOf(root: string): number {

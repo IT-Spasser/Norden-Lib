@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@tlib/shared",
+      "name": "@nlib/shared",
       "dependencies": {
         "clsx": "^2.1.1",
         "fflate": "^0.8.2",
