@@ -3,6 +3,7 @@ import * as path from "node:path";
 import { registerWriteResourceFile } from "../shared/ts/fs/server";
 import { setInstallIdResolver } from "../shared/ts/install-id";
 import { installCommunityConfigs } from "./lib/community-configs/index";
+import { installCrypto } from "./lib/crypto/index";
 import { installFeedback } from "./lib/feedback/index";
 import { installHttp } from "./lib/http/index";
 import { installInference } from "./lib/inference/index";
@@ -55,6 +56,9 @@ installTelemetry();
 // The "Send feedback" dialog in every t* menu. Deliberately NOT gated on
 // telemetry consent -- the reasoning is at the top of server/lib/feedback/index.ts.
 installFeedback();
+
+// Token verification and password hashing for resources that cannot do either in Lua.
+installCrypto();
 
 const siblings: string[] = [];
 
