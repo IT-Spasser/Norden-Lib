@@ -1,4 +1,4 @@
-import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
 declare function exports(name: string, fn: (...args: never[]) => unknown): void;
 
@@ -26,7 +26,12 @@ export function sha256(input: string): string {
   return createHash("sha256").update(String(input)).digest("hex");
 }
 
+export function hmacSha256(secret: string, body: string): string {
+  return createHmac("sha256", String(secret)).update(String(body)).digest("hex");
+}
+
 export function installCrypto(): void {
+  exports("HmacSha256", hmacSha256 as never);
   exports("Sha256", sha256 as never);
   exports("HashPassword", hashPassword as never);
   exports("VerifyPassword", verifyPassword as never);
