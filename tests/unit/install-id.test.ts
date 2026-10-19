@@ -4,8 +4,8 @@
  * THIS SUITE IS THE SUCCESSOR TO THE INSTALL-ID BLOCK IN
  * `telemetry-consent.test.ts`. The id used to be minted only when telemetry
  * consent was on and lived in `telemetry-install-id.txt`, so its tests lived
- * with consent's. It now lives inside NLib's own `data.json` and rides on every
- * tWeb-bound request regardless of `nlib_telemetry`, so the one thing that must
+ * with consent's. It now lives inside Norden Lib's own `data.json` and rides on every
+ * tWeb-bound request regardless of `norden_lib_telemetry`, so the one thing that must
  * NOT get lost in the move is the generation contract: minted once, 25
  * characters of base36, validated strictly, and never re-randomised per boot.
  * Every assertion that was there is here.
@@ -40,10 +40,10 @@ const readDoc = (): Record<string, unknown> =>
   JSON.parse(readFileSync(dataPath(), "utf8")) as Record<string, unknown>;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), "nlib-install-id-"));
+  root = mkdtempSync(join(tmpdir(), "norden-install-id-"));
   // The FiveM globals the resolver reaches through, stubbed. The REAL module is
   // under test — nothing here substitutes its logic, only its host.
-  g.GetCurrentResourceName = () => "NLib";
+  g.GetCurrentResourceName = () => "norden_lib";
   g.GetResourcePath = () => root;
   resetInstallIdCache();
   setInstallIdResolver(null);
@@ -135,7 +135,7 @@ describe("storage", () => {
 
   /**
    * A document that does not PARSE is left alone entirely — no id, no write.
-   * The same split `nlib.jsonstore` makes: an empty read is right for a reader,
+   * The same split `norden_lib.jsonstore` makes: an empty read is right for a reader,
    * and treating it as "brand new install" is how a one-key document lands on
    * top of somebody's configuration. The id is worth less than their data.
    */
@@ -170,7 +170,7 @@ describe("the header", () => {
   /**
    * OMITTED, never sent blank — an empty value fails tWeb's pattern. And a
    * bundle with no resolver installed (every consumer's, since the reader is
-   * NLib's own) sends no header rather than inventing a second id from its own
+   * Norden Lib's own) sends no header rather than inventing a second id from its own
    * directory.
    */
   test("no resolver, a throwing one, and a malformed answer all omit it", () => {

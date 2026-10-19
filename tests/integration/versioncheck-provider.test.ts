@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from "node:fs";
 // are stripped; no global mocks or logger.wrapAll side effects leak to other suites.
 //
 // tRadio is a sibling resource, not a dependency: this suite is skipped wherever
-// NLib is checked out on its own, which includes CI.
+// Norden Lib is checked out on its own, which includes CI.
 const root = new URL("../../../tRadio/server/lib/", import.meta.url);
 const available = existsSync(new URL("updates.ts", root));
 const describeWithRadio = available ? describe : describe.skip;
@@ -25,7 +25,7 @@ function fixture(current = "v1.0.0") {
   let gate: Promise<void> = Promise.resolve();
   const api = load("updates.ts", ["checkForUpdates", "isNewerVersion", "getCachedUpdateResult"], {
     serverLogger: { debug() {}, warn() {}, error() {} },
-    // `load` strips imports, so updates.ts's import of NLib's single base-URL
+    // `load` strips imports, so updates.ts's import of Norden Lib's single base-URL
     // definition has to be handed in. Production reads the convar here.
     marketplaceBaseUrl: () => "https://timmygstudios.com",
     GetResourceMetadata: () => current,

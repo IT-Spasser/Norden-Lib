@@ -1,6 +1,6 @@
--- Run from NLib: bunx --bun --package fengari-node-cli fengari scripts/run-lua-suite.lua tests/lua/modules.lua
+-- Run from norden_lib: bunx --bun --package fengari-node-cli fengari scripts/run-lua-suite.lua tests/lua/modules.lua
 --
--- Oracle for nlib.modules — content discovery by `module.json`.
+-- Oracle for norden_lib.modules — content discovery by `module.json`.
 --
 -- Two things are under test, and they fail differently:
 --
@@ -33,7 +33,7 @@ end
 
 -- `dirs[base]` is the directory listing; `files[path]` is file content. Two
 -- tables rather than one tree because that is exactly the split the runtime
--- sees: a directory listing comes from NLib's Node bundle and file content
+-- sees: a directory listing comes from Norden Lib's Node bundle and file content
 -- comes from LoadResourceFile, and the whole live-read question is what happens
 -- when the first knows about something the second does not.
 local dirs = {}
@@ -68,8 +68,8 @@ json = {
 
 exports = setmetatable({}, {
     __index = function(_, key)
-        assert(key == 'NLib', 'unexpected export target: ' .. tostring(key))
-        if not exportsAvailable then error('NLib export not registered yet') end
+        assert(key == 'norden_lib', 'unexpected export target: ' .. tostring(key))
+        if not exportsAvailable then error('norden_lib export not registered yet') end
         return {
             ListResourceDirs = function(_, resource, base)
                 assert(resource == 'tRadio')
@@ -347,7 +347,7 @@ end)
 
 -- 5. The cache, and the live-scan property
 
-test('an empty answer is not cached, so a late-starting NLib export is not fatal', function()
+test('an empty answer is not cached, so a late-starting Norden Lib export is not fatal', function()
     reset()
     exportsAvailable = false
     assert(#modules.scan('layouts', 'layout') == 0)
@@ -422,4 +422,4 @@ test('the io.popen fallback still works where the export is absent', function()
     assert(table.concat(modules.scan('layouts', 'layout'), ',') == 'QRX-720')
 end)
 
-report(('PASS: %d nlib.modules assertions'):format(passed))
+report(('PASS: %d norden_lib.modules assertions'):format(passed))

@@ -20,12 +20,12 @@
  * `data.jsonc`, `data-json.bak` — is required to stay GREEN. A gate that fails a
  * release over `config.json` is a gate that acquires a skip flag.
  *
- * ## What the `nlib_modules` half plants
+ * ## What the `norden_lib_modules` half plants
  *
  * A typo'd name; a `shared/imports` directory with no loadable file in it; a
- * declaration referenced ONLY inside a Lua comment (real: every `nlib.diag` in
+ * declaration referenced ONLY inside a Lua comment (real: every `norden_lib.diag` in
  * tELS's `cl_env.lua` is commented out); a commented-out declaration, which must
- * NOT be read as one; and a wrong NLib path, which makes every declared name a
+ * NOT be read as one; and a wrong Norden Lib path, which makes every declared name a
  * ghost and must therefore trip the floor rather than report a screen of
  * confident lies.
  *
@@ -130,7 +130,7 @@ const STAGED: StagedFixture[] = [
     name: "migration backup",
     plant: ["data.json.v2.bak"],
     expect: ["R-DATA-MIGRATION-BAK"],
-    why: "nlib.jsonstore's pre-migration snapshot. Per-install by construction.",
+    why: "norden_lib.jsonstore's pre-migration snapshot. Per-install by construction.",
   },
   {
     name: "tmp with pid suffix",
@@ -285,23 +285,23 @@ for (const { file, rule } of DRILL) {
 
 // Part 2: declared modules
 
-console.log("\n  nlib_modules fixtures");
+console.log("\n  norden_lib_modules fixtures");
 
-/** A fake NLib with a known, small module set. */
-const fakeNlib = join(root, "fakeNlib");
+/** A fake Norden Lib with a known, small module set. */
+const fakeNordenLib = join(root, "fakeNordenLib");
 for (const [name, files] of [
   ["logger", ["shared.lua"]],
   ["jsonstore", ["server.lua"]],
   ["kvp", ["client.lua"]],
   ["notdeclared", ["shared.lua"]],
 ] as Array<[string, string[]]>) {
-  const dir = join(fakeNlib, "shared", "imports", name);
+  const dir = join(fakeNordenLib, "shared", "imports", name);
   mkdirSync(dir, { recursive: true });
   for (const f of files) writeFileSync(join(dir, f), "return {}");
 }
 // A directory with no loadable file at all: `imports.lua` resolves this to
 // nothing, so it must NOT count as available.
-mkdirSync(join(fakeNlib, "shared", "imports", "emptydir"), { recursive: true });
+mkdirSync(join(fakeNordenLib, "shared", "imports", "emptydir"), { recursive: true });
 
 type ModuleFixture = {
   name: string;
@@ -314,17 +314,18 @@ type ModuleFixture = {
 const MODULES: ModuleFixture[] = [
   {
     name: "clean",
-    manifest: "fx_version 'cerulean'\nnlib_modules { 'logger', 'jsonstore' }\n",
+    manifest: "fx_version 'cerulean'\nnorden_lib_modules { 'logger', 'jsonstore' }\n",
     lua: {
-      "server/sv_data.lua": "local s = nlib.jsonstore.open({ log = nlib.logger.create('x') })",
+      "server/sv_data.lua":
+        "local s = norden_lib.jsonstore.open({ log = norden_lib.logger.create('x') })",
     },
     expect: [],
     why: "the baseline. Both declared, both present, both referenced.",
   },
   {
     name: "ghost module",
-    manifest: "fx_version 'cerulean'\nnlib_modules { 'logger', 'jsonstoer' }\n",
-    lua: { "server/sv_data.lua": "nlib.logger.create('x'); nlib.jsonstoer.open({})" },
+    manifest: "fx_version 'cerulean'\nnorden_lib_modules { 'logger', 'jsonstoer' }\n",
+    lua: { "server/sv_data.lua": "norden_lib.logger.create('x'); norden_lib.jsonstoer.open({})" },
     expect: ["R-MODULE-GHOST"],
     why:
       "⛔ the silent one. A typo'd name is not a failed load, it is NOT A LOAD AT ALL — " +
@@ -332,8 +333,8 @@ const MODULES: ModuleFixture[] = [
   },
   {
     name: "directory with no module file",
-    manifest: "fx_version 'cerulean'\nnlib_modules { 'emptydir' }\n",
-    lua: { "server/sv_x.lua": "nlib.emptydir.go()" },
+    manifest: "fx_version 'cerulean'\nnorden_lib_modules { 'emptydir' }\n",
+    lua: { "server/sv_x.lua": "norden_lib.emptydir.go()" },
     expect: ["R-MODULE-GHOST"],
     why:
       "a directory under shared/imports is not a module. `imports.lua` looks for " +
@@ -341,55 +342,56 @@ const MODULES: ModuleFixture[] = [
   },
   {
     name: "unused declaration (soft)",
-    manifest: "fx_version 'cerulean'\nnlib_modules { 'logger', 'kvp' }\n",
-    lua: { "server/sv_x.lua": "nlib.logger.create('x')" },
+    manifest: "fx_version 'cerulean'\nnorden_lib_modules { 'logger', 'kvp' }\n",
+    lua: { "server/sv_x.lua": "norden_lib.logger.create('x')" },
     expect: ["R-MODULE-UNUSED"],
     why: "a stale entry in a block whose stated purpose is being an honest inventory.",
   },
   {
     name: "referenced only in a comment",
-    manifest: "fx_version 'cerulean'\nnlib_modules { 'logger', 'kvp' }\n",
+    manifest: "fx_version 'cerulean'\nnorden_lib_modules { 'logger', 'kvp' }\n",
     lua: {
       "server/sv_x.lua":
-        "nlib.logger.create('x')\n-- we used to call nlib.kvp.get here\n--[[ nlib.kvp.set ]]",
+        "norden_lib.logger.create('x')\n-- we used to call norden_lib.kvp.get here\n--[[ norden_lib.kvp.set ]]",
     },
     expect: ["R-MODULE-UNUSED"],
     why:
-      "⛔ prose is not use. MEASURED for real: every `nlib.diag` in tELS's cl_env.lua is " +
+      "⛔ prose is not use. MEASURED for real: every `norden_lib.diag` in tELS's cl_env.lua is " +
       "inside a comment, and a reader that did not strip comments called that declaration used.",
   },
   {
     name: "method-call and has() both count",
-    manifest: "fx_version 'cerulean'\nnlib_modules { 'logger', 'kvp', 'jsonstore' }\n",
+    manifest: "fx_version 'cerulean'\nnorden_lib_modules { 'logger', 'kvp', 'jsonstore' }\n",
     lua: {
-      "server/sv_x.lua": "nlib.logger.create('x')",
-      "client/cl_x.lua": "if nlib.has('kvp') then end\nlocal v = nlib:jsonstore",
+      "server/sv_x.lua": "norden_lib.logger.create('x')",
+      "client/cl_x.lua": "if norden_lib.has('kvp') then end\nlocal v = norden_lib:jsonstore",
     },
     expect: [],
     why:
-      "`nlib.has('x')` is the SANCTIONED guard (a bare `if nlib.x` is always truthy), and " +
-      "`nlib:x` is legal Lua. Calling either of those unused would be a false positive.",
+      "`norden_lib.has('x')` is the SANCTIONED guard (a bare `if norden_lib.x` is always truthy), and " +
+      "`norden_lib:x` is legal Lua. Calling either of those unused would be a false positive.",
   },
   {
-    name: "singular nlib_module is read too",
-    manifest: "fx_version 'cerulean'\nnlib_module { 'logger' }\n",
-    lua: { "server/sv_x.lua": "nlib.logger.create('x')" },
+    name: "singular norden_lib_module is read too",
+    manifest: "fx_version 'cerulean'\nnorden_lib_module { 'logger' }\n",
+    lua: { "server/sv_x.lua": "norden_lib.logger.create('x')" },
     expect: [],
     why: "imports.lua reads BOTH spellings; a reader that read one would call the other absent.",
   },
   {
     name: "declaration inside a comment is not one",
-    manifest: "fx_version 'cerulean'\n-- nlib_modules { 'jsonstoer' }\nnlib_modules { 'logger' }\n",
-    lua: { "server/sv_x.lua": "nlib.logger.create('x')" },
+    manifest:
+      "fx_version 'cerulean'\n-- norden_lib_modules { 'jsonstoer' }\nnorden_lib_modules { 'logger' }\n",
+    lua: { "server/sv_x.lua": "norden_lib.logger.create('x')" },
     expect: [],
     why:
       "a commented-out block is a very common way to park a declaration, and reading it " +
       "would invent a ghost that is not there.",
   },
   {
-    name: "floor: wrong NLib path",
-    manifest: "fx_version 'cerulean'\nnlib_modules { 'logger' }\n",
-    lua: { "server/sv_x.lua": "nlib.logger.create('x')" },
+    name: "floor: wrong Norden Lib path",
+    manifest: "fx_version 'cerulean'\nnorden_lib_modules { 'logger' }\n",
+    lua: { "server/sv_x.lua": "norden_lib.logger.create('x')" },
     expect: ["R-IMPORTS-FLOOR"],
     why:
       "⛔ availableModules returns [] for a path that does not exist, which makes EVERY " +
@@ -407,8 +409,11 @@ for (const fixture of MODULES) {
     writeFileSync(full, body);
   }
 
-  const nlib = fixture.name === "floor: wrong NLib path" ? join(root, "no-such-nlib") : fakeNlib;
-  const result = checkDeclaredModules({ root: dir, nlib });
+  const norden_lib =
+    fixture.name === "floor: wrong Norden Lib path"
+      ? join(root, "no-such-norden_lib")
+      : fakeNordenLib;
+  const result = checkDeclaredModules({ root: dir, norden_lib });
   report(
     fixture.name,
     fixture.expect,
@@ -422,7 +427,7 @@ for (const fixture of MODULES) {
 // what every real fxmanifest in this estate looks like.
 {
   const parsed = declaredModules(
-    `nlib_modules {
+    `norden_lib_modules {
     -- a long paragraph about why this one is eager, mentioning 'notdeclared'
     'logger',
     --[[ and a block comment naming 'alsonot' ]]

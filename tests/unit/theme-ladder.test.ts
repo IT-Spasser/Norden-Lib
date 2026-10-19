@@ -8,13 +8,13 @@
  *
  *     L(background) <= L(card) < L(input) == L(popover) < L(border)
  *
- * holds in EVERY palette block it declares. When it does not, a NLib field and every
+ * holds in EVERY palette block it declares. When it does not, a Norden Lib field and every
  * `border-input` edge become darker than the panel they sit on and the product grows
  * black outlines around things. That has shipped twice — tELS raised `--card`, then
  * tUnit did — and neither time did anything fail. Each token on its own is a
  * perfectly reasonable colour; only the ORDER is wrong, and nothing reads the order.
  *
- * This does. A new palette block (`.nlib-overlay`, or whatever comes after it) that
+ * This does. A new palette block (`.norden-overlay`, or whatever comes after it) that
  * moves one rung without moving the ones around it fails here, at `bun test`, in the
  * repo that owns the tokens — which is the only place the mistake is cheap.
  *
@@ -70,10 +70,10 @@ function lightness(body: string, token: string): number | undefined {
 }
 
 describe("theme-tokens.css declares at least the two palettes it documents", () => {
-  test(":root and .nlib-overlay are both present", () => {
+  test(":root and .norden-overlay are both present", () => {
     const selectors = paletteBlocks(CSS).map((b) => b.selector);
     expect(selectors).toContain(":root");
-    expect(selectors).toContain(".nlib-overlay");
+    expect(selectors).toContain(".norden-overlay");
   });
 });
 

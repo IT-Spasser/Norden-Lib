@@ -8,4 +8,4 @@ render(() => <App />, document.getElementById("root")!);
 
 // All NUI event listeners are now registered. Signal Lua so it can flush
 // any SendNUIMessage calls that were buffered while the page was loading.
-fetchNui("__nlib_nui_ready");
+fetchNui("__norden_lib_nui_ready");

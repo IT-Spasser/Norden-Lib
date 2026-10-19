@@ -1,7 +1,7 @@
 --[[----------------------------------------------------------------------------
     Cross-resource keybind registry.
 
-    Every consumer that binds through `nlib.platform.bindKey` reports the bind
+    Every consumer that binds through `norden_lib.platform.bindKey` reports the bind
     here. That is the only place in the stack where two different resources'
     bindings are visible at the same time, and it is the reason this file exists.
 
@@ -31,7 +31,7 @@
     empty table. `REPORT_DELAY_MS` is generous for that reason.
 ------------------------------------------------------------------------------]]
 
-local log = Logger.create('NLib/keybinds')
+local log = Logger.create('norden_lib/keybinds')
 
 --- Every bind reported, keyed `group\1key` -> { {resource=, token=, label=}, ... }
 local byKey = {}
@@ -105,9 +105,9 @@ local function conflicts()
     return out
 end
 
-Platform.export('NLib', 'ReportKeybind', report)
-Platform.export('NLib', 'GetKeybinds', function() return all end)
-Platform.export('NLib', 'GetKeybindConflicts', conflicts)
+Platform.export('norden_lib', 'ReportKeybind', report)
+Platform.export('norden_lib', 'GetKeybinds', function() return all end)
+Platform.export('norden_lib', 'GetKeybindConflicts', conflicts)
 
 CreateThread(function()
     Wait(REPORT_DELAY_MS)

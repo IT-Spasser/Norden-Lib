@@ -3,7 +3,7 @@
 // studio's mock harness, for data-hud-* lint warnings, and for what an in-game
 // consumer is allowed to SetHudState with.
 //
-// NLib owns the generic types and the helpers that read them. Concrete manifests
+// Norden Lib owns the generic types and the helpers that read them. Concrete manifests
 // live in their consumer resources — `uiRadarManifest`, `uiTelsHudManifest`,
 // `uiDetectorManifest`, `uiRadioSkinManifest` — and tWeb's Studio VENDORS those
 // files at build time (`scripts/sync-hud-sdk.ts`) so it can preview a layout
@@ -18,7 +18,7 @@
 // Do not reintroduce one speculatively; add it when something reads it.
 //
 // There was also a STATIC registry here — `shared/ts/manifests.ts`, exported as
-// `@nlib/shared/manifests`, holding hand-copied bodies of `uiRadioManifest` and
+// `@norden_lib/shared/manifests`, holding hand-copied bodies of `uiRadioManifest` and
 // `uiTelsHudManifest` under a comment saying "kept in sync manually". It is gone,
 // and the two reasons it went are both reasons not to write another one:
 //
@@ -31,8 +31,8 @@
 //      in its own hand-written port, inherited from tg-new's.
 //   2. It could not be fixed by gating it the way `internal/shared-ts/deck` is
 //      gated. That vendoring runs one way, from a library into private
-//      consumers. A manifest sync would run the other way — NLib reading
-//      tRadio and tELS — which inverts the dependency NLib exists to keep
+//      consumers. A manifest sync would run the other way — Norden Lib reading
+//      tRadio and tELS — which inverts the dependency Norden Lib exists to keep
 //      one-directional and puts two paid resources' manifests in a public repo.
 //
 // Its only consumer was `internal/tgstudios-v2`, which now reads the real
@@ -43,7 +43,7 @@
 // Keys are dot-pathed so `leds.R1` resolves through HudBinder's `read()`.
 
 // Open string: a consumer wanting compile-time narrowing augments the module on
-// its own side, which keeps NLib vocabulary-clean.
+// its own side, which keeps Norden Lib vocabulary-clean.
 export type UiItemType = string;
 
 export interface UiManifest {

@@ -21,7 +21,7 @@ A clear description of what you expected to happen.
 If applicable, add screenshots or server/client console output.
 
 **Environment**
-- NLib version:
+- Norden Lib version:
 - Framework (ESX / QBCore / standalone):
 - FiveM game build:
 - Server artifacts version:

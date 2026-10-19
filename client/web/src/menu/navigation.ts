@@ -24,7 +24,7 @@ export interface MenuEntry extends MenuItem {
   // hit is what lets activate() route the row to a navigation rather than an
   // action: it does not exist on this page, so there is nothing to dispatch to.
   hit?: SearchHit;
-  // Only on the one synthetic row NLib's menu injects into every owner's entry
+  // Only on the one synthetic row Norden Lib's menu injects into every owner's entry
   // page: the resource the feedback is about. Same reason as `hit` — the row
   // belongs to no resource, so there is no action to dispatch and activate()
   // opens a dialog instead.

@@ -1,11 +1,11 @@
 --[[
-    NLib/shared/imports/access/adapters.lua
+    norden_lib/shared/imports/access/adapters.lua
 
 
     Two ordered lists. Order IS the priority, and it is the whole detection
     strategy: first adapter whose resource is `started` wins -- `started`, not
     `~= 'missing'`, so a leftover folder the owner stopped months ago cannot
-    knock out the live one. Overridable with `nlib.access.use()`.
+    knock out the live one. Overridable with `norden_lib.access.use()`.
 
     Every function here is called inside a pcall by server.lua, so an adapter may
     index freely. It must return the right TYPE though: `jobs` a table, `count` a

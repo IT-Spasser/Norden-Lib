@@ -65,7 +65,7 @@ mock.module("../../shared/ts/nui", () => ({
    * coherent fiction for a mock whose `fetchNui` always answers.
    */
   isNUI: () => true,
-  getResourceName: (fallback = "NLib") => fallback,
+  getResourceName: (fallback = "norden_lib") => fallback,
 }));
 
 const { previewMarketplaceHtml, clearPreviewCache, previewCacheStats } = await import(

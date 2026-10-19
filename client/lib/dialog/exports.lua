@@ -1,6 +1,6 @@
 DialogExports = {}
 
-local log = Logger.create('NLib/dialog')
+local log = Logger.create('norden_lib/dialog')
 
 local VALID_FIELD_TYPES = {
     text     = true,
@@ -216,7 +216,7 @@ local _usedIds = {}
 local _stoppingOwners = {}
 
 -- Native focus may still be false while a dialog waits in the NUI-ready queue, so
--- other NLib editors check this rather than the focus flag.
+-- other Norden Lib editors check this rather than the focus flag.
 function DialogExports.isActive()
     return not _stopped and _activeDialogId ~= nil
 end
@@ -294,9 +294,9 @@ end
 
 -- NUI focus is a process-wide switch, so a rescue path calling SetNuiFocus(false)
 -- blindly could yank the cursor from an unrelated resource's UI. Rescue paths
--- release only what NLib took; the normal close paths stay unconditional.
-local function nlibHoldsFocus()
-    return _NLIB_NUI_FOCUSED == true or _NLIB_UI_FOCUSED == true
+-- release only what Norden Lib took; the normal close paths stay unconditional.
+local function nordenLibHoldsFocus()
+    return _NORDEN_LIB_NUI_FOCUSED == true or _NORDEN_LIB_UI_FOCUSED == true
 end
 
 local function lockPlayerInput()
@@ -329,7 +329,7 @@ local function closeDialog(ui, id)
     DialogState.remove(id)
     Platform.sendUIEvent(ui, 'closeDialog', { id = id, instance = entry.instance })
     unlockPlayerInput(ui, id)
-    Platform.TriggerEvent('NLib:dialog:cancelled', id)
+    Platform.TriggerEvent('norden_lib:dialog:cancelled', id)
     if cbs and cbs.onCancel then
         invoke(cbs.onCancel)
     end
@@ -370,15 +370,15 @@ local function armNuiReadyWatchdog(ui)
         _readyWatchdog = nil
         if Platform.isNUIReady() then return end
         _readyWarned = true
-        log('A dialog was requested but NLib\'s NUI page has not reported ready after '
+        log('A dialog was requested but Norden Lib\'s NUI page has not reported ready after '
             .. tostring(math.floor(NUI_READY_TIMEOUT_MS / 1000)) .. 's, so no dialog can be shown. This is '
-            .. 'almost always missing UI assets: NLib/client/ui/assets/ is excluded by .gitignore, so a '
+            .. 'almost always missing UI assets: norden_lib/client/ui/assets/ is excluded by .gitignore, so a '
             .. 'copy taken from the source archive ships an index.html whose script tag 404s and '
-            .. 'the page never mounts. Install the packaged release (NLib.zip) instead of a source '
-            .. 'download, or build the UI from the NLib folder. Player input has been left with '
+            .. 'the page never mounts. Install the packaged release (norden_lib.zip) instead of a source '
+            .. 'download, or build the UI from the Norden Lib folder. Player input has been left with '
             .. 'the game, so nobody is locked out.', 4)
         -- In case some other path grabbed focus first.
-        if nlibHoldsFocus() then unlockPlayerInput(ui) end
+        if nordenLibHoldsFocus() then unlockPlayerInput(ui) end
     end, NUI_READY_TIMEOUT_MS)
 end
 
@@ -425,7 +425,7 @@ local function wireEvents(ui)
         DialogState.remove(data.id)
         Platform.sendUIEvent(ui, 'closeDialog', { id = data.id, instance = entry.instance })
         unlockPlayerInput(ui, data.id)
-        Platform.TriggerEvent('NLib:dialog:submitted', data.id, values)
+        Platform.TriggerEvent('norden_lib:dialog:submitted', data.id, values)
         if cbs and cbs.onSubmit then
             invoke(cbs.onSubmit, values)
         end
@@ -438,7 +438,7 @@ local function wireEvents(ui)
         if not field or not validValue(field, data.value) then return end
         refreshFocusWatchdog(ui, data.id)
         local cbs = _dialogCallbacks[data.id]
-        Platform.TriggerEvent('NLib:dialog:changed', data.id, data.fieldId, data.value)
+        Platform.TriggerEvent('norden_lib:dialog:changed', data.id, data.fieldId, data.value)
         if DialogState.get(data.id) == entry and cbs then
             invoke(cbs.onChange, data.fieldId, data.value)
         end
@@ -457,7 +457,7 @@ local function wireEvents(ui)
         if not allowed then return end
         refreshFocusWatchdog(ui, data.id)
         local cbs = _dialogCallbacks[data.id]
-        Platform.TriggerEvent('NLib:dialog:buttonClick', data.id, data.fieldId)
+        Platform.TriggerEvent('norden_lib:dialog:buttonClick', data.id, data.fieldId)
         if DialogState.get(data.id) == entry and cbs then
             invoke(cbs.onButtonClick, data.fieldId)
         end
@@ -469,7 +469,7 @@ local function wireEvents(ui)
         _dialogCallbacks[data.id] = nil
         DialogState.remove(data.id)
         unlockPlayerInput(ui, data.id)
-        Platform.TriggerEvent('NLib:dialog:cancelled', data.id)
+        Platform.TriggerEvent('norden_lib:dialog:cancelled', data.id)
         if cbs and cbs.onCancel then
             invoke(cbs.onCancel)
         end
@@ -499,12 +499,12 @@ function DialogExports.register()
     end)
 
     local function registerExport(name, fn)
-        Platform.export('NLib', name, fn)
+        Platform.export('norden_lib', name, fn)
     end
 
     -- Returns the resolved dialog id, generating one when `id` is nil.
     --
-    -- Results arrive both as local events (NLib:dialog:submitted/cancelled) and
+    -- Results arrive both as local events (norden_lib:dialog:submitted/cancelled) and
     -- through inline callbacks, which are additive rather than a replacement.
     -- onSubmit/onCancel may be passed positionally for backward compatibility, or on
     -- opts alongside onChange and onButtonClick.
@@ -566,7 +566,7 @@ function DialogExports.register()
         -- newer and wins. Never let this outer call overwrite or focus it later.
         if previous then
             Platform.sendUIEvent(ui, 'closeDialog', { id = previousId, instance = previous.instance })
-            Platform.TriggerEvent('NLib:dialog:cancelled', previousId)
+            Platform.TriggerEvent('norden_lib:dialog:cancelled', previousId)
             if previousCallbacks then invoke(previousCallbacks.onCancel) end
         end
         if _stopped or DialogState.get(id) ~= entry or _activeDialogId ~= id then
@@ -577,7 +577,7 @@ function DialogExports.register()
         -- sendUIEvent buffers on the same signal and the adapter flushes it before
         -- running ready callbacks, so the dialog is on screen before focus is taken.
         acquireFocus(ui, id)
-        Platform.TriggerEvent('NLib:dialog:opened', id)
+        Platform.TriggerEvent('norden_lib:dialog:opened', id)
         return id
     end)
 
@@ -666,7 +666,7 @@ function DialogExports.register()
         Platform.sendUIEvent(ui, 'updateDialogFields', { dialogId = dialogId, instance = entry.instance, fields = serialised })
     end)
 
-    -- Closes an open dialog and fires NLib:dialog:cancelled. No-op for an id that
+    -- Closes an open dialog and fires norden_lib:dialog:cancelled. No-op for an id that
     -- already submitted or cancelled.
     registerExport('CloseDialog', function(id)
         if type(id) ~= 'string' or id == '' then

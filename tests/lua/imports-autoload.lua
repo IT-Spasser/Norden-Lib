@@ -1,15 +1,15 @@
--- Run from NLib: bunx --bun --package fengari-node-cli fengari scripts/run-lua-suite.lua tests/lua/imports-autoload.lua
+-- Run from norden_lib: bunx --bun --package fengari-node-cli fengari scripts/run-lua-suite.lua tests/lua/imports-autoload.lua
 --
 -- Oracle for the AUTOLOAD list in imports.lua — the two modules whose wiring only
 -- happens when they load, which a consumer no longer has to declare.
 --
 -- WHAT THIS GUARDS
 -- ----------------
--- `telemetry`'s file scope is what registers the `nlib:diagnostics` NUI callback,
+-- `telemetry`'s file scope is what registers the `norden_lib:diagnostics` NUI callback,
 -- subscribes the consent event and starts the flush thread. tRadio's and tCAD's
--- diagnostics producer is the NUI collector, which never touches `nlib.telemetry`
+-- diagnostics producer is the NUI collector, which never touches `norden_lib.telemetry`
 -- from Lua at all, so there is no first access to trigger a lazy load. Until
--- 0.15.x the thing that loaded it was a `nlib_modules { 'telemetry' }` entry in
+-- 0.15.x the thing that loaded it was a `norden_lib_modules { 'telemetry' }` entry in
 -- eight manifests; those entries are gone, and if the autoload list ever loses
 -- the module the NUI flushes into an unregistered callback and NOTHING
 -- TRANSMITS, with nothing saying so. There is no error to assert on. So the
@@ -55,7 +55,7 @@ local REAL = {
     occupancy = 'shared/imports/occupancy/server.lua',
 }
 
---- Run the REAL imports.lua against a fake NLib install and record what the
+--- Run the REAL imports.lua against a fake Norden Lib install and record what the
 --- modules it loads register.
 ---
 --- `opts.author`   the consumer manifest's `author`, which is what decides the
@@ -92,13 +92,13 @@ local function fixture(opts)
 
     _ENV.GetNumResourceMetadata = function(_, key)
         if key == 'author' then return opts.author and 1 or 0 end
-        if key == 'nlib_modules' then return #(opts.declared or {}) end
+        if key == 'norden_lib_modules' then return #(opts.declared or {}) end
         return 0
     end
     _ENV.GetResourceMetadata = function(_, key, index)
         if key == 'version' then return '9.9.9' end
         if key == 'author' then return opts.author end
-        if key == 'nlib_modules' then return (opts.declared or {})[index + 1] end
+        if key == 'norden_lib_modules' then return (opts.declared or {})[index + 1] end
         return nil
     end
 
@@ -106,7 +106,7 @@ local function fixture(opts)
     -- here is non-nil; the body that actually runs is decided by `load` below.
     local files = {
         -- imports.lua probes fxmanifest.lua to tell "one module is missing" from
-        -- "I cannot read NLib at all".
+        -- "I cannot read Norden Lib at all".
         ['fxmanifest.lua'] = 'MARKER:manifest',
         ['shared/sh_branding.lua'] = 'MARKER:branding',
     }
@@ -143,7 +143,7 @@ local function fixture(opts)
     _ENV.load = function(chunk, chunkname, mode, env)
         -- Branding is the real file too: the studio rule is half of what is
         -- under test, and a stub would be asserting against itself.
-        if chunkname == '@@NLib/shared/sh_branding.lua' then
+        if chunkname == '@@norden_lib/shared/sh_branding.lua' then
             return assert(realLoad(
                 'StudioBranding = StudioBranding or {}\n' ..
                 'return (function() ' ..
@@ -175,17 +175,17 @@ local function fixture(opts)
     _ENV.load = realLoad
     _ENV.print = realPrint
 
-    return _ENV.nlib, wired, ok, err
+    return _ENV.norden_lib, wired, ok, err
 end
 
 local STUDIO = 'TIMMYG Studios'
-local NUI_CALLBACK = 'nlib:diagnostics'
-local CONSENT_EVENT = 'nlib:diag:consent'
+local NUI_CALLBACK = 'norden_lib:diagnostics'
+local CONSENT_EVENT = 'norden_lib:diag:consent'
 
 -- The thing this whole change risks
 
 test('telemetry wires in a consumer that declares NOTHING', function()
-    local nlib, wired, ok, err = fixture({ author = STUDIO, real = { 'telemetry' } })
+    local norden_lib, wired, ok, err = fixture({ author = STUDIO, real = { 'telemetry' } })
     assert(ok, 'imports.lua raised: ' .. tostring(err))
     assert(wired.bodies.telemetry, 'the real telemetry body never ran')
     assert(wired.nuiCallbacks[NUI_CALLBACK],
@@ -193,28 +193,28 @@ test('telemetry wires in a consumer that declares NOTHING', function()
         .. 'would land on nothing and transmit silently')
     assert(wired.netEvents[CONSENT_EVENT], 'the consent event is not subscribed')
     assert(wired.threads > 0, 'no flush thread was started')
-    assert(type(rawget(nlib, 'telemetry')) == 'table', 'telemetry is not cached on nlib')
+    assert(type(rawget(norden_lib, 'telemetry')) == 'table', 'telemetry is not cached on norden_lib')
 end)
 
 test('the manifest really declared nothing — the fixture is not cheating', function()
     -- Guards the test, not the code: if the fixture ever reported a declaration,
     -- the assertion above would be proving the OLD mechanism still works.
     local probes = {}
-    local nlib = fixture({ author = STUDIO, real = { 'telemetry' } })
-    for key in pairs({ nlib_module = true, nlib_modules = true }) do
+    local norden_lib = fixture({ author = STUDIO, real = { 'telemetry' } })
+    for key in pairs({ norden_lib_module = true, norden_lib_modules = true }) do
         probes[#probes + 1] = key
         assert(GetNumResourceMetadata('consumer', key) == 0,
             'the fixture manifest declares ' .. key .. '; this suite must not depend on it')
     end
     assert(#probes == 2, 'expected both spellings checked')
-    assert(nlib ~= nil, 'no nlib table')
+    assert(norden_lib ~= nil, 'no norden_lib table')
 end)
 
 test('a declaration still loads a module, so the directive keeps working', function()
     -- `coords` is not in AUTOLOAD and has no Lua caller in the fixture, so the
     -- only thing that can have loaded it is the manifest loop.
-    local nlib = fixture({ author = STUDIO, declared = { 'coords' } })
-    assert(rawget(nlib, 'coords') ~= nil, 'a declared module was not eagerly loaded')
+    local norden_lib = fixture({ author = STUDIO, declared = { 'coords' } })
+    assert(rawget(norden_lib, 'coords') ~= nil, 'a declared module was not eagerly loaded')
 end)
 
 test('declaring telemetry as well as autoloading it loads it ONCE', function()
@@ -230,8 +230,8 @@ test('occupancy wires its discovery handler with nothing declared', function()
     local _, wired, ok, err = fixture({ context = 'server', real = { 'occupancy' } })
     assert(ok, 'imports.lua raised: ' .. tostring(err))
     assert(wired.bodies.occupancy, 'the real occupancy body never ran')
-    assert(wired.netEvents['nlib:occupancy:moved'],
-        'nlib:occupancy:moved is not registered — a client seat ping would be dropped '
+    assert(wired.netEvents['norden_lib:occupancy:moved'],
+        'norden_lib:occupancy:moved is not registered — a client seat ping would be dropped '
         .. 'and partnerOf would report an empty seat beside a driver')
     assert(wired.netEvents.playerDropped, 'the disconnect sweep is not registered')
 end)
@@ -250,7 +250,7 @@ test('telemetry does not autoload into a non-studio resource', function()
     local _, wired, ok = fixture({ author = 'Someone Else', real = { 'telemetry' } })
     assert(ok, 'imports.lua raised')
     assert(not wired.bodies.telemetry,
-        'telemetry autoloaded into a third-party resource; NLib is MIT and must not '
+        'telemetry autoloaded into a third-party resource; Norden Lib is MIT and must not '
         .. 'start a flush thread in a VM that never asked for one')
     assert(not wired.nuiCallbacks[NUI_CALLBACK], 'the NUI callback was registered anyway')
 end)
@@ -281,7 +281,7 @@ local function joined(lines) return table.concat(lines, '\n') end
 test('an autoload name that resolves to no file SAYS SO', function()
     -- The manifest loop discards loadModule's return, so a name it cannot
     -- resolve raises nothing at all. AUTOLOAD must not inherit that: the names
-    -- in it are NLib's own, so one that misses is a packaging bug.
+    -- in it are Norden Lib's own, so one that misses is a packaging bug.
     local _, wired, ok, err = fixture({ context = 'server', absent = { 'occupancy' } })
     assert(ok, 'imports.lua raised: ' .. tostring(err))
     local out = joined(wired.printed)
@@ -298,26 +298,26 @@ test('a missing autoload module does NOT take the consumer down', function()
     -- off", it is every t* resource on the server refusing to start — over a
     -- fault a half-finished download can cause. The suite asserts the weaker
     -- failure ON PURPOSE.
-    local nlib, _, ok = fixture({ context = 'server', absent = { 'occupancy' } })
+    local norden_lib, _, ok = fixture({ context = 'server', absent = { 'occupancy' } })
     assert(ok, 'imports.lua must still load with one of its own modules missing')
-    assert(type(nlib) == 'table', 'the consumer must still get a nlib table')
-    assert(nlib.has('occupancy') == false, 'and has() must answer honestly about it')
-    assert(type(rawget(nlib, 'coords')) ~= 'table' or true, 'the rest of NLib is unaffected')
+    assert(type(norden_lib) == 'table', 'the consumer must still get a norden_lib table')
+    assert(norden_lib.has('occupancy') == false, 'and has() must answer honestly about it')
+    assert(type(rawget(norden_lib, 'coords')) ~= 'table' or true, 'the rest of Norden Lib is unaffected')
 end)
 
-test('a host that cannot read NLib AT ALL is not a packaging fault', function()
+test('a host that cannot read Norden Lib AT ALL is not a packaging fault', function()
     -- MEASURED FAILURE, not a hypothetical. An earlier version of this check
     -- error()ed whenever loadModule returned nil, which in a VM with
     -- LoadResourceFile stubbed is every module — so it declared `occupancy`
     -- missing while shared/imports/occupancy/{client,server}.lua sat untouched on
     -- disk, and took tests/lua/imports-has.lua down with it. Two different faults
     -- with two different fixes must not share one verdict.
-    local nlib, wired, ok = fixture({ context = 'server', unreadable = true, author = STUDIO })
-    assert(ok, 'imports.lua must load in a VM that can read none of NLib: ' .. tostring(ok))
-    assert(type(nlib) == 'table', 'and still hand the consumer a nlib table')
+    local norden_lib, wired, ok = fixture({ context = 'server', unreadable = true, author = STUDIO })
+    assert(ok, 'imports.lua must load in a VM that can read none of norden_lib: ' .. tostring(ok))
+    assert(type(norden_lib) == 'table', 'and still hand the consumer a norden_lib table')
     local out = joined(wired.printed)
     assert(not out:find('packaged', 1, true),
-        'a host that can read nothing was blamed on NLib packaging: ' .. out)
+        'a host that can read nothing was blamed on Norden Lib packaging: ' .. out)
     assert(out == '', 'expected no console output at all, got: ' .. out)
 end)
 

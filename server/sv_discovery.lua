@@ -1,21 +1,21 @@
 -- Scans resources for tagged configs, loads and saves them, resolves hash↔name
 -- aliases, edits manifests and picks up resources that start late.
 
-local log = Logger.create('NLib/discovery')
+local log = Logger.create('norden_lib/discovery')
 
 Discovery = {}
 
 -- The resource whose VM issues the file-writing natives below. Every write in
--- this file is made from NLib's runtime no matter which resource asked for it,
--- because Discovery.create is reached across an export boundary — so NLib is the
+-- this file is made from Norden Lib's runtime no matter which resource asked for it,
+-- because Discovery.create is reached across an export boundary — so Norden Lib is the
 -- name that appears in a filesystem-permission grant, not the consumer's.
-local NLIB_RESOURCE = _NLIB_IS_FIVEM and GetCurrentResourceName() or 'NLib'
+local NORDEN_LIB_RESOURCE = _NORDEN_LIB_IS_FIVEM and GetCurrentResourceName() or 'norden_lib'
 
 -- THERE IS NO server.cfg LINE THAT LIFTS THE CROSS-RESOURCE WRITE REFUSAL.
 -- DO NOT ADD ONE BACK, AND DO NOT TELL OPERATORS TO TRY ONE.
 --
 -- This file used to carry
---     BLANKET_GRANT_LINE = 'add_filesystem_permission NLib write *'
+--     BLANKET_GRANT_LINE = 'add_filesystem_permission Norden Lib write *'
 -- and six places recommended it whenever a write was refused. It was a
 -- hypothesis awaiting measurement. The measurement is in, and it is negative:
 -- that exact line sat in 305RP2's server.cfg from 2026-09-25, across many
@@ -24,9 +24,9 @@ local NLIB_RESOURCE = _NLIB_IS_FIVEM and GetCurrentResourceName() or 'NLib'
 --
 -- The reason is that the sandbox objects to WHICH RESOURCE IS WRITING, not to
 -- a missing permission. FiveM's Node runtime confines each resource to its own
--- directory, so a write originating in NLib's VM cannot land in someone else's
+-- directory, so a write originating in Norden Lib's VM cannot land in someone else's
 -- folder whatever the cfg says. shared/ts/fs/server.ts records the same finding
--- from the other side: a NLib-registered `WriteResourceFile(resource, ...)` was
+-- from the other side: a Norden Lib-registered `WriteResourceFile(resource, ...)` was
 -- built, measured, and abandoned for this, and replaced by "every resource
 -- writes to itself from its own bundle".
 --
@@ -34,17 +34,17 @@ local NLIB_RESOURCE = _NLIB_IS_FIVEM and GetCurrentResourceName() or 'NLib'
 -- comment used to say so. They are possible, and _saveFile does them: the
 -- write just has to ORIGINATE in the target, which is what calling the
 -- TARGET's own `WriteResourceFile` export achieves. Every t* resource bundles
--- NLib's shared/ts and registers one, and exports cross resources freely. The
+-- Norden Lib's shared/ts and registers one, and exports cross resources freely. The
 -- only unreachable destination is one with no server bundle at all -- a plain
 -- ASSET PACK, a vehicle resource shipping a tels.json. That case is structural.
 --
 -- For that case, and only that case, there is STAGING: write the finished file
--- inside NLib and tell the operator the two or three steps to put it where it
+-- inside Norden Lib and tell the operator the two or three steps to put it where it
 -- belongs. See stagingPath and _stageFile below, and the identical fallback in
 -- saveModelConfig.
 
--- Where a refused export leaves the file it could not deliver. Inside NLib,
--- because NLib's own directory is the one place a write from NLib's VM is always
+-- Where a refused export leaves the file it could not deliver. Inside Norden Lib,
+-- because Norden Lib's own directory is the one place a write from Norden Lib's VM is always
 -- allowed.
 local function stagingPath(targetResource, targetPath)
     return 'export-staging/' .. tostring(targetResource) .. '/' .. tostring(targetPath)
@@ -73,7 +73,7 @@ local _rateBuckets = {}
 local function rateLimited(bucket, src, intervalMs)
     -- Platform.now() is a stub off FiveM, where there are no net events to
     -- limit in the first place.
-    if not _NLIB_IS_FIVEM then return false end
+    if not _NORDEN_LIB_IS_FIVEM then return false end
     local b = _rateBuckets[bucket]
     if not b then
         b = {}
@@ -93,7 +93,7 @@ Platform.onPlayerDropped(function(src)
 end)
 
 local function _loadFile(resource, path)
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         return LoadResourceFile(resource, path)
     else
         log('_loadFile: host has no file-read API (resource=' .. tostring(resource) .. ' path=' .. tostring(path) .. ')', 3)
@@ -122,7 +122,7 @@ end
 --   'missing' the target resource does not exist (the native raised)
 --   'nohost'  not running on FiveM at all
 local function _saveFile(resource, path, content)
-    if not _NLIB_IS_FIVEM then
+    if not _NORDEN_LIB_IS_FIVEM then
         local err = 'host has no file-write API (resource=' .. tostring(resource) .. ' path=' .. tostring(path) .. ')'
         log('_saveFile: ' .. err, 3)
         return false, err, 'nohost'
@@ -142,10 +142,10 @@ local function _saveFile(resource, path, content)
     -- The sandbox objects to which resource is DOING the writing, not to the
     -- destination — so the write has to originate inside the target. That is
     -- exactly what the target's own `WriteResourceFile` export is: every
-    -- resource bundling NLib's shared/ts calls `registerWriteResourceFile()`
+    -- resource bundling Norden Lib's shared/ts calls `registerWriteResourceFile()`
     -- in its own server/main.ts, and an export is callable across resources.
     --
-    -- `exports[resource]`, NOT `exports[NLib]`. Asking our own bridge to
+    -- `exports[resource]`, NOT `exports[norden_lib]`. Asking our own bridge to
     -- write somewhere else is the thing that is refused, and shared/ts/fs/
     -- server.ts refuses it there deliberately rather than letting Node answer
     -- with "use --allow-fs-write" — a server startup argument no customer can
@@ -171,16 +171,16 @@ local function _saveFile(resource, path, content)
         'denied'
 end
 
---- Write into NLib's OWN directory, which is never sandbox-refused.
+--- Write into Norden Lib's OWN directory, which is never sandbox-refused.
 ---
---- Goes through NLib's Node export rather than SaveResourceFile because it
+--- Goes through Norden Lib's Node export rather than SaveResourceFile because it
 --- creates missing parent directories; the staging tree below is nested.
 local function _stageFile(relPath, content)
-    if not _NLIB_IS_FIVEM then
+    if not _NORDEN_LIB_IS_FIVEM then
         return false, 'host has no file-write API'
     end
     local called, res = pcall(function()
-        return exports[NLIB_RESOURCE]:WriteResourceFile(NLIB_RESOURCE, relPath, content)
+        return exports[NORDEN_LIB_RESOURCE]:WriteResourceFile(NORDEN_LIB_RESOURCE, relPath, content)
     end)
     if not called then return false, tostring(res) end
     -- WriteResourceFile answers `true`, or a string describing the failure.
@@ -189,7 +189,7 @@ local function _stageFile(relPath, content)
 end
 
 local function _getResourceMeta(resource, key)
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         return GetResourceMetadata(resource, key, 0)
     else
         return nil
@@ -197,7 +197,7 @@ local function _getResourceMeta(resource, key)
 end
 
 local function _getResourceCount()
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         return GetNumResources()
     else
         return 0
@@ -205,7 +205,7 @@ local function _getResourceCount()
 end
 
 local function _getResourceAtIndex(i)
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         return GetResourceByFindIndex(i)
     else
         return nil
@@ -213,7 +213,7 @@ local function _getResourceAtIndex(i)
 end
 
 local function _getResourceState(resource)
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         return GetResourceState(resource)
     else
         return 'unknown'
@@ -221,7 +221,7 @@ local function _getResourceState(resource)
 end
 
 local function _hashKey(key)
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         return GetHashKey(key)
     else
         return key
@@ -229,34 +229,34 @@ local function _hashKey(key)
 end
 
 local function _chatMessage(src, tag, message)
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         Platform.TriggerClientEvent("chat:addMessage", src, { args = { tag, message } })
     end
 end
 
 local function _onResourceStart(cb)
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         return AddEventHandler("onResourceStart", cb)
     end
 end
 
 local function _onResourceStop(cb)
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         return AddEventHandler("onResourceStop", cb)
     end
 end
 
 --  INSTANCE LIFETIME
 --
---  Every handler this module registers lives in NLib's resource state, not in
+--  Every handler this module registers lives in Norden Lib's resource state, not in
 --  the consumer's -- Discovery.create is called across an export boundary, so
---  the closures it builds belong to NLib and survive for as long as NLIB is
+--  the closures it builds belong to Norden Lib and survive for as long as NORDEN_LIB is
 --  running. Nothing in here used to end that lifetime.
 --
 --  The consequence was not subtle. `restart tELS` re-ran CreateDiscovery and
 --  registered a SECOND config_request handler over a freshly loaded `configs`
 --  table, while the first one stayed live over the table it loaded whenever
---  NLib last started. Both answered. The client kept whichever reply landed
+--  Norden Lib last started. Both answered. The client kept whichever reply landed
 --  last, so an edit to data.json could be correct on disk, correctly loaded by
 --  the restarted consumer, and still never reach a client -- and restarting the
 --  consumer again only added a third voice. It presented as "the config is
@@ -280,7 +280,7 @@ function Discovery.addManifestSibling(key)
         if k == key then return end
     end
     MANIFEST_SIBLINGS[#MANIFEST_SIBLINGS + 1] = key
-    pcall(function() exports['NLib']:RegisterManifestSibling(key) end)
+    pcall(function() exports['norden_lib']:RegisterManifestSibling(key) end)
 end
 
 --- Ensure a resource's fxmanifest.lua carries a metadata line for `metadataKey`.
@@ -290,7 +290,7 @@ end
 --- never be the thing that unwinds an otherwise-successful export, hence pcall.
 local function appendToManifest(resourceName, metadataKey, filePath)
     local ok, res = pcall(function()
-        return exports[NLIB_RESOURCE]:AppendToManifest(resourceName, metadataKey, filePath)
+        return exports[NORDEN_LIB_RESOURCE]:AppendToManifest(resourceName, metadataKey, filePath)
     end)
     if not ok then
         log('AppendToManifest raised for ' .. tostring(resourceName) .. ': ' .. tostring(res), 4)
@@ -365,7 +365,7 @@ function Discovery.create(opts)
     -- took a whole resource offline. Guards skip or pass through, never throw.
 
     -- `skipAutoSave` means the owning resource does its own file writes; what it
-    -- is avoiding is SaveResourceFile reaching from NLib's runtime into its
+    -- is avoiding is SaveResourceFile reaching from Norden Lib's runtime into its
     -- folder. Every write path must honour it.
     --- Returns ok, err, kind. `kind == 'skipped'` is not a failure: the owner
     --- writes its own file and is expected to. Any other falsey return IS one,
@@ -496,12 +496,12 @@ function Discovery.create(opts)
         -- every caller went on to report success.
         local advice = ""
         if kind == 'denied' then
-            -- NLib is writing into the consumer's own folder from NLib's VM. The
+            -- Norden Lib is writing into the consumer's own folder from Norden Lib's VM. The
             -- owner is the resource that can always write here, so the real fix
             -- is for it to take the write — which is exactly what `skipAutoSave`
             -- is for.
             advice = " '" .. tostring(ownerResource) .. "' should pass skipAutoSave = true to CreateDiscovery and"
-                .. " write its own data file (nlib.fs.writeResourceFile runs inside its VM and is always allowed)."
+                .. " write its own data file (norden_lib.fs.writeResourceFile runs inside its VM and is always allowed)."
         end
         log("[" .. tag .. "] saveLocal FAILED for " .. tostring(ownerResource) .. "/" .. tostring(filePath)
             .. " — " .. tostring(err) .. " Nothing was written; these settings will be gone after a restart."
@@ -661,14 +661,14 @@ function Discovery.create(opts)
                 -- DO NOT RECOMMEND THE BLANKET GRANT HERE. It cannot work.
                 --
                 -- This used to end with "add this one line to server.cfg and
-                -- restart: add_filesystem_permission NLib write *". That advice
+                -- restart: add_filesystem_permission Norden Lib write *". That advice
                 -- is false, and it was being printed on EVERY lightbar save.
                 -- The grant has been in 305RP2's server.cfg since 2026-09-25 and
                 -- the write is still refused, because the sandbox objects to
                 -- WHICH RESOURCE IS WRITING, not to a missing permission:
                 -- FiveM's Node runtime confines each resource to its own
                 -- directory. shared/ts/fs/server.ts documents the same thing
-                -- from the other side -- a NLib-registered WriteResourceFile
+                -- from the other side -- a Norden Lib-registered WriteResourceFile
                 -- taking a target resource was built, measured and abandoned
                 -- for exactly this reason, and replaced by "every resource
                 -- writes to itself from its own bundle".
@@ -681,7 +681,7 @@ function Discovery.create(opts)
                 -- structural, not a configuration gap, and no cfg line fixes it.
                 --
                 -- So do what the export path at the bottom of this file already
-                -- does: stage the finished file inside NLib and tell the
+                -- does: stage the finished file inside Norden Lib and tell the
                 -- operator the three steps. `stagingPath` and `_stageFile`
                 -- exist for precisely this.
                 local staged = stagingPath(ext.resource, ext.filePath)
@@ -690,8 +690,8 @@ function Discovery.create(opts)
                 if stagedOk then
                     log("[" .. tag .. "] Could not write '" .. model .. "' into '" .. ext.resource
                         .. "' (" .. tostring(err) .. "), so the finished file was written to "
-                        .. NLIB_RESOURCE .. "/" .. staged .. " instead.", 3)
-                    log("[" .. tag .. "]   1. Copy " .. NLIB_RESOURCE .. "/" .. staged
+                        .. NORDEN_LIB_RESOURCE .. "/" .. staged .. " instead.", 3)
+                    log("[" .. tag .. "]   1. Copy " .. NORDEN_LIB_RESOURCE .. "/" .. staged
                         .. "  ->  " .. ext.resource .. "/" .. ext.filePath, 3)
                     log("[" .. tag .. "]   2. Restart " .. ext.resource .. " (or the server).", 3)
                     log("[" .. tag .. "]   Until then the calling resource's own copy is what is used,"
@@ -703,7 +703,7 @@ function Discovery.create(opts)
                         .. "), so this change exists only in memory here.", 4)
                 end
 
-                -- Still false: NLib did not write the owning resource's file.
+                -- Still false: Norden Lib did not write the owning resource's file.
                 -- The caller (tELS) persists its own copy, which is why the
                 -- setting survives a restart -- but that is the CALLER's doing,
                 -- not something this function may claim.
@@ -850,7 +850,7 @@ function Discovery.create(opts)
     ---
     --- Returns `ok, targetPath, info`. `info.status` is one of:
     ---   'exported' written into the target resource
-    ---   'staged'   the write was refused; the file is in NLib, with instructions
+    ---   'staged'   the write was refused; the file is in Norden Lib, with instructions
     ---   'local'    moved back to the owner's own data file
     ---   'failed'   nothing was written anywhere
     ---   'no-config' there is no such model
@@ -917,16 +917,16 @@ function Discovery.create(opts)
             local staged = stagingPath(targetResource, targetPath)
             local stagedOk, stageErr = _stageFile(staged, encoded)
             if stagedOk then
-                info.stagedResource = NLIB_RESOURCE
+                info.stagedResource = NORDEN_LIB_RESOURCE
                 info.stagedPath = staged
                 info.steps = {
-                    "1. Copy " .. NLIB_RESOURCE .. "/" .. staged
+                    "1. Copy " .. NORDEN_LIB_RESOURCE .. "/" .. staged
                         .. "  ->  " .. targetResource .. "/" .. targetPath,
                     "2. Add this line to " .. targetResource .. "/fxmanifest.lua:  " .. info.manifestLine,
                     "3. Restart " .. targetResource .. " (or the server).",
                 }
                 info.message = "Could not write into '" .. targetResource .. "' (" .. tostring(err)
-                    .. "), so the finished file was written to " .. NLIB_RESOURCE .. "/" .. staged .. " instead."
+                    .. "), so the finished file was written to " .. NORDEN_LIB_RESOURCE .. "/" .. staged .. " instead."
             else
                 info.status = 'failed'
                 info.stageError = stageErr
@@ -1002,7 +1002,7 @@ function Discovery.create(opts)
     -- watcher and the whole event-handler block — is registered AFTER these
     -- three calls, and Platform.wrapExport on FiveM is a bare exports(name, fn)
     -- with no pcall of its own. An error raised in here therefore unwinds
-    -- straight out of the consumer's `exports['NLib']:CreateDiscovery{…}`: the
+    -- straight out of the consumer's `exports['norden_lib']:CreateDiscovery{…}`: the
     -- handle is never assigned, config_request/config_save are never registered,
     -- and the consumer looks alive while silently answering nothing. One
     -- malformed entry in one data file used to be enough.
@@ -1239,7 +1239,7 @@ end
 
 
 function Discovery.registerExports()
-    Platform.export('NLib', 'CreateDiscovery', function(opts)
+    Platform.export('norden_lib', 'CreateDiscovery', function(opts)
         -- GetInvokingResource() returns nil when called at module init time (top-level
         -- script execution), so callers must pass resourceName = GetCurrentResourceName()
         -- explicitly. Warn loudly here so the misconfiguration is obvious.
@@ -1253,7 +1253,7 @@ function Discovery.registerExports()
                 -- does.
                 log('[Discovery] resourceName not set and GetInvokingResource() returned nil. '
                     .. 'Pass resourceName = GetCurrentResourceName() in your CreateDiscovery opts. '
-                    .. 'Defaulting to NLib — file I/O will target the wrong resource!', 4)
+                    .. 'Defaulting to Norden Lib — file I/O will target the wrong resource!', 4)
             end
         end
         return Discovery.create(opts)

@@ -62,8 +62,8 @@ Thumbs.db
 .tmp/
 
 # The developer's real credentials. Never committed, never packaged.
-# The tracked config.lua holds blanks permanently; nlib.secrets overlays this
-# file onto Config at server start. See NLib/shared/imports/secrets/server.lua.
+# The tracked config.lua holds blanks permanently; norden_lib.secrets overlays this
+# file onto Config at server start. See norden_lib/shared/imports/secrets/server.lua.
 config.local.lua
 config/config.local.lua
 

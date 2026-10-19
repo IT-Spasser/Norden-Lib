@@ -22,8 +22,8 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "paths": {
-      "@nlib/shared": ["./index.ts"],
-      "@nlib/shared/*": ["./*"]
+      "@norden_lib/shared": ["./index.ts"],
+      "@norden_lib/shared/*": ["./*"]
     }
   },
   // The JSX surface and what it pulls in. This package has no build of its own —

@@ -6,7 +6,7 @@
  *
  * FXServer attributes its `spawn` permission check to the CALLING resource, so
  * every t* resource shipping a local engine needed its own
- * `add_unsafe_child_process_permission` line. One line for NLib replaces them,
+ * `add_unsafe_child_process_permission` line. One line for Norden Lib replaces them,
  * and that is only an improvement because what sits behind it is NARROWER: see
  * catalog.ts and docs/internal/spawn-gate.md.
  */
@@ -72,10 +72,10 @@ const announced = new Set<string>();
 
 function announce(resource: string, plan: Resolved | Refusal, what: string): void {
   if ("error" in plan) {
-    console.log(`[NLib] spawn: refused ${resource}'s ${what} — ${plan.error}`);
+    console.log(`[norden_lib] spawn: refused ${resource}'s ${what} — ${plan.error}`);
     return;
   }
-  if (plan.authorWarning) console.log(`[NLib] spawn: ${plan.authorWarning}`);
+  if (plan.authorWarning) console.log(`[norden_lib] spawn: ${plan.authorWarning}`);
 
   // Once per (resource, program), not per invocation: tDB runs the same binary
   // four times at boot -- update, superuser upsert, migrate, serve -- and the
@@ -91,7 +91,7 @@ function announce(resource: string, plan: Resolved | Refusal, what: string): voi
   // Still says yes, once, per the contract above -- but WITHOUT the argument
   // list and the absolute cwd. Those made each line ~200 characters, and tDB
   // alone spawns four times at boot (update, superuser upsert, migrate, serve),
-  // so the single noisiest thing in a startup log was NLib narrating its own
+  // so the single noisiest thing in a startup log was Norden Lib narrating its own
   // plumbing in full. The program and the resource are what an operator needs
   // to see; the arguments are a debugging detail, and `plan` is already
   // reachable from the gate's own tests and docs/internal/spawn-gate.md.
@@ -99,7 +99,7 @@ function announce(resource: string, plan: Resolved | Refusal, what: string): voi
   // The REFUSAL branch above is deliberately untouched and stays verbatim.
   // A refusal that is quiet reads as "the feature just does not work", which is
   // the exact failure this function's docstring exists to prevent.
-  console.log(`[NLib] spawn: ${resource} → ${plan.program}`);
+  console.log(`[norden_lib] spawn: ${resource} → ${plan.program}`);
 }
 
 /**
@@ -114,8 +114,8 @@ function guarded(name: string, fn: (...args: unknown[]) => string): (...args: un
       return fn(...args);
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      console.log(`[NLib] spawn: ${name} failed — ${error.stack ?? error.message}`);
-      return JSON.stringify({ error: `NLib's ${name} failed: ${error.message}` });
+      console.log(`[norden_lib] spawn: ${name} failed — ${error.stack ?? error.message}`);
+      return JSON.stringify({ error: `Norden Lib's ${name} failed: ${error.message}` });
     }
   };
 }
@@ -123,7 +123,7 @@ function guarded(name: string, fn: (...args: unknown[]) => string): (...args: un
 export function installSpawn(): void {
   // The allowlist is hardcoded, so server.cfg no longer tells an operator who
   // may spawn. This is still where they find out -- but it is now a ROW IN
-  // NLib'S BANNER rather than a separate line above it, because it is a static
+  // norden_lib'S BANNER rather than a separate line above it, because it is a static
   // startup fact and that is what the banner is for. The intent is unchanged:
   // the catalogue has to be visible somewhere an operator will actually look.
   //
@@ -135,8 +135,8 @@ export function installSpawn(): void {
   // is known immediately. Being early is what broke it.
   setTimeout(() => {
     fEmit(
-      "nlib:vcInfo:spawns",
-      `${describeFamily().join(" | ")} (one add_unsafe_child_process_permission NLib covers all)`
+      "norden_lib:vcInfo:spawns",
+      `${describeFamily().join(" | ")} (one add_unsafe_child_process_permission Norden Lib covers all)`
     );
   }, 0);
 
@@ -214,25 +214,25 @@ export function installSpawn(): void {
   // Reaping
   //
   // The feature, not an afterthought. See host.ts: a child started here belongs
-  // to NLib's VM and will not die with its owner unless this fires.
+  // to Norden Lib's VM and will not die with its owner unless this fires.
   fOn("onResourceStop", (resource: unknown) => {
     if (typeof resource !== "string") return;
     if (resource === currentResource()) {
-      // NLib going down. Everything it is holding open on someone else's behalf
+      // Norden Lib going down. Everything it is holding open on someone else's behalf
       // goes with it, or the restart finds its own ports held by its children.
       const killed = host.killEverything();
-      if (killed > 0) console.log(`[NLib] spawn: stopped ${killed} process(es) on shutdown`);
+      if (killed > 0) console.log(`[norden_lib] spawn: stopped ${killed} process(es) on shutdown`);
       return;
     }
     // Forget what was announced for it, or the dedupe above makes every spawn
-    // after a resource's first restart silent for the rest of NLib's life --
+    // after a resource's first restart silent for the rest of Norden Lib's life --
     // a quiet grant being the thing announce() exists to prevent.
     for (const key of announced) {
       if (key.startsWith(`${resource}\u0000`)) announced.delete(key);
     }
 
     // Silent. Reaping a stopped resource's children is bookkeeping that always
-    // happens; NLib's OWN shutdown above still says so, because there the
+    // happens; Norden Lib's OWN shutdown above still says so, because there the
     // children outliving it is the failure this exists to prevent.
     host.killAll(resource);
   });

@@ -1,8 +1,8 @@
-.nlib-layout {
-  --nlib-layout-panel: var(--hud-editor-panel, var(--nui-surface));
-  --nlib-layout-border: var(--nui-border);
-  --nlib-layout-text: var(--nui-text);
-  --nlib-layout-muted: var(--nui-muted);
+.norden-layout {
+  --norden-layout-panel: var(--hud-editor-panel, var(--nui-surface));
+  --norden-layout-border: var(--nui-border);
+  --norden-layout-text: var(--nui-text);
+  --norden-layout-muted: var(--nui-muted);
   position: fixed;
   inset: 0;
   z-index: 100000;
@@ -14,18 +14,18 @@
   outline: none;
   color-scheme: dark;
 }
-.nlib-layout *,
-.nlib-layout *::before,
-.nlib-layout *::after {
+.norden-layout *,
+.norden-layout *::before,
+.norden-layout *::after {
   box-sizing: border-box;
 }
-.nlib-layout svg {
+.norden-layout svg {
   width: 16px;
   height: 16px;
   stroke-width: 1.7;
   flex-shrink: 0;
 }
-.nlib-layout__panel {
+.norden-layout__panel {
   position: absolute;
   z-index: 5;
   top: 50%;
@@ -38,17 +38,17 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: var(--radius-surface, 0.875rem);
-  border: 1px solid var(--nlib-layout-border);
-  background: var(--nlib-layout-panel);
+  border: 1px solid var(--norden-layout-border);
+  background: var(--norden-layout-panel);
 }
-.nlib-layout__header {
+.norden-layout__header {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 14px 14px 10px;
   flex-shrink: 0;
 }
-.nlib-layout .nlib-layout__drag {
+.norden-layout .norden-layout__drag {
   flex: 1;
   min-width: 0;
   gap: 10px;
@@ -60,57 +60,57 @@
   cursor: grab;
   touch-action: none;
 }
-.nlib-layout__panel--dragging .nlib-layout__drag {
+.norden-layout__panel--dragging .norden-layout__drag {
   cursor: grabbing;
 }
-.nlib-layout__header-icon {
+.norden-layout__header-icon {
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
-  border: 1px solid var(--nlib-layout-border);
+  border: 1px solid var(--norden-layout-border);
   border-radius: var(--nui-radius);
   background: var(--nui-inset);
 }
-.nlib-layout__title {
+.norden-layout__title {
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.3px;
   line-height: 1.2;
 }
-.nlib-layout__grip {
+.norden-layout__grip {
   margin-left: auto;
-  color: var(--nlib-layout-muted);
+  color: var(--norden-layout-muted);
 }
-.nlib-layout__body {
+.norden-layout__body {
   padding: 0 14px;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
   min-height: 0;
   scrollbar-width: thin;
-  scrollbar-color: var(--nlib-layout-border) transparent;
+  scrollbar-color: var(--norden-layout-border) transparent;
 }
-.nlib-layout__panel p {
+.norden-layout__panel p {
   margin: 0;
 }
-.nlib-layout__list {
+.norden-layout__list {
   list-style: none;
   display: grid;
   gap: 2px;
   margin: 0;
   padding: 0;
 }
-.nlib-layout__row {
+.norden-layout__row {
   display: flex;
   align-items: center;
   gap: 4px;
   border-radius: var(--nui-radius);
 }
-.nlib-layout__row--selected {
+.norden-layout__row--selected {
   background: var(--nui-inset);
 }
-.nlib-layout .nlib-layout__row-select {
+.norden-layout .norden-layout__row-select {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -126,25 +126,25 @@
   text-align: left;
   cursor: pointer;
 }
-.nlib-layout .nlib-layout__row-select:hover {
+.norden-layout .norden-layout__row-select:hover {
   background: var(--nui-inset);
 }
-.nlib-layout__row--selected .nlib-layout__row-select {
+.norden-layout__row--selected .norden-layout__row-select {
   font-weight: 600;
 }
-.nlib-layout__row-name {
+.norden-layout__row-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.nlib-layout__row-owner {
+.norden-layout__row-owner {
   margin-left: auto;
   flex-shrink: 0;
-  color: var(--nlib-layout-muted);
+  color: var(--norden-layout-muted);
   font-size: 11px;
   font-weight: 400;
 }
-.nlib-layout .nlib-layout__row-visible {
+.norden-layout .norden-layout__row-visible {
   width: 32px;
   min-height: 32px;
   padding: 6px;
@@ -152,89 +152,89 @@
   border-color: transparent;
   background: transparent;
 }
-.nlib-layout__panel .nlib-layout__pinned,
-.nlib-layout__panel .nlib-layout__help {
-  color: var(--nlib-layout-muted);
+.norden-layout__panel .norden-layout__pinned,
+.norden-layout__panel .norden-layout__help {
+  color: var(--norden-layout-muted);
   font-size: 11px;
 }
-.nlib-layout__panel .nlib-layout__pinned {
+.norden-layout__panel .norden-layout__pinned {
   padding: 8px 10px 0;
 }
-.nlib-layout__panel .nlib-layout__help {
+.norden-layout__panel .norden-layout__help {
   margin: 10px 0 12px;
   text-align: center;
 }
 /* Three controls now, so the row wraps rather than squeezing the labels out. */
-.nlib-layout__actions {
+.norden-layout__actions {
   flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding: 10px 0 14px;
-  border-top: 1px solid var(--nlib-layout-border);
+  border-top: 1px solid var(--norden-layout-border);
 }
-.nlib-layout__history {
+.norden-layout__history {
   display: flex;
   gap: 4px;
 }
-.nlib-layout__history button {
+.norden-layout__history button {
   width: 34px;
   padding: 7px;
 }
-.nlib-layout .nlib-layout__reset {
+.norden-layout .norden-layout__reset {
   padding-inline: 8px;
   border-color: transparent;
   background: transparent;
   font-size: 13px;
 }
-.nlib-layout__panel .nlib-layout__notice {
+.norden-layout__panel .norden-layout__notice {
   padding: 0 14px 12px;
   color: var(--nui-danger);
   font-size: 12px;
 }
-.nlib-layout__panel .nlib-layout__empty {
+.norden-layout__panel .norden-layout__empty {
   padding: 8px 0 4px;
-  color: var(--nlib-layout-muted);
+  color: var(--norden-layout-muted);
   font-size: 14px;
 }
-.nlib-layout__panel footer {
+.norden-layout__panel footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   padding: 12px 14px;
-  border-top: 1px solid var(--nlib-layout-border);
+  border-top: 1px solid var(--norden-layout-border);
   flex-shrink: 0;
 }
-.nlib-layout__panel footer button {
+.norden-layout__panel footer button {
   padding-inline: 8px;
   white-space: nowrap;
 }
-.nlib-layout .nlib-layout__discard {
+.norden-layout .norden-layout__discard {
   background: transparent;
 }
-.nlib-layout__safezone {
+.norden-layout__safezone {
   position: absolute;
   border: 1px dashed #ffffff30;
   pointer-events: none;
 }
-.nlib-layout__guide {
+.norden-layout__guide {
   position: absolute;
   pointer-events: none;
 }
-.nlib-layout__guide--x {
+.norden-layout__guide--x {
   top: 0;
   bottom: 0;
   border-left: 1px dashed var(--nui-accent);
 }
-.nlib-layout__guide--y {
+.norden-layout__guide--y {
   left: 0;
   right: 0;
   border-top: 1px dashed var(--nui-accent);
 }
 /* Placement rides on `transform`, so the box itself never leaves the origin and
    a drag composites instead of relayouting the overlay. */
-.nlib-layout__proxy {
+.norden-layout__proxy {
   position: absolute;
   left: 0;
   top: 0;
@@ -246,12 +246,12 @@
   min-height: 1px;
   will-change: transform;
 }
-.nlib-layout__proxy--selected {
+.norden-layout__proxy--selected {
   z-index: 2;
   border-color: var(--nui-accent);
   background: #ffffff03;
 }
-.nlib-layout__proxy--hidden {
+.norden-layout__proxy--hidden {
   border-style: dashed;
   background: repeating-linear-gradient(
     135deg,
@@ -261,7 +261,7 @@
     transparent 10px
   );
 }
-.nlib-layout__tag {
+.norden-layout__tag {
   position: absolute;
   top: 4px;
   left: 4px;
@@ -270,21 +270,21 @@
   align-items: center;
   gap: 6px;
   padding: 3px 6px;
-  border: 1px solid var(--nlib-layout-border);
+  border: 1px solid var(--norden-layout-border);
   border-radius: 4px;
-  background: var(--nlib-layout-panel);
-  color: var(--nlib-layout-text);
+  background: var(--norden-layout-panel);
+  color: var(--norden-layout-text);
   font-size: 12px;
   white-space: nowrap;
 }
-.nlib-layout__proxy--selected .nlib-layout__tag {
+.norden-layout__proxy--selected .norden-layout__tag {
   border-color: var(--nui-accent);
 }
-.nlib-layout__tag > span {
+.norden-layout__tag > span {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.nlib-layout__tag button {
+.norden-layout__tag button {
   border-color: transparent;
   border-radius: 3px;
   min-height: 24px;
@@ -292,12 +292,12 @@
   flex-shrink: 0;
   background: transparent;
 }
-.nlib-layout__tag svg {
+.norden-layout__tag svg {
   width: 14px;
   height: 14px;
 }
 /* Only rendered mid-gesture, so it can sit over the widget without competing. */
-.nlib-layout__scale-badge {
+.norden-layout__scale-badge {
   position: absolute;
   right: 4px;
   bottom: 4px;
@@ -312,13 +312,13 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.nlib-layout__handle {
+.norden-layout__handle {
   position: absolute;
   z-index: 3;
   width: 14px;
   height: 14px;
 }
-.nlib-layout__handle::after {
+.norden-layout__handle::after {
   content: "";
   position: absolute;
   inset: 4px;
@@ -326,27 +326,27 @@
   border: 1px solid var(--nui-accent-text);
   border-radius: 1px;
 }
-.nlib-layout__handle--nw {
+.norden-layout__handle--nw {
   top: -7px;
   left: -7px;
   cursor: nwse-resize;
 }
-.nlib-layout__handle--ne {
+.norden-layout__handle--ne {
   top: -7px;
   right: -7px;
   cursor: nesw-resize;
 }
-.nlib-layout__handle--sw {
+.norden-layout__handle--sw {
   bottom: -7px;
   left: -7px;
   cursor: nesw-resize;
 }
-.nlib-layout__handle--se {
+.norden-layout__handle--se {
   bottom: -7px;
   right: -7px;
   cursor: nwse-resize;
 }
-.nlib-layout__demo {
+.norden-layout__demo {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -361,26 +361,26 @@
   color: #efefea;
   pointer-events: none;
 }
-.nlib-layout__demo strong {
+.norden-layout__demo strong {
   font-size: 10px;
   letter-spacing: 3px;
   color: #b7b7b1;
 }
-.nlib-layout__demo > div {
+.norden-layout__demo > div {
   font-size: clamp(20px, 4vh, 55px);
   font-weight: 700;
 }
-.nlib-layout__demo small {
+.norden-layout__demo small {
   font-size: 10px;
   color: #a8a8a1;
 }
-.nlib-layout__demo > span {
+.norden-layout__demo > span {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 9px;
 }
-.nlib-layout__demo i {
+.norden-layout__demo i {
   display: block;
   width: 45px;
   height: 4px;
@@ -388,9 +388,9 @@
   border-radius: 4px;
 }
 @media (prefers-reduced-motion: reduce) {
-  .nlib-layout *,
-  .nlib-layout *::before,
-  .nlib-layout *::after {
+  .norden-layout *,
+  .norden-layout *::before,
+  .norden-layout *::after {
     animation: none !important;
     transition: none !important;
   }

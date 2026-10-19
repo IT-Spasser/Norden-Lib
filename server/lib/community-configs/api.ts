@@ -2,14 +2,14 @@
 //
 // `server/sv_community_configs.lua` used to do this with PerformHttpRequest,
 // and it did not authenticate. The publish endpoint now requires
-// `X-Resource-Secret` — whose value is `NLIB_PUBLIC_KEY`, defined once in
+// `X-Resource-Secret` — whose value is `NORDEN_LIB_PUBLIC_KEY`, defined once in
 // `shared/ts/marketplace/catalogue.ts`. The HEADER name is unchanged and must
 // stay that way: every already-shipped copy sends it and tWeb authenticates on
 // it. Only the constant was renamed, because the key was never
 // marketplace-specific -- it authenticates every tWeb API, this one included.
 //
 // It is NOT read from a convar and must never become one; see the note on
-// `NLIB_PUBLIC_KEY` for why it is public by design. Handing it to the Lua VM
+// `NORDEN_LIB_PUBLIC_KEY` for why it is public by design. Handing it to the Lua VM
 // through an export would let any third-party script on a customer's server read
 // it without console or file access, so the request moves to the secret rather
 // than the other way round.
@@ -22,9 +22,8 @@
 // 200 and then has the body withheld. Every read here runs server-side.
 //
 
-import { NLIB_PUBLIC_KEY } from "../../../shared/ts/marketplace/catalogue";
+import { NORDEN_LIB_PUBLIC_KEY, studioHeaders } from "../../../shared/ts/marketplace/catalogue";
 import { MarketplaceError } from "../marketplace/api";
-import { studioHeaders } from "../../../shared/ts/marketplace/catalogue";
 import { resolveConfig } from "../marketplace/config";
 import { parseJson, request, toError } from "../marketplace/http";
 
@@ -77,7 +76,10 @@ export async function publishConfig(payload: PublishPayload): Promise<PublishRes
     "POST",
     JSON.stringify(payload),
     // The ONLY call in this file that sends the secret. The reads below are
-    studioHeaders({ "Content-Type": "application/json", "X-Resource-Secret": NLIB_PUBLIC_KEY })
+    studioHeaders({
+      "Content-Type": "application/json",
+      "X-Resource-Secret": NORDEN_LIB_PUBLIC_KEY,
+    })
   );
   if (!resp.ok) throw toError(resp);
 
@@ -94,7 +96,7 @@ export async function publishConfig(payload: PublishPayload): Promise<PublishRes
 // Edits
 //
 // Both of these send the resource secret AND the per-listing edit token. The
-// secret alone proves "somebody running NLib", which is every deployment and
+// secret alone proves "somebody running norden_lib", which is every deployment and
 // therefore nobody; the token is what proves "the publisher of THIS listing".
 //
 // Neither takes the publisher identity. `(server_hash, publisher_license)` was
@@ -130,7 +132,7 @@ export async function updateConfig(
     JSON.stringify(payload),
     studioHeaders({
       "Content-Type": "application/json",
-      "X-Resource-Secret": NLIB_PUBLIC_KEY,
+      "X-Resource-Secret": NORDEN_LIB_PUBLIC_KEY,
       "X-Edit-Token": editToken,
     })
   );
@@ -154,7 +156,7 @@ export async function withdrawConfig(id: string, editToken: string): Promise<str
     endpoint(`/${encodeURIComponent(id)}/withdraw`),
     "POST",
     "",
-    studioHeaders({ "X-Resource-Secret": NLIB_PUBLIC_KEY, "X-Edit-Token": editToken })
+    studioHeaders({ "X-Resource-Secret": NORDEN_LIB_PUBLIC_KEY, "X-Edit-Token": editToken })
   );
   if (!resp.ok) throw toError(resp);
   return parseJson<{ status?: string }>(resp).status ?? "unlisted";

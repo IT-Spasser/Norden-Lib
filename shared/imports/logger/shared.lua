@@ -1,21 +1,21 @@
 --[[
-    NLib/shared/imports/logger — levelled console logging for consumer resources.
+    norden_lib/shared/imports/logger — levelled console logging for consumer resources.
 
     Usage in a consumer:
-        local log = nlib.logger.create('tDetector')
+        local log = norden_lib.logger.create('tDetector')
         log('layout not installed, falling back', 3)   -- WARN
-        log('armed', nlib.logger.DEBUG)
+        log('armed', norden_lib.logger.DEBUG)
 
     Why this is not shared/lib/logger.lua
     ------------------------------------
-    That file is NLib's own and binds `Platform.getSide()` at load time. A
+    That file is Norden Lib's own and binds `Platform.getSide()` at load time. A
     consumer VM has no such global: shared/imports/platform returns a *local* table and
-    does not expose getSide, so loading shared/lib/logger.lua here errors. NLib
+    does not expose getSide, so loading shared/lib/logger.lua here errors. Norden Lib
     also registers CreateLogger as an export from client.lua only, which leaves
     every server-side consumer with nothing.
 
     So this stands alone, on purpose, for the same reason imports.lua carries its
-    own copy of parseVer: it runs in the consumer's VM, not NLib's. Keep the
+    own copy of parseVer: it runs in the consumer's VM, not Norden Lib's. Keep the
     output format in step with shared/lib/logger.lua's `[scope][LEVEL] message`.
 ]]
 
@@ -36,7 +36,7 @@ local _minLevel = 2
 
 --- Set the minimum level for every logger created in this VM.
 function Logger.setLevel(level)
-    assert(type(level) == 'number', '[NLib/logger] setLevel: level must be a number')
+    assert(type(level) == 'number', '[norden_lib/logger] setLevel: level must be a number')
     _minLevel = level
 end
 
@@ -75,14 +75,14 @@ function Logger.format(scope, args, n)
 end
 
 --- Returns a log function pinned to a scope, conventionally the resource name:
----   local log = nlib.logger.create('tDetector')
----   log('Bad value', val, nlib.logger.WARN)
+---   local log = norden_lib.logger.create('tDetector')
+---   log('Bad value', val, norden_lib.logger.WARN)
 ---
 --- Args are tostring'd and joined with spaces; a trailing number is the level.
 function Logger.create(scope)
     assert(
         type(scope) == 'string' and scope ~= '',
-        '[NLib/logger] create: scope must be a non-empty string'
+        '[norden_lib/logger] create: scope must be a non-empty string'
     )
     return function(...)
         local args = { ... }

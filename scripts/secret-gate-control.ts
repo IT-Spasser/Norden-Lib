@@ -49,8 +49,8 @@ import { hookIsCurrent, PRE_COMMIT } from "../shared/ts/secrets/hook.ts";
 import { isSecretName, secretPatterns } from "../shared/ts/secrets/patterns.ts";
 import { scanLua } from "../shared/ts/secrets/scan.ts";
 
-const nlibRoot = path.resolve(import.meta.dir, "..");
-const gateScript = path.join(nlibRoot, "scripts", "secret-gate.ts");
+const nordenLibRoot = path.resolve(import.meta.dir, "..");
+const gateScript = path.join(nordenLibRoot, "scripts", "secret-gate.ts");
 
 const failures: string[] = [];
 function check(ok: boolean, what: string): void {
@@ -100,23 +100,23 @@ const BLANK_CONFIG = `Config = {
 const PLANTED = "SYNTHETIC-NOT-A-REAL-CREDENTIAL-0000";
 
 /**
- * A fixture repo in a parent directory that also holds a `NLib` junction to the
- * real NLib, so the hook's `../NLib/scripts/secret-gate.ts` branch — the one
+ * A fixture repo in a parent directory that also holds a `norden_lib` junction to the
+ * real Norden Lib, so the hook's `../norden_lib/scripts/secret-gate.ts` branch — the one
  * every consumer resource actually takes — is what gets exercised.
  *
  * MEASURED: an earlier version dropped a one-line `scripts/secret-gate.ts`
- * re-export into the fixture instead. That took the hook's "we are NLib" branch,
+ * re-export into the fixture instead. That took the hook's "we are norden_lib" branch,
  * `bun run` loaded the gate as an imported module, `import.meta.main` was false,
  * `main()` never ran and the hook exited 0 — a hook that looked installed and
  * checked nothing. Four assertions in this control caught it. A symlink of type
  * `junction` needs no administrator on Windows.
  */
 function makeRepo(label: string): string {
-  const parent = fs.mkdtempSync(path.join(os.tmpdir(), `nlib-secretgate-${label}-`));
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), `norden-secretgate-${label}-`));
   cleanup.push(parent);
   const dir = path.join(parent, "fixture");
   fs.mkdirSync(dir);
-  fs.symlinkSync(nlibRoot, path.join(parent, "NLib"), "junction");
+  fs.symlinkSync(nordenLibRoot, path.join(parent, "norden_lib"), "junction");
   run(dir, ["git", "init", "-q", "-b", "main"]);
   run(dir, ["git", "config", "user.email", "control@example.invalid"]);
   run(dir, ["git", "config", "user.name", "Secret Gate Control"]);
@@ -131,8 +131,8 @@ function makeRepo(label: string): string {
   );
   fs.writeFileSync(path.join(dir, ".gitignore"), "config.local.lua\n", "utf8");
 
-  // The real hook bytes, verbatim from NLib's hook.ts. The fixture's parent
-  // holds a `NLib` junction, so the hook takes its `../NLib/...` branch — the
+  // The real hook bytes, verbatim from Norden Lib's hook.ts. The fixture's parent
+  // holds a `norden_lib` junction, so the hook takes its `../norden_lib/...` branch — the
   // one every consumer resource actually takes.
   fs.mkdirSync(path.join(dir, ".githooks"), { recursive: true });
   fs.writeFileSync(path.join(dir, ".githooks", "pre-commit"), PRE_COMMIT, "utf8");
@@ -151,18 +151,18 @@ function makeRepo(label: string): string {
 const cleanup: string[] = [];
 
 /**
- * The junction is UNLINKED FIRST, explicitly, and NLib is re-checked
+ * The junction is UNLINKED FIRST, explicitly, and Norden Lib is re-checked
  * afterwards.
  *
- * A recursive delete over a directory containing a junction to NLib is one
- * typo away from deleting NLib. `fs.rmSync` unlinks a junction rather than
+ * A recursive delete over a directory containing a junction to Norden Lib is one
+ * typo away from deleting Norden Lib. `fs.rmSync` unlinks a junction rather than
  * descending into it, but "should" is not the standard for a line that could
  * delete the library, so the link is removed by name before anything recursive
  * runs and the result is verified.
  */
 function dispose(): void {
   for (const dir of cleanup) {
-    const link = path.join(dir, "NLib");
+    const link = path.join(dir, "norden_lib");
     try {
       if (fs.lstatSync(link).isSymbolicLink()) fs.unlinkSync(link);
     } catch {
@@ -170,8 +170,8 @@ function dispose(): void {
     }
     fs.rmSync(dir, { recursive: true, force: true });
   }
-  if (!fs.existsSync(path.join(nlibRoot, "shared", "imports", "diag", "shared.lua"))) {
-    console.error("CONTROL ABORTED: cleanup appears to have followed the NLib junction.");
+  if (!fs.existsSync(path.join(nordenLibRoot, "shared", "imports", "diag", "shared.lua"))) {
+    console.error("CONTROL ABORTED: cleanup appears to have followed the Norden Lib junction.");
     process.exit(3);
   }
 }
@@ -179,7 +179,7 @@ function dispose(): void {
 // 0. The gate can see itself
 
 console.log("\n0. preconditions");
-check(hookIsCurrent(nlibRoot), "NLib's own .githooks/pre-commit is the canonical bytes");
+check(hookIsCurrent(nordenLibRoot), "Norden Lib's own .githooks/pre-commit is the canonical bytes");
 check(secretPatterns().length >= 18, "the pattern list parsed from Lua is non-trivial");
 
 // 1. CLEAN: the baseline must be green, or nothing below means anything
@@ -336,14 +336,14 @@ console.log("\n2b. STAGED-ADD — a brand-new config file, never yet committed")
 //
 // A red verdict above is only evidence if the rule is what produced it. The gate
 // derives its patterns from the Lua file, so the drill narrows that file in a
-// COPY of NLib and re-runs the same planted repo against it. If the planted
+// COPY of Norden Lib and re-runs the same planted repo against it. If the planted
 // credential is still caught with `token` and `accesskey` removed, something
 // other than the pattern list is doing the catching and the control above
 // proves nothing.
 
 console.log("\n3. DRILL — pattern list narrowed; the planted case must go GREEN");
 {
-  const drillRoot = fs.mkdtempSync(path.join(os.tmpdir(), "nlib-secretgate-drill-"));
+  const drillRoot = fs.mkdtempSync(path.join(os.tmpdir(), "norden-secretgate-drill-"));
   cleanup.push(drillRoot);
 
   for (const relative of [
@@ -356,7 +356,7 @@ console.log("\n3. DRILL — pattern list narrowed; the planted case must go GREE
   ]) {
     const target = path.join(drillRoot, relative);
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.copyFileSync(path.join(nlibRoot, relative), target);
+    fs.copyFileSync(path.join(nordenLibRoot, relative), target);
   }
 
   const luaPath = path.join(drillRoot, "shared/imports/diag/shared.lua");

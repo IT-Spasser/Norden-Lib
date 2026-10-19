@@ -1,15 +1,15 @@
 --[[
-    NLib/shared/imports/opengate — the SERVER half of "may I open my panel?".
+    norden_lib/shared/imports/opengate — the SERVER half of "may I open my panel?".
 
     Usage in a consumer (server scripts):
 
-        local gate = nlib.access.gate(Config.access, { key = 'radar' })
+        local gate = norden_lib.access.gate(Config.access, { key = 'radar' })
 
-        nlib.opengate.serve({
+        norden_lib.opengate.serve({
             key      = 'settings',
             allow    = function(src) return gate:allowed(src) end,
             configOk = function() return tradarConfigOk() end,
-            payload  = function(src) return { isAdmin = nlib.permission.isAdmin(src) } end,
+            payload  = function(src) return { isAdmin = norden_lib.permission.isAdmin(src) } end,
         })
 
      What this replaces
@@ -22,7 +22,7 @@
 
     It exists because the decision has to be the SERVER's, re-resolved on every
     open. Asking the client whether it may open its own settings is asking the
-    wrong machine, and a client-side `exports['NLib']:IsAdmin()` is a value
+    wrong machine, and a client-side `exports['norden_lib']:IsAdmin()` is a value
     cached once at resource start — revoke an ace on a running server and the
     panel keeps drawing the admin section until the player reconnects.
 
@@ -48,7 +48,7 @@
     because the alternative — a missing option quietly meaning "open" — is how a
     gate meant to restrict something ends up granting it. A panel that genuinely
     opens for everybody writes `allow = function() return true end`, which is
-    greppable and mirrors `nlib.access`'s own `mode = 'everyone'`.
+    greppable and mirrors `norden_lib.access`'s own `mode = 'everyone'`.
 
     tAFK's case is exactly that one: its panel always opens and the only thing
     the reply carries is whether the admin fields belong on it. That belongs in
@@ -56,20 +56,20 @@
 
      This is not a second access mechanism
 
-    `allow` is a hole you put a `nlib.access` gate into, as above. opengate
+    `allow` is a hole you put a `norden_lib.access` gate into, as above. opengate
     decides nothing about permissions itself; it owns the handshake, the wire
     names and the decision ORDER, and nothing else.
 
-     The wire names belong to NLib
+     The wire names belong to Norden Lib
 
-    `<resource>:nlib:opengate:<key>:request` / `:open` / `:denied` / `:broken`,
-    namespaced by resource for the reason `nlib.access` gives: FiveM net event
+    `<resource>:norden_lib:opengate:<key>:request` / `:open` / `:denied` / `:broken`,
+    namespaced by resource for the reason `norden_lib.access` gives: FiveM net event
     names are global, so two resources both using key 'settings' would otherwise
     answer each other's clients. Consumers never spell them — which is what
-    makes them renameable later, the same lesson `NLib:receiveAdminPermission`
+    makes them renameable later, the same lesson `norden_lib:receiveAdminPermission`
     is currently teaching the hard way.
 
-    The source guard and the rate limit come from `nlib.net.fromClient`.
+    The source guard and the rate limit come from `norden_lib.net.fromClient`.
     Deliberately WITHOUT its `allow` option: the decision here is three-way and
     ordered, and folding `configOk` into an `allow` would be exactly the
     conflation the order exists to prevent.
@@ -93,13 +93,13 @@ function OpenGate.serve(opts)
 
     local key = opts.key or 'settings'
     assert(type(key) == 'string' and key ~= '',
-        'nlib.opengate.serve: key must be a non-empty string')
+        'norden_lib.opengate.serve: key must be a non-empty string')
     assert(opts.configOk == nil or type(opts.configOk) == 'function',
-        'nlib.opengate.serve: configOk must be a function returning a boolean')
+        'norden_lib.opengate.serve: configOk must be a function returning a boolean')
     assert(opts.payload == nil or type(opts.payload) == 'function',
-        'nlib.opengate.serve: payload must be a function taking (src)')
+        'norden_lib.opengate.serve: payload must be a function taking (src)')
 
-    local base    = ('%s:nlib:opengate:%s'):format(RESOURCE, key)
+    local base    = ('%s:norden_lib:opengate:%s'):format(RESOURCE, key)
     local allow   = opts.allow
     local configOk = opts.configOk
     local payload = opts.payload
@@ -109,12 +109,12 @@ function OpenGate.serve(opts)
     -- over a panel, and a panel nobody can open is a visible, reportable
     -- symptom that names its own cause.
     if type(allow) ~= 'function' then
-        print(('^1[%s] nlib.opengate.serve(%q): no `allow` function — DENYING EVERYONE. ' ..
-               'Pass a nlib.access gate, or `allow = function() return true end` if this ' ..
+        print(('^1[%s] norden_lib.opengate.serve(%q): no `allow` function — DENYING EVERYONE. ' ..
+               'Pass a norden_lib.access gate, or `allow = function() return true end` if this ' ..
                'panel is open to all players.^7'):format(RESOURCE, key))
     end
 
-    nlib.net.fromClient(base .. ':request', { rateLimit = opts.rateLimit }, function(src)
+    norden_lib.net.fromClient(base .. ':request', { rateLimit = opts.rateLimit }, function(src)
         -- Before the access check: a broken config is not a permissions
         -- problem. The detail was printed at boot by the resource's config
         -- spec; this only routes the player to the right person.
@@ -137,7 +137,7 @@ function OpenGate.serve(opts)
         -- a dropped event, and a denial is the safe way for that to land.
         local ok, allowed = pcall(allow, src)
         if not ok then
-            print(('^1[%s] nlib.opengate(%q): allow errored: %s. Denying.^7')
+            print(('^1[%s] norden_lib.opengate(%q): allow errored: %s. Denying.^7')
                 :format(RESOURCE, key, tostring(allowed)))
             allowed = false
         end
@@ -155,7 +155,7 @@ function OpenGate.serve(opts)
             if pok then
                 data = built
             else
-                print(('^1[%s] nlib.opengate(%q): payload errored: %s. Opening without it.^7')
+                print(('^1[%s] norden_lib.opengate(%q): payload errored: %s. Opening without it.^7')
                     :format(RESOURCE, key, tostring(built)))
             end
         end

@@ -1,18 +1,18 @@
 --[[
-    NLib — the Sounds tab of a settings dialog (client)
+    Norden Lib — the Sounds tab of a settings dialog (client)
 
         local fields = {}
-        nlib.soundfields.append(fields, { config = soundConfig, noun = 'detector' })
+        norden_lib.soundfields.append(fields, { config = soundConfig, noun = 'detector' })
 
         -- in onChange:
-        local soundKey = nlib.soundfields.keyOf(fieldId)
+        local soundKey = norden_lib.soundfields.keyOf(fieldId)
         if soundKey then ... end
 
         -- on submit/cancel, and when the viewer turns out not to be an admin:
-        nlib.soundfields.clear()
+        norden_lib.soundfields.clear()
 
         -- when the server pushes a new sound config:
-        nlib.soundfields.refresh('tdet_settings', data)
+        norden_lib.soundfields.refresh('tdet_settings', data)
 
      The remembered key list is the whole reason this is a module
 
@@ -34,7 +34,7 @@ local SoundFields = {}
 local SOUND_FIELD_PREFIX = 'sound:'
 
 -- The empty option IS the old "Clear" button. A select cannot express "no
--- value" without an option carrying it, and NLib's validValue only accepts ''
+-- value" without an option carrying it, and Norden Lib's validValue only accepts ''
 -- for a non-required field, which these are.
 local SOUND_NONE = { value = '', label = '— none —' }
 
@@ -112,7 +112,7 @@ end
 --- @param opts table    { config = <sound config>, noun = 'detector', tab = 'sounds' }
 --- @return string[]  the keys drawn, in order
 function SoundFields.append(fields, opts)
-    assert(type(fields) == 'table', 'nlib.soundfields.append: fields must be a table')
+    assert(type(fields) == 'table', 'norden_lib.soundfields.append: fields must be a table')
     opts = opts or {}
     local sc   = type(opts.config) == 'table' and opts.config or {}
     local tab  = opts.tab or 'sounds'
@@ -165,14 +165,14 @@ end
 --- @param dialogId string  the dialog the fields live in
 --- @param data table       the sound config that just arrived
 --- @param patch fun(dialogId: string, fieldId: string, patch: table)|nil
----        injection seam for tests; defaults to NLib's UpdateDialogField export
+---        injection seam for tests; defaults to Norden Lib's UpdateDialogField export
 --- @return number  how many fields were patched
 function SoundFields.refresh(dialogId, data, patch)
     if #drawnKeys == 0 or type(data) ~= 'table' then return 0 end
     if type(dialogId) ~= 'string' or dialogId == '' then return 0 end
 
     patch = patch or function(id, fieldId, p)
-        exports['NLib']:UpdateDialogField(id, fieldId, p)
+        exports['norden_lib']:UpdateDialogField(id, fieldId, p)
     end
 
     local map = type(data.soundWavMap) == 'table' and data.soundWavMap or {}

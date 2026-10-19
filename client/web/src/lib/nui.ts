@@ -1,5 +1,5 @@
-// NLib's own UI re-exports the shared NUI utilities.
-// Consumer tScripts import from @nlib/shared/nui directly.
+// Norden Lib's own UI re-exports the shared NUI utilities.
+// Consumer tScripts import from @norden_lib/shared/nui directly.
 export {
   fetchNui,
   getResourceName,

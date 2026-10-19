@@ -224,7 +224,7 @@ export function recoverMarketplaceLock(
         )
           fs.unlinkSync(marker);
       } catch (err) {
-        console.warn(`[NLib/marketplace] retained recovery claim ${marker}: ${String(err)}`);
+        console.warn(`[norden_lib/marketplace] retained recovery claim ${marker}: ${String(err)}`);
       }
     }
     if (quarantine) {
@@ -294,7 +294,7 @@ export function lockTarget(c: Context, operation: MarketplaceLockOwner["operatio
       fs.rmdirSync(key);
     } catch (cleanupError) {
       console.warn(
-        `[NLib/marketplace] retained failed lock acquisition ${key}: ${String(cleanupError)}`
+        `[norden_lib/marketplace] retained failed lock acquisition ${key}: ${String(cleanupError)}`
       );
     }
     throw err;
@@ -332,7 +332,7 @@ export function lockTarget(c: Context, operation: MarketplaceLockOwner["operatio
         throw err;
       }
     } catch (err) {
-      console.warn(`[NLib/marketplace] retained lock ${key}: ${String(err)}`);
+      console.warn(`[norden_lib/marketplace] retained lock ${key}: ${String(err)}`);
     }
   };
 }

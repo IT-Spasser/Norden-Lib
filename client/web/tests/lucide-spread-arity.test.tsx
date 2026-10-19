@@ -55,7 +55,7 @@ import { cleanup, render } from "@solidjs/testing-library";
  * file. So the `spread` exercised below is the production-shaped module and not
  * a second copy of the logic.
  */
-import * as shim from "@nlib/shared/solid-compat/solid-1-compat-web";
+import * as shim from "@norden_lib/shared/solid-compat/solid-1-compat-web";
 import { Anchor, Ban } from "lucide-solid";
 import { createRoot, createSignal, flush } from "solid-js";
 

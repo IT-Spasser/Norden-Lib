@@ -1,9 +1,9 @@
 /**
- * `nlib_api_base_url` is meant to be ONE switch: point it at a local dev
+ * `norden_lib_api_base_url` is meant to be ONE switch: point it at a local dev
  * worker and every call this codebase makes to the TIMMYG Studios API follows
  * it. Two things used to stop that, and this suite is what keeps them fixed.
  *
- *  1. The default host was written out five separate times — NLib's
+ *  1. The default host was written out five separate times — Norden Lib's
  *     `config.ts`, `cl_marketplace.lua`, `sv_marketplace.lua`, `catalogue.ts`
  *     and tRadio's `cl_bridge.lua`. Five copies of a value that must agree.
  *  2. `shared/imports/versioncheck/server.lua` did not read the convar at all,
@@ -46,11 +46,11 @@ describe("the studio API base URL has one definition per language", () => {
   });
 
   test("the convar name agrees across the two languages", () => {
-    expect(API_BASE_URL_CONVAR).toBe("nlib_api_base_url");
-    expect(read("shared/sh_api.lua")).toContain("StudioApi.CONVAR = 'nlib_api_base_url'");
+    expect(API_BASE_URL_CONVAR).toBe("norden_lib_api_base_url");
+    expect(read("shared/sh_api.lua")).toContain("StudioApi.CONVAR = 'norden_lib_api_base_url'");
   });
 
-  test("no NLib reader carries its own copy of the host or its own convar read", () => {
+  test("no Norden Lib reader carries its own copy of the host or its own convar read", () => {
     // Every runtime file that resolves the base URL. A new one that inlines the
     // literal, or calls GetConvar directly, is a fifth copy by another name.
     for (const file of [
@@ -61,7 +61,7 @@ describe("the studio API base URL has one definition per language", () => {
     ]) {
       const source = read(file);
       expect(`${file}: ${source.includes("https://timmygstudios.com")}`).toBe(`${file}: false`);
-      expect(`${file}: ${/GetConvar\(\s*['"]nlib_api_base_url/.test(source)}`).toBe(
+      expect(`${file}: ${/GetConvar\(\s*['"]norden_lib_api_base_url/.test(source)}`).toBe(
         `${file}: false`
       );
     }
@@ -77,7 +77,7 @@ describe("the studio API base URL has one definition per language", () => {
   });
 
   test("sh_api.lua is in both shared_scripts and files, or one VM silently has no rule", () => {
-    // Loaded into NLib's own VMs by shared_scripts; read out of the resource by
+    // Loaded into Norden Lib's own VMs by shared_scripts; read out of the resource by
     // a consumer's versioncheck through LoadResourceFile, which needs `files`.
     const manifest = read("fxmanifest.lua");
     expect(manifest.match(/'shared\/sh_api\.lua'/g)?.length).toBe(2);
@@ -98,10 +98,10 @@ describe("versioncheck follows the override", () => {
     expect(source).toContain("https://api.github.com/repos/");
   });
 
-  test("it loads the shared module rather than assuming NLib's VM", () => {
-    // versioncheck runs inside the CONSUMER resource's VM, where NLib's
+  test("it loads the shared module rather than assuming Norden Lib's VM", () => {
+    // versioncheck runs inside the CONSUMER resource's VM, where Norden Lib's
     // shared_scripts were never loaded. Same bootstrap as sh_branding.lua.
-    expect(source).toContain("LoadResourceFile('NLib', path)");
+    expect(source).toContain("LoadResourceFile('norden_lib', path)");
     expect(source).toContain("local path = 'shared/sh_api.lua'");
   });
 });
@@ -165,7 +165,7 @@ describe("resolveConfig is not memoised", () => {
   test("a convar change mid-session is picked up without a resource restart", async () => {
     // It used to cache into a module-scope `cached` at first use, so someone
     // iterating against a dev server got tRadio (which always re-read) on the
-    // new host and NLib still on the old one, with nothing to explain it.
+    // new host and Norden Lib still on the old one, with nothing to explain it.
     const { resolveConfig } = await import("../../server/lib/marketplace/config");
     const g = globalThis as { GetConvar?: (n: string, d: string) => string };
     const original = g.GetConvar;
@@ -188,17 +188,17 @@ describe("resolveConfig is not memoised", () => {
 
 /**
  * tRadio is a sibling resource, not a dependency, so this block is skipped
- * wherever NLib is checked out on its own — the same shape as
+ * wherever Norden Lib is checked out on its own — the same shape as
  * tests/integration/versioncheck-provider.test.ts.
  */
 const radio = new URL("../../../tRadio/", import.meta.url);
 const withRadio = existsSync(new URL("client/cl_bridge.lua", radio)) ? describe : describe.skip;
 
-withRadio("tRadio, the one copy that cannot import NLib's Lua", () => {
+withRadio("tRadio, the one copy that cannot import Norden Lib's Lua", () => {
   const radioRead = (path: string) => readFileSync(new URL(path, radio), "utf8");
 
-  test("its client default matches NLib's, exactly", () => {
-    // tRadio's client VM cannot LoadResourceFile NLib's module: its own Lua VM
+  test("its client default matches Norden Lib's, exactly", () => {
+    // tRadio's client VM cannot LoadResourceFile Norden Lib's module: its own Lua VM
     // test fixtures stub LoadResourceFile to a fixed file table, so the call
     // would resolve to nil under test. The copy is deliberate and held here.
     const source = radioRead("client/cl_bridge.lua");
@@ -209,7 +209,7 @@ withRadio("tRadio, the one copy that cannot import NLib's Lua", () => {
   });
 
   test("its update check follows the convar instead of a hardcoded host", () => {
-    // Same gap as NLib's versioncheck had: /api/products was a module-scope
+    // Same gap as Norden Lib's versioncheck had: /api/products was a module-scope
     // literal, so update checks ignored a localhost override entirely.
     const source = radioRead("server/lib/updates.ts");
     expect(source).not.toContain("https://timmygstudios.com/api/products");

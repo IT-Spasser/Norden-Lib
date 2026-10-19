@@ -9,7 +9,7 @@
  * it only while the marketplace tab is the active one. So closing the panel or
  * switching dialog tabs during an install disposed the component's own
  * `onNuiEvent` subscriptions and the result was delivered to nobody. The install
- * still landed — NLib logged it, the consumer's lifecycle handler fired — and the
+ * still landed — Norden Lib logged it, the consumer's lifecycle handler fired — and the
  * admin was told nothing.
  *
  * On the way back in it got worse. A remounted browser re-applies the host's
@@ -28,7 +28,7 @@
  *
  * The obvious alternative is a "re-send what is installed" callback each consumer
  * answers, and it is a new contract across four resources for a problem that is
- * entirely NLib's. The host's payload stays the snapshot it is; this is the patch
+ * entirely Norden Lib's. The host's payload stays the snapshot it is; this is the patch
  * over it.
  *
  * Only CONFIRMED outcomes are recorded. A failed install changed nothing on disk,

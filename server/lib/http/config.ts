@@ -1,9 +1,9 @@
-// Router configuration. NLib has no config file; deployment-specific values are
+// Router configuration. Norden Lib has no config file; deployment-specific values are
 // FiveM convars read at boot:
 //
-//   set nlib_http_port        7777        # the one external port
-//   set nlib_http_host        "0.0.0.0"   # bind address
-//   set nlib_http_public_url  ""          # the address clients should be told
+//   set norden_lib_http_port        7777        # the one external port
+//   set norden_lib_http_host        "0.0.0.0"   # bind address
+//   set norden_lib_http_public_url  ""          # the address clients should be told
 //
 // `set`, not `setr`. All three are read here, server-side, through GetConvar —
 // nothing in client/ or any web/ tree reads them, so replicating them to every
@@ -13,7 +13,7 @@
 // need to be replicated. README.md's convar table is the source of truth for
 // this and already said `set`; this comment was the one that was wrong.
 //
-// nlib_http_public_url is the one an operator has to think about: the router
+// norden_lib_http_public_url is the one an operator has to think about: the router
 // binds a port but cannot know what address reaches it from outside. Unset
 // auto-detects the public IP. public-url.ts has the inference rules.
 //
@@ -38,9 +38,9 @@ export interface HttpConfig {
 
 export function resolveConfig(): HttpConfig {
   return {
-    host: strConvar("nlib_http_host", DEFAULT_HOST),
-    port: intConvar("nlib_http_port", DEFAULT_PORT),
-    publicUrlOverride: strConvar("nlib_http_public_url", "") || null,
+    host: strConvar("norden_lib_http_host", DEFAULT_HOST),
+    port: intConvar("norden_lib_http_port", DEFAULT_PORT),
+    publicUrlOverride: strConvar("norden_lib_http_public_url", "") || null,
     upstreamTimeoutMs: 30_000,
     maxConnections: 1024,
   };

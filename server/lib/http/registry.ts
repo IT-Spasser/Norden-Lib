@@ -20,8 +20,8 @@ export interface ProxyMount {
 }
 
 /**
- * A handler in NLib's own bundle (realtime at /rt). Reachable only from inside
- * NLib by construction: each resource's Node bundle is a separate V8 isolate.
+ * A handler in Norden Lib's own bundle (realtime at /rt). Reachable only from inside
+ * Norden Lib by construction: each resource's Node bundle is a separate V8 isolate.
  */
 export interface InProcessMount {
   kind: "inprocess";

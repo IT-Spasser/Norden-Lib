@@ -75,7 +75,7 @@ function fixture(protectedInventory?: ProtectedBuiltinInventory) {
   );
   const controller = init({ installTypes: { ui: "layouts", sound: "sounds" }, protectedInventory });
   const send = (action: string, changes: any = {}) =>
-    events[`nlib:marketplace:do${action}:consumer`]({
+    events[`norden_lib:marketplace:do${action}:consumer`]({
       token: "one",
       slug: "item",
       type: "ui",

@@ -25,7 +25,7 @@
 
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { cleanup, render } from "@solidjs/testing-library";
-import type { Component } from "@nlib/shared/hud-geometry";
+import type { Component } from "@norden_lib/shared/hud-geometry";
 import { flush } from "solid-js";
 import LayoutEditor from "../src/layout/LayoutEditor";
 
@@ -36,11 +36,11 @@ beforeEach(() => {
   sent = [];
   realFetch = globalThis.fetch;
   (window as unknown as { GetParentResourceName: () => string }).GetParentResourceName = () =>
-    "nlib-test";
+    "norden-test";
   globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     const href = typeof url === "string" ? url : url instanceof URL ? url.href : url.url;
     sent.push({
-      event: href.replace("https://nlib-test/", ""),
+      event: href.replace("https://norden-test/", ""),
       data: init?.body ? JSON.parse(String(init.body)) : {},
     });
     return new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } });
@@ -94,12 +94,12 @@ async function settle() {
 
 const q = (c: HTMLElement, sel: string) => c.querySelector(sel) as HTMLElement | null;
 const prompt = (c: HTMLElement) => q(c, '[role="alertdialog"]');
-const undoButton = (c: HTMLElement) => q(c, ".nlib-layout__history button") as HTMLButtonElement;
-const transform = (c: HTMLElement) => q(c, ".nlib-layout__proxy")!.style.transform;
+const undoButton = (c: HTMLElement) => q(c, ".norden-layout__history button") as HTMLButtonElement;
+const transform = (c: HTMLElement) => q(c, ".norden-layout__proxy")!.style.transform;
 const previews = () => sent.filter((s) => s.event === "layoutPreview");
 
 function key(c: HTMLElement, init: KeyboardEventInit) {
-  q(c, ".nlib-layout")!.dispatchEvent(
+  q(c, ".norden-layout")!.dispatchEvent(
     new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init })
   );
   flush();
@@ -117,14 +117,14 @@ const pointer = (type: string, x: number, y: number) =>
 
 test("hiding a component is an edit, so Cancel asks before throwing it away", async () => {
   const { container } = await openEditor();
-  q(container, ".nlib-layout__tag button")!.click();
+  q(container, ".norden-layout__tag button")!.click();
   await settle();
   // The write itself was never the broken half — the proxy does go hidden.
-  expect(q(container, ".nlib-layout__proxy")!.className).toContain("--hidden");
+  expect(q(container, ".norden-layout__proxy")!.className).toContain("--hidden");
   // What was broken: nothing was recorded, so the session looked untouched.
   expect(undoButton(container).disabled).toBe(false);
   expect(undoButton(container).title).toBe("Undo hide Speedometer · Ctrl Z");
-  q(container, ".nlib-layout__discard")!.click();
+  q(container, ".norden-layout__discard")!.click();
   await settle();
   expect(prompt(container)).not.toBeNull();
 });
@@ -135,7 +135,7 @@ test("Reset this is undoable, which is what its own tooltip promises", async () 
   window.dispatchEvent(new KeyboardEvent("keyup", { key: "ArrowRight" }));
   await settle();
   const moved = transform(container);
-  q(container, ".nlib-layout__reset")!.click();
+  q(container, ".norden-layout__reset")!.click();
   await settle();
   expect(undoButton(container).title).toBe("Undo reset Speedometer · Ctrl Z");
   expect(transform(container)).not.toBe(moved);
@@ -149,7 +149,7 @@ test("a drag flushed by its own pointerup is kept, and is recorded as one entry"
   // flushes the gesture's only frame and then settles it immediately after.
   const { container } = await openEditor();
   const before = transform(container);
-  const proxy = q(container, ".nlib-layout__proxy")!;
+  const proxy = q(container, ".norden-layout__proxy")!;
   proxy.dispatchEvent(pointer("pointerdown", 500, 400));
   window.dispatchEvent(pointer("pointermove", 560, 430));
   window.dispatchEvent(pointer("pointerup", 560, 430));
@@ -167,23 +167,23 @@ test("the discard question is modal: a proxy drag behind it does nothing", async
   key(container, { key: "ArrowRight" });
   window.dispatchEvent(new KeyboardEvent("keyup", { key: "ArrowRight" }));
   await settle();
-  q(container, ".nlib-layout__discard")!.click();
+  q(container, ".norden-layout__discard")!.click();
   await settle();
   expect(prompt(container)).not.toBeNull();
   const held = transform(container);
   sent = [];
   // The shade is opaque but it only covers the PANEL; every outline, its eye
   // button, the wheel and the arrow keys sat outside it.
-  const proxy = q(container, ".nlib-layout__proxy")!;
+  const proxy = q(container, ".norden-layout__proxy")!;
   proxy.dispatchEvent(pointer("pointerdown", 500, 400));
   window.dispatchEvent(pointer("pointermove", 700, 600));
   window.dispatchEvent(pointer("pointerup", 700, 600));
   proxy.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, bubbles: true, cancelable: true }));
   key(container, { key: "ArrowRight", shiftKey: true });
-  q(container, ".nlib-layout__tag button")!.click();
+  q(container, ".norden-layout__tag button")!.click();
   await settle();
   expect(transform(container)).toBe(held);
-  expect(q(container, ".nlib-layout__proxy")!.className).not.toContain("--hidden");
+  expect(q(container, ".norden-layout__proxy")!.className).not.toContain("--hidden");
   expect(previews()).toEqual([]);
   // …and the question is still the only thing being asked.
   expect(prompt(container)).not.toBeNull();
@@ -194,7 +194,7 @@ test("a session that ends with the question up does not reopen into it", async (
   key(container, { key: "ArrowRight" });
   window.dispatchEvent(new KeyboardEvent("keyup", { key: "ArrowRight" }));
   await settle();
-  q(container, ".nlib-layout__discard")!.click();
+  q(container, ".norden-layout__discard")!.click();
   await settle();
   expect(prompt(container)).not.toBeNull();
   // The watchdog closes the editor for its own reasons — focus loss, a dialog,
@@ -209,18 +209,18 @@ test("a session that ends with the question up does not reopen into it", async (
 
 test("a resize interrupted by losing focus leaves no percentage pinned to the widget", async () => {
   const { container } = await openEditor();
-  const handle = q(container, ".nlib-layout__handle--se");
+  const handle = q(container, ".norden-layout__handle--se");
   expect(handle).not.toBeNull();
   handle!.dispatchEvent(pointer("pointerdown", 600, 450));
   window.dispatchEvent(pointer("pointermove", 640, 470));
   await new Promise((r) => requestAnimationFrame(() => r(null)));
   await settle();
-  expect(q(container, ".nlib-layout__scale-badge")).not.toBeNull();
+  expect(q(container, ".norden-layout__scale-badge")).not.toBeNull();
   // The badge said "only while it is actually changing", but it was cleared at
   // the pointer handlers — and `blur` ends the gesture without going near them.
   window.dispatchEvent(new Event("blur"));
   await settle();
-  expect(q(container, ".nlib-layout__scale-badge")).toBeNull();
+  expect(q(container, ".norden-layout__scale-badge")).toBeNull();
 });
 
 test("a resize that moves nothing posts no preview", async () => {

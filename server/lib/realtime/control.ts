@@ -11,8 +11,8 @@ import { URL } from "node:url";
 import WebSocket from "ws";
 import { fEmit } from "./fivem";
 
-const EVT_RECV = "__nlib:rt:control:recv"; // wire → Lua (consumer reacts)
-const EVT_STATE = "__nlib:rt:control:state"; // connection state changes for observability
+const EVT_RECV = "__norden_lib:rt:control:recv"; // wire → Lua (consumer reacts)
+const EVT_STATE = "__norden_lib:rt:control:state"; // connection state changes for observability
 
 type State = "idle" | "fetching-token" | "connecting" | "open" | "closed";
 
@@ -209,7 +209,7 @@ export class ControlClient {
               "version",
               ""
             ) ?? undefined,
-          resourceName: "NLib",
+          resourceName: "norden_lib",
           bootedAt: Date.now(),
         },
       });

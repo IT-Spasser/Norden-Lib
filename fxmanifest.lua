@@ -2,15 +2,15 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
--- The technical name, not a retail title: NLib is a public developer library.
+-- The technical name, not a retail title: Norden Lib is a public developer library.
 -- Set explicitly so StudioBranding.displayName is not reading a fallback.
-name 'NLib'
+name 'norden_lib'
 author 'Tommy Johnston'
 author 'TIMMYG Studios'
-description 'Nordic Lib (NLib) — shared UI and utility library (FiveM)'
+description 'Norden Lib (norden_lib) — shared UI and utility library (FiveM)'
 
--- 0.6 is the only NLib ever released, so a pin below `1.0` is meaningless and
--- every consumer pins `nlib_min_version '1.0'`. Nothing between the two was
+-- 0.6 is the only Norden Lib ever released, so a pin below `1.0` is meaningless and
+-- every consumer pins `norden_lib_min_version '1.0'`. Nothing between the two was
 -- tagged: 0.6.0, 0.12.0 through 0.17.0 and this 1.0.0 exist only as values on
 -- this line, which is why a consumer installed against the public v0.6 zip
 -- fails the gate in imports.lua rather than running degraded.
@@ -18,13 +18,13 @@ description 'Nordic Lib (NLib) — shared UI and utility library (FiveM)'
 -- Release notes live in the GitHub release and the tWeb changelog feed. The
 -- retired CHANGELOG.md held the per-module rationale for 0.7-0.17; recover it
 -- for the 1.0.0 notes with `git show 858f933:CHANGELOG.md`.
-version '1.0.0'
+version '2.0.0'
 
 -- The top-level folder is the VM a file is loaded into. A module spanning VMs
 -- keeps its own name under each tree's lib/, so the blocks below stay the single
 -- authority on what runs where.
 --
--- imports.lua stays at the root: consumers name it as '@NLib/imports.lua' in
+-- imports.lua stays at the root: consumers name it as '@norden_lib/imports.lua' in
 -- their own manifests, so that path is a contract, not a convention.
 
 shared_scripts {
@@ -38,7 +38,7 @@ shared_scripts {
     -- Before lifecycle.lua, which wraps it as Platform.isStudioResource. Shared
     -- because a consumer VM loads this exact file via shared/imports/versioncheck.
     'shared/sh_branding.lua',
-    -- The one definition of the studio API host and of nlib_api_base_url's
+    -- The one definition of the studio API host and of norden_lib_api_base_url's
     -- normalisation. Shared because client/cl_marketplace.lua, server/
     -- sv_marketplace.lua and a consumer VM (via shared/imports/versioncheck)
     -- all need the same answer.
@@ -125,7 +125,7 @@ files {
     'imports.lua',
     -- Read by a consumer's versioncheck module via LoadResourceFile.
     'shared/sh_branding.lua',
-    -- Same: a consumer VM loads this to resolve nlib_api_base_url.
+    -- Same: a consumer VM loads this to resolve norden_lib_api_base_url.
     'shared/sh_api.lua',
     'shared/imports/**/*.lua',
     'client/ui/index.html',

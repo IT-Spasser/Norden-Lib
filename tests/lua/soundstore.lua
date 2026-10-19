@@ -51,20 +51,20 @@ end
 -- called registerWriteResourceFile(), which is an error crossing the boundary
 -- rather than a returned string.
 --
--- It hangs off `exports.tRadar`, not `exports.NLib`, and that placement is the
+-- It hangs off `exports.tRadar`, not `exports.norden_lib`, and that placement is the
 -- test: FiveM's Node runtime sandboxes each resource to its own directory, so
--- NLib cannot write tRadar's data.json on its behalf. Every resource registers
--- the shared implementation itself and nlib.fs calls the LOCAL one. A stub on
--- `NLib` here would pass while production was being refused.
+-- Norden Lib cannot write tRadar's data.json on its behalf. Every resource registers
+-- the shared implementation itself and norden_lib.fs calls the LOCAL one. A stub on
+-- `norden_lib` here would pass while production was being refused.
 local bridgeWorks = true
 exports = {
-    NLib = {
+    norden_lib = {
         ScanResourceFiles = function(_, _, _) return scanReply end,
     },
     tRadar = {
         WriteResourceFile = function(_, resource, path, contents)
             -- What FiveM itself raises for an export a resource does not have,
-            -- which is the shape nlib.fs has to recognise as "no bridge here".
+            -- which is the shape norden_lib.fs has to recognise as "no bridge here".
             if not bridgeWorks then error('No such export WriteResourceFile in resource tRadar') end
             writes = writes + 1
             files[resource .. '/' .. path] = contents
@@ -80,14 +80,14 @@ local function diskListing(names)
     return json.encode({ ok = true, entries = entries })
 end
 
--- nlib.fs consults demo mode before every write. Off for the whole suite except
+-- norden_lib.fs consults demo mode before every write. Off for the whole suite except
 -- the section at the end, so every case above keeps asserting that the write
 -- really reaches disk.
 local demoOn = false
 
 local recordedTimings = {}
 
-nlib = {
+norden_lib = {
     -- A sink for jsonstore's instrumented write path. A RECORDER rather than
     -- a no-op even where this suite does not read it, so the call is exercised
     -- rather than merely tolerated; tests/lua/jsonstore.lua is where the
@@ -126,16 +126,16 @@ end
 local function reset()
     files, _blobs, logged, writes, writeFails, scanReply = {}, {}, {}, 0, false, nil
     bridgeWorks = true
-    -- nlib.fs memoises "is SaveResourceFile usable here" per target resource for
+    -- norden_lib.fs memoises "is SaveResourceFile usable here" per target resource for
     -- the life of the server, which is right in production and wrong across
     -- cases here: without a fresh copy, the first case that makes the native
     -- fail pins every later one onto the bridge.
-    nlib.fs = dofile('shared/imports/fs/server.lua')
+    norden_lib.fs = dofile('shared/imports/fs/server.lua')
     -- And jsonstore memoises one store per resource-and-file for the life of
     -- the server, which is the whole point of it there and wrong here: a case
     -- that left a write in flight, or that tripped the once-per-store
     -- unparseable-JSON notice, would carry both into the next one.
-    nlib.jsonstore.reset()
+    norden_lib.jsonstore.reset()
 end
 
 local KEYS = { 'BEEP', 'LOCK', 'FAST_LOCK' }
@@ -173,7 +173,7 @@ store = open()
 assert(#store.installedSounds == 1, 'an unreadable folder must not prune installedSounds')
 assert(store.toneWavMap.BEEP == 'beep.wav', 'nor delete the mappings that list would have justified')
 assert(writes == 0, 'and nothing is written, so the next boot starts from the same place')
-assert(loggedAt(nlib.logger.WARN), 'the skipped reconciliation is announced, not silent')
+assert(loggedAt(norden_lib.logger.WARN), 'the skipped reconciliation is announced, not silent')
 
 -- An empty listing is the same story: it is indistinguishable from a folder we
 -- could not read, and only one of the two readings is worth losing data over.
@@ -189,11 +189,11 @@ assert(#store.installedSounds == 1 and store.toneWavMap.BEEP == 'beep.wav',
 -- print a warning about an unreadable directory on every boot of a perfectly
 -- healthy server, which is how a real warning stops being read. The behaviour
 -- above is deliberately identical; only the level and the wording differ.
-assert(not loggedAt(nlib.logger.WARN),
+assert(not loggedAt(norden_lib.logger.WARN),
     'a folder that was read and holds no audio is not a warning')
-assert(not loggedAt(nlib.logger.INFO),
+assert(not loggedAt(norden_lib.logger.INFO),
     'nor an INFO line on every boot of a stock install')
-local empty = loggedAt(nlib.logger.DEBUG)
+local empty = loggedAt(norden_lib.logger.DEBUG)
 assert(empty and empty:find('holds no audio files', 1, true),
     'it is still recorded at DEBUG, for a boot where tones were expected')
 
@@ -287,13 +287,13 @@ store:setMapping('BEEP', 'siren.wav')
 local removed = store:uninstall('siren')
 assert(removed == 'siren.wav', 'the removed filename is reported back')
 assert(store.toneWavMap.BEEP == nil, 'and its mappings are cleared')
-assert(loggedAt(nlib.logger.INFO), 'the clearing is logged, since the admin did not ask for it')
+assert(loggedAt(norden_lib.logger.INFO), 'the clearing is logged, since the admin did not ask for it')
 
 -- a refused native write falls back, and is never swallowed
 --
 -- FiveM for GTAV Enhanced refuses SaveResourceFile outright for some resources
 -- while Node's fs writes the identical path, so a refusal is not the end of the
--- story: nlib.fs retries through the resource's own bridge and the settings
+-- story: norden_lib.fs retries through the resource's own bridge and the settings
 -- still land. That
 -- is the case this suite has to hold, because the symptom it replaces --
 -- "data.json never changes and nothing says why" -- is invisible until a
@@ -310,9 +310,9 @@ writeFails = true
 store:setMapping('BEEP', 'beep.wav')
 assert(json.decode(files['tRadar/data.json']).soundWavMap.BEEP == 'beep.wav',
     'a native refusal is retried through the bridge, and the mapping still lands')
-assert(not loggedAt(nlib.logger.ERROR),
+assert(not loggedAt(norden_lib.logger.ERROR),
     'a write that succeeded through the bridge is not an error')
-local diverted = loggedAt(nlib.logger.WARN)
+local diverted = loggedAt(norden_lib.logger.WARN)
 assert(diverted and diverted:find('Node fs bridge', 1, true),
     'the diversion is announced once, so a later failure can be read in context')
 
@@ -327,7 +327,7 @@ store = open()
 logged = {}
 writeFails, bridgeWorks = true, false
 store:setMapping('BEEP', 'beep.wav')
-local err = loggedAt(nlib.logger.ERROR)
+local err = loggedAt(norden_lib.logger.ERROR)
 assert(err and err:find('will not survive a restart', 1, true),
     'a write nothing can complete is reported, not swallowed')
 assert(err:find('bridge is unavailable', 1, true),
@@ -344,7 +344,7 @@ assert(not ok, 'every branch here is destructive or corrective; none of them may
 --
 -- The half of demo mode that keeps a showroom server pristine. Two properties
 -- matter and they pull in opposite directions: nothing may reach disk, and the
--- caller must not be told the save failed. Every caller of nlib.fs treats a
+-- caller must not be told the save failed. Every caller of norden_lib.fs treats a
 -- failure as data loss and says so to the player, so returning false here would
 -- put a red error behind every settings change on a working demo.
 
@@ -360,16 +360,16 @@ assert(files['tRadar/data.json'] == before, 'demo mode leaves the file on disk e
 -- `toneWavMap` in memory, `soundWavMap` on disk -- the two names are the same
 -- map and the asymmetry is easy to assert past by accident.
 assert(store.toneWavMap.BEEP == 'beep.wav', 'while the in-memory mapping is live for this session')
-assert(not loggedAt(nlib.logger.ERROR), 'and the caller is not told its save failed')
+assert(not loggedAt(norden_lib.logger.ERROR), 'and the caller is not told its save failed')
 
--- The native must not even be attempted: nlib.fs memoises "is SaveResourceFile
+-- The native must not even be attempted: norden_lib.fs memoises "is SaveResourceFile
 -- usable here" per target, and letting a dropped write through to a stubbed-out
 -- or refusing native would poison that verdict for the rest of the session.
 local writesBefore = writes
 writeFails = true
 store:setMapping('LOCK', 'lock.wav')
 assert(writes == writesBefore, 'no native write is attempted at all')
-assert(not loggedAt(nlib.logger.ERROR), 'and a refusing native is never reached, so never reported')
+assert(not loggedAt(norden_lib.logger.ERROR), 'and a refusing native is never reached, so never reported')
 
 demoOn = false
 writeFails = false

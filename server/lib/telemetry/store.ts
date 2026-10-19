@@ -19,7 +19,7 @@
  *      the ring drops. `MAX_EVENTS_PER_CLIENT_PER_MINUTE` is that floor.
  *
  * The per-client budget is swept on `playerDropped`, for the reason
- * `nlib.ratelimit` exists: without it every bucket keeps one entry per player
+ * `norden_lib.ratelimit` exists: without it every bucket keeps one entry per player
  * who has ever connected, for the life of the server.
  */
 
@@ -37,7 +37,7 @@ export interface QueuedEvent {
   dimensions: Record<string, string>;
   measures: Record<string, number>;
   /**
-   * `nlib.error_reported` only, and a SIBLING of `dimensions`. It is carried
+   * `norden_lib.error_reported` only, and a SIBLING of `dimensions`. It is carried
    * through the queue verbatim because it has already been scrubbed at the point
    * of capture — a non-zero `redactions` count on a stored stack is a bug in
    * this emitter and nothing else will report it.
@@ -136,7 +136,7 @@ export function createStore(now: () => number = () => Date.now()): Store {
             measures,
             // Only where the contract allows one. A `stack` on any other
             // event is refused, and the refusal costs the whole event.
-            ...(event.event === "nlib.error_reported" && typeof event.stack === "string"
+            ...(event.event === "norden_lib.error_reported" && typeof event.stack === "string"
               ? { stack: event.stack }
               : {}),
           },

@@ -12,7 +12,7 @@
 /** The manifest filename. One name, in every kind of module. */
 export const MODULE_MANIFEST = "module.json";
 
-/** The only schema this NLib understands. Bump deliberately; never widen in place. */
+/** The only schema this Norden Lib understands. Bump deliberately; never widen in place. */
 export const MODULE_SCHEMA = 1;
 
 export const MODULE_KINDS = ["layout", "theme", "sound"] as const;
@@ -330,7 +330,7 @@ export function parseModuleManifest(value: unknown, id: string, kind?: ModuleKin
 
   if (raw.schema !== MODULE_SCHEMA)
     throw new Error(
-      `module.json: declares schema ${JSON.stringify(raw.schema)}; this NLib understands ${MODULE_SCHEMA}`
+      `module.json: declares schema ${JSON.stringify(raw.schema)}; this Norden Lib understands ${MODULE_SCHEMA}`
     );
 
   const declaredKind = raw.kind;

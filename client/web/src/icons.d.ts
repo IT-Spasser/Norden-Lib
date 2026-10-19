@@ -21,7 +21,7 @@
  * `ValidComponent`, which is a different type in each package. The shipped
  * declaration itself has to go.
  *
- * Same shape as the one `NLib/shared/ts/env.d.ts` carries for the same reason:
+ * Same shape as the one `norden_lib/shared/ts/env.d.ts` carries for the same reason:
  * a component is all this needs to be, and the props type comes from
  * `@solidjs/web`, which is where the JSX namespace lives now.
  */

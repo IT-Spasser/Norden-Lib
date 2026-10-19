@@ -7,7 +7,7 @@
 -- megabyte. The compact wire format is keyed per owner, since more than one
 -- resource may publish a catalog and a grant has to say whose it is.
 --
--- Pure Lua, like schema.lua: it loads in NLib's VM, in a consumer's VM through
+-- Pure Lua, like schema.lua: it loads in Norden Lib's VM, in a consumer's VM through
 -- imports/menu/shared.lua, and in a bare test host.
 
 MenuCatalog = {}

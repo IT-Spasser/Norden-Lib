@@ -1,4 +1,4 @@
--- `nlib.kvp.view` and `nlib.settings`'s `serverScoped`, against a fake KVP store.
+-- `norden_lib.kvp.view` and `norden_lib.settings`'s `serverScoped`, against a fake KVP store.
 --
 -- The load-bearing assertion in here is not that the options work — it is that
 -- the key strings they produce are **byte-identical** to the ones the two forks
@@ -23,7 +23,7 @@ local function host(convars)
     local env = setmetatable({}, { __index = _G })
     env._G = env
     env.store = {}
-    env.GetCurrentResourceName = function() return 'NLib' end
+    env.GetCurrentResourceName = function() return 'norden_lib' end
     env.IsDuplicityVersion = function() return false end
     env.GetConvar = function(name, default) return (convars or {})[name] or default end
     env.GetCurrentServerEndpoint = function() return ENDPOINT end
@@ -104,12 +104,12 @@ print('PASS the shared server tag is byte-identical to tRadio\'s')
 -- Key composition matches both forks
 
 do
-    local env = host({ nlib_community_id = 'tgstudios' })
+    local env = host({ norden_lib_community_id = 'tgstudios' })
     local kvp = loadKvp(env)
     local tag = kvp.serverTag()
     local key = 'radio_setting_fx_overrides'
 
-    -- tRadio Lua, before: `nlib.kvp.key(key .. "_" .. serverTag())`
+    -- tRadio Lua, before: `norden_lib.kvp.key(key .. "_" .. serverTag())`
     local tradioLua = kvp.key(key .. '_' .. tag)
     -- tRadio TypeScript, `SettingsStore.fullKey`: prefix + key + suffix
     local tradioTs = 'tgstudios_' .. key .. '_' .. tag
@@ -119,7 +119,7 @@ do
     check(view.key(key) == tradioTs, 'view key matches tRadio TS: ' .. view.key(key) .. ' vs ' .. tradioTs)
     check(kvp.key(key, { serverScoped = true }) == tradioLua, 'kvp.key honours serverScoped directly')
 
-    -- tAFK, before: `nlib.kvp` with keys hand-prefixed `'tafk:' .. key`
+    -- tAFK, before: `norden_lib.kvp` with keys hand-prefixed `'tafk:' .. key`
     local prefs = kvp.view({ prefix = 'tafk:' })
     check(prefs.key('playerDisabled') == kvp.key('tafk:playerDisabled'), 'view prefix matches tAFK\'s hand-prefixing')
 
@@ -131,7 +131,7 @@ print('PASS composed keys are byte-identical to both forks')
 do
     -- No endpoint resolved yet. A scoped key must stay unscoped rather than
     -- gaining a bare trailing underscore and reverting the player.
-    local env = host({ nlib_community_id = 'tgstudios' })
+    local env = host({ norden_lib_community_id = 'tgstudios' })
     env.GetCurrentServerEndpoint = function() return '' end
     local kvp = loadKvp(env)
     check(
@@ -175,10 +175,10 @@ print('PASS nilWhenUnset changes only the never-written answer')
 -- settings.serverScoped
 
 do
-    local env = host({ nlib_community_id = 'tgstudios' })
-    env.nlib = { kvp = loadKvp(env) }
+    local env = host({ norden_lib_community_id = 'tgstudios' })
+    env.norden_lib = { kvp = loadKvp(env) }
     local settingsMod = loadSettings(env)
-    local tag = env.nlib.kvp.serverTag()
+    local tag = env.norden_lib.kvp.serverTag()
 
     local settings = settingsMod.create({
         { key = 'radio_setting_volume', type = 'float', default = 0.5, clamp = { 0.0, 1.0 } },
@@ -204,10 +204,10 @@ do
     check(settings:isUserSet('radio_setting_fx_overrides'), 'a scoped write still marks the setting user-set')
 
     -- Reconnecting to a DIFFERENT server must not see the first server's tuning.
-    local other = host({ nlib_community_id = 'tgstudios' })
+    local other = host({ norden_lib_community_id = 'tgstudios' })
     other.store = env.store
     other.GetCurrentServerEndpoint = function() return '198.51.100.9:30120' end
-    other.nlib = { kvp = loadKvp(other) }
+    other.norden_lib = { kvp = loadKvp(other) }
     local otherSettings = assert(loadfile('shared/imports/settings/client.lua', 't', other))()
     local fresh = otherSettings.create({
         { key = 'radio_setting_volume', type = 'float', default = 0.5, clamp = { 0.0, 1.0 } },

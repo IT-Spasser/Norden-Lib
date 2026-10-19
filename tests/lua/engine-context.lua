@@ -1,7 +1,7 @@
 -- Standalone from resource root:
 --   bunx --bun fengari tests/lua/engine-context.lua
 --
--- Oracle for NLib's presentation pipeline.
+-- Oracle for Norden Lib's presentation pipeline.
 --
 -- Presentation is the one stage that is allowed to take rows AWAY and never allowed
 -- to add them back. A snapshot says what the server granted; this pass narrows it to
@@ -21,7 +21,7 @@
 -- in for the ones a consuming resource registers.
 
 
-_NLIB_SIDE = 'client'
+_NORDEN_LIB_SIDE = 'client'
 local clock = 0
 Platform = {
     now = function() return clock end,
@@ -30,7 +30,7 @@ Platform = {
 }
 
 assert(loadfile('shared/lib/menu/schema.lua', 't', _G),
-    'shared/lib/menu/schema.lua not found -- run this suite from the NLib resource root')()
+    'shared/lib/menu/schema.lua not found -- run this suite from the Norden Lib resource root')()
 assert(loadfile('shared/lib/menu/catalog.lua', 't', _G))()
 assert(loadfile('client/lib/menu/actions.lua', 't', _G))()
 assert(loadfile('client/lib/menu/context.lua', 't', _G))()

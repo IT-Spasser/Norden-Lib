@@ -3,7 +3,7 @@
 --
 --  WHAT WAS WRONG 
 --
--- All three implementations — `shared/lib/adapter/shim.lua` for NLib's own VM
+-- All three implementations — `shared/lib/adapter/shim.lua` for Norden Lib's own VM
 -- and `shared/imports/platform/{client,server}.lua` for a consumer's — were a
 -- bare `exports(name, fn)`. The only comment on them explained why the
 -- `resource` argument is ignored, so nothing said the guard was absent, and
@@ -37,7 +37,7 @@ local function host(side)
     local env = setmetatable({}, { __index = _G })
     env._G = env
     env.exported, env.printed = {}, {}
-    env.GetCurrentResourceName = function() return 'NLib' end
+    env.GetCurrentResourceName = function() return 'norden_lib' end
     env.IsDuplicityVersion = function() return side == 'server' end
     env.GetInvokingResource = function() return 'consumer' end
     env.GetGameTimer = function() return 0 end
@@ -91,7 +91,7 @@ for _, entry in ipairs(SOURCES) do
 
     -- THE HALF A NAIVE pcall WRAPPER GETS WRONG. `ok, reason` is the house
     -- shape and `return fn(...)` inside a pcall collapses it to `ok`.
-    platform.wrapExport('NLib', 'Grant', function(a, b)
+    platform.wrapExport('norden_lib', 'Grant', function(a, b)
         return false, 'no permission', a + b
     end)
     local ok, reason, sum = env.exported['Grant'](2, 3)
@@ -101,7 +101,7 @@ for _, entry in ipairs(SOURCES) do
 
     -- A nil in the middle of a return list is a value, not a terminator. Without
     -- `table.pack`'s `n`, `unpack` stops at the hole and the trailing value is lost.
-    platform.wrapExport('NLib', 'Sparse', function() return 1, nil, 3 end)
+    platform.wrapExport('norden_lib', 'Sparse', function() return 1, nil, 3 end)
     local one, two, three = env.exported['Sparse']()
     check(one == 1 and two == nil and three == 3, path .. ': a nil mid-list does not truncate')
 
@@ -110,7 +110,7 @@ for _, entry in ipairs(SOURCES) do
     check(#env.printed == 1, path .. ': a successful export prints nothing')
 end
 
--- NLib's own VM copy. Loaded through the adapter entry so it is the real file in
+-- Norden Lib's own VM copy. Loaded through the adapter entry so it is the real file in
 -- its real order, not a hand-picked one — the two copies exist because a
 -- consumer's natives must run in the consumer's VM, and they must not diverge.
 do
@@ -120,17 +120,17 @@ do
     local Platform = env.Platform
     check(type(Platform.wrapExport) == 'function', 'shim: wrapExport exists')
 
-    Platform.wrapExport('NLib', 'Boom', function() error('inner') end)
+    Platform.wrapExport('norden_lib', 'Boom', function() error('inner') end)
     check(env.exported['Boom']() == nil, 'shim: a throwing export answers nil')
     check(#env.printed == 1 and env.printed[1]:find('Boom', 1, true), 'shim: the reason is printed')
 
-    Platform.wrapExport('NLib', 'Pair', function() return false, 'why' end)
+    Platform.wrapExport('norden_lib', 'Pair', function() return false, 'why' end)
     local ok, why = env.exported['Pair']()
     check(ok == false and why == 'why', 'shim: multiple return values survive')
 
     -- `Platform.export` is an alias and has to inherit the guard rather than
     -- being a second, unguarded door to the same thing.
-    Platform.export('NLib', 'AliasBoom', function() error('alias inner') end)
+    Platform.export('norden_lib', 'AliasBoom', function() error('alias inner') end)
     check(env.exported['AliasBoom']() == nil, 'shim: Platform.export answers nil too')
     check(#env.printed == 2, 'shim: Platform.export is guarded, not a bypass')
 end

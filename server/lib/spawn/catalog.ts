@@ -1,10 +1,10 @@
 /**
  * What may be spawned, by whom, with which arguments.
  *
- * THIS FILE IS THE SECURITY CONTROL. `add_unsafe_child_process_permission NLib`
+ * THIS FILE IS THE SECURITY CONTROL. `add_unsafe_child_process_permission norden_lib`
  * is a grant to run anything; everything narrower is written down here, and
  * nothing outside this file can widen it. A caller names a program declared
- * below and never passes a path: NLib resolves it, requires it to be inside the
+ * below and never passes a path: Norden Lib resolves it, requires it to be inside the
  * caller's own resource directory after `realpath`, builds the argv from the
  * declared shape, and execs with `shell: false`.
  *
@@ -67,7 +67,7 @@ export interface Program {
    */
   loaderDir?: string;
   /**
-   * Resource-relative paths NLib puts in front of the caller's arguments.
+   * Resource-relative paths Norden Lib puts in front of the caller's arguments.
    */
   prepend?: string[];
   /** Resource-relative working directories the caller may pick. `""` is the root. */
@@ -184,7 +184,7 @@ export const FAMILY: Caller[] = [
             head: [{ lit: "serve" }],
             flags: [
               // Inline only, and loopback only: tDB reaches the outside world
-              // through NLib's router, never by binding another address.
+              // through Norden Lib's router, never by binding another address.
               { name: "--http", form: "inline", value: "loopbackAddress" },
               { name: "--dir", form: "either", value: "path" },
               { name: "--publicDir", form: "either", value: "path" },
@@ -240,7 +240,7 @@ export const FAMILY: Caller[] = [
          * This is the one duplex program: the caller and the child exchange
          * length-prefixed binary frames, not lines, because audio is decoded and
          * sent while the backbone is still generating. `prepend` is what keeps
-         * that from being a hole — tAI names `tts-sidecar` and NLib supplies the
+         * that from being a hole — tAI names `tts-sidecar` and Norden Lib supplies the
          * script, so "run this binary" never becomes "run this JavaScript".
          */
         id: "tts-sidecar",
@@ -335,14 +335,14 @@ export const FAMILY: Caller[] = [
   },
 ];
 
-// There were two "probes" here: fixed PowerShell command lines NLib ran on a
+// There were two "probes" here: fixed PowerShell command lines Norden Lib ran on a
 // caller's behalf, to resolve a live PID's executable and to count physical
 // cores. They are gone, and nothing replaced them — both questions are now
 // answered in-process by the callers themselves, the same way on every platform.
 //
 // Removed for two reasons, neither of which is that they were exploitable. They
-// were not: NLib owned every byte of those command lines and a caller supplied at
-// most one integer. But NLib is a public MIT library, and shipping *any*
+// were not: Norden Lib owned every byte of those command lines and a caller supplied at
+// most one integer. But Norden Lib is a public MIT library, and shipping *any*
 // `powershell.exe` invocation in one is a thing a reader stops at — which is a
 // real cost even when the code is fine. And they were Windows-only, so the same
 // question had two implementations, of which the Linux one is the one nobody

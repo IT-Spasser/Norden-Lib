@@ -10,7 +10,7 @@
 -- questions. The rear tier PERCEIVES and never CONTROLS, so most of what this
 -- file asserts about a rear seat is what it is still refused.
 --
--- The module is loaded into each CONSUMER's VM, like every NLib import, so each
+-- The module is loaded into each CONSUMER's VM, like every Norden Lib import, so each
 -- resource keeps its own cache over the same authoritative natives. Nothing here
 -- is shared between resources at runtime — only the rule is.
 
@@ -25,7 +25,7 @@ RegisterNetEvent = function(name, fn) netEvents[name] = fn end
 local clock = 0
 GetGameTimer = function() return clock end
 
-nlib = {
+norden_lib = {
     platform = {
         -- The ANY-seat read. The adapter also has a two-seat `getPlayerFrontSeat`,
         -- but occupancy no longer calls it: collapsing a rear seat to nil is now
@@ -415,7 +415,7 @@ print('PASS: partnerOf names the other front seat, live, and never the caller')
 -- not done anything. The payload is a nudge: the seat is re-read here, so a
 -- client claiming a seat it is not in gets the truth written instead.
 
-local moved = assert(netEvents['nlib:occupancy:moved'], 'the move ping is registered')
+local moved = assert(netEvents['norden_lib:occupancy:moved'], 'the move ping is registered')
 
 seats = {}
 occupancy.clear(1); occupancy.clear(2); occupancy.clear(3)

@@ -4,8 +4,8 @@
    menu root, which is the only thing the markup knows about skins.
 
    Everything here is an override of the shared default in ../menu.css, and every
-   rule is written against `.nlib-menu[data-skin=vmenu]` so it is strictly heavier
-   than the `:where(.nlib-menu)` rule it replaces. Nothing here should ever be the
+   rule is written against `.norden-menu[data-skin=vmenu]` so it is strictly heavier
+   than the `:where(.norden-menu)` rule it replaces. Nothing here should ever be the
    answer for the default skin: a rule that belongs to both belongs in menu.css. */
 
 /* Source geometry: vMenu draws a 431px-wide menu with 38px rows at 1080p. Every
@@ -13,7 +13,7 @@
    because the panel must stay pixel-identical at the resolution it was drawn
    against. The min-height steps at the foot of this file restate these tokens for
    taller clients, the same way the max-height steps do for short ones. */
-.nlib-menu[data-skin="vmenu"] {
+.norden-menu[data-skin="vmenu"] {
   --menu-width: 431px;
   --row-height: 38px;
   --heading-height: 38px;
@@ -23,7 +23,7 @@
   --heading-font: 17px;
   --row-font: 16px;
   /* A literal, not the shared --radius: this skin is a replica, and a theme that
-     rounds every other NLib surface must not round this one out of fidelity. */
+     rounds every other Norden Lib surface must not round this one out of fidelity. */
   --menu-radius: 6px;
   /* The default skin pushes its chrome bands well below the panel so they read
      as chrome. The source's bands are the panel's own inset, so the replica
@@ -35,74 +35,74 @@
   --menu-panel-bg: var(--panel);
 }
 
-/* The default's lit top edge is a NLib cue; the source has one flat border. */
-.nlib-menu[data-skin="vmenu"] .menu-panel {
+/* The default's lit top edge is a Norden Lib cue; the source has one flat border. */
+.norden-menu[data-skin="vmenu"] .menu-panel {
   border-top-color: var(--border);
 }
 
 /* The 107px band with the word centred in it, rather than the default's 46px
    left-aligned bar. No gutters and no rule beneath it. */
-.nlib-menu[data-skin="vmenu"] .menu-brand {
+.norden-menu[data-skin="vmenu"] .menu-brand {
   justify-content: center;
   padding: 0;
   border-bottom: 0;
 }
 /* Tight tracking at 43px is the source's own look, and the word is not clipped
    the way the default clips it -- it is centred in a band with no gutter. */
-.nlib-menu[data-skin="vmenu"] .brand-word {
+.norden-menu[data-skin="vmenu"] .brand-word {
   letter-spacing: -2px;
 }
-.nlib-menu[data-skin="vmenu"] .brand-word:not(.source-title) {
+.norden-menu[data-skin="vmenu"] .brand-word:not(.source-title) {
   min-width: auto;
   overflow: visible;
   white-space: normal;
 }
-.nlib-menu[data-skin="vmenu"] .close-button {
+.norden-menu[data-skin="vmenu"] .close-button {
   border-radius: 0;
 }
 
 /* A ruled table, not a padded list: rows are full-bleed and square, and the
    selection is the white bar across the whole panel. */
-.nlib-menu[data-skin="vmenu"] .menu-items {
+.norden-menu[data-skin="vmenu"] .menu-items {
   padding: 0;
 }
 /* The hairline is a softened --border, written as alpha over --border-raw rather
    than a color-mix(): that is a Chromium 111 function, and CEF 103 invalidates
    the whole declaration rather than ignoring it, so the replica's rows went
    unruled. */
-.nlib-menu[data-skin="vmenu"] .menu-row {
+.norden-menu[data-skin="vmenu"] .menu-row {
   border-radius: 0;
   border-bottom-color: hsl(var(--border-raw) / 0.55);
 }
-.nlib-menu[data-skin="vmenu"] .menu-row.is-active {
+.norden-menu[data-skin="vmenu"] .menu-row.is-active {
   border-bottom-color: transparent;
 }
-.nlib-menu[data-skin="vmenu"] .row-main {
+.norden-menu[data-skin="vmenu"] .row-main {
   padding: 0 12px;
 }
 
 /* vMenu marks a submenu with three overlapped chevrons; the default hides two. */
-.nlib-menu[data-skin="vmenu"] .row-chevron svg {
+.norden-menu[data-skin="vmenu"] .row-chevron svg {
   margin-right: -6px;
 }
-.nlib-menu[data-skin="vmenu"] .row-chevron svg:last-child {
+.norden-menu[data-skin="vmenu"] .row-chevron svg:last-child {
   margin-right: 0;
 }
 
 /* The square outline toggle. Checked is left alone deliberately: only the
    unfilled box differs, an outline in the row's own ink rather than a well. */
-.nlib-menu[data-skin="vmenu"] .toggle.nlib-nui-checkbox-control[data-state="unchecked"] {
+.norden-menu[data-skin="vmenu"] .toggle.norden-nui-checkbox-control[data-state="unchecked"] {
   background: none;
   border-color: currentColor;
 }
 
 /* vMenu shows stacked up/down chevrons on its own inset strip below the last row. */
-.nlib-menu[data-skin="vmenu"] .scroll-cue {
+.norden-menu[data-skin="vmenu"] .scroll-cue {
   height: 30px;
   background: var(--menu-inset);
   color: inherit;
 }
-.nlib-menu[data-skin="vmenu"] .scroll-cue svg {
+.norden-menu[data-skin="vmenu"] .scroll-cue svg {
   width: 13px;
   height: 13px;
   margin: -2px 0;
@@ -110,7 +110,7 @@
 
 /* Both confirmation buttons carry the control border here; the default leaves
    the primary one borderless. */
-.nlib-menu[data-skin="vmenu"] .dialog-confirm {
+.norden-menu[data-skin="vmenu"] .dialog-confirm {
   border-color: var(--menu-control-border);
 }
 
@@ -124,7 +124,7 @@
    by NuiRange only when the row actually has a barColor, so falling back to the
    track's own colour collapses the gradient to a flat bar for every row that does
    not, which is exactly what the source draws. */
-.nlib-menu[data-skin="vmenu"] .row-slider .nlib-nui-range {
+.norden-menu[data-skin="vmenu"] .row-slider .norden-nui-range {
   background: linear-gradient(
     to right,
     var(--nui-range-color, var(--menu-control-border)) var(--nui-range-fill, 0%),
@@ -134,20 +134,20 @@
 /* currentColor, not --nui-accent: the thumb follows the row's own ink, which is
    what makes it invert with the selection bar and take the barColor that
    .row-slider sets inline. */
-.nlib-menu[data-skin="vmenu"] .row-slider .nlib-nui-range::-webkit-slider-thumb {
+.norden-menu[data-skin="vmenu"] .row-slider .norden-nui-range::-webkit-slider-thumb {
   width: 15px;
   height: 15px;
   border: 0;
   background: currentColor;
 }
-.nlib-menu[data-skin="vmenu"] .row-slider .nlib-nui-range::-moz-range-thumb {
+.norden-menu[data-skin="vmenu"] .row-slider .norden-nui-range::-moz-range-thumb {
   width: 15px;
   height: 15px;
   border: 0;
   background: currentColor;
 }
 /* Against the selection bar the unfilled share is a shadow rather than a border. */
-.nlib-menu[data-skin="vmenu"] .menu-row.is-active .row-slider .nlib-nui-range {
+.norden-menu[data-skin="vmenu"] .menu-row.is-active .row-slider .norden-nui-range {
   background: linear-gradient(
     to right,
     var(--nui-range-color, #0005) var(--nui-range-fill, 0%),
@@ -158,14 +158,14 @@
 /* Short viewports, unchanged in effect — the heights and font sizes these used to
    set inline are now the same tokens the tall steps below restate. */
 @media (max-height: 800px) {
-  .nlib-menu[data-skin="vmenu"] {
+  .norden-menu[data-skin="vmenu"] {
     --row-height: 32px;
     --brand-height: 80px;
     --brand-font: 35px;
   }
 }
 @media (max-height: 650px) {
-  .nlib-menu[data-skin="vmenu"] {
+  .norden-menu[data-skin="vmenu"] {
     --row-height: 28px;
     --brand-height: 62px;
     --brand-font: 30px;
@@ -180,7 +180,7 @@
    viewport forever, because past that the rows are large enough that the limit
    is the player's reading distance, not the backbuffer. */
 @media (min-height: 1200px) {
-  .nlib-menu[data-skin="vmenu"] {
+  .norden-menu[data-skin="vmenu"] {
     --menu-width: 575px;
     --row-height: 51px;
     --heading-height: 51px;
@@ -192,7 +192,7 @@
   }
 }
 @media (min-height: 1800px) {
-  .nlib-menu[data-skin="vmenu"] {
+  .norden-menu[data-skin="vmenu"] {
     --menu-width: 862px;
     --row-height: 76px;
     --heading-height: 76px;

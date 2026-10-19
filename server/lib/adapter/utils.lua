@@ -1,8 +1,8 @@
--- NLib/server/lib/adapter/utils.lua
+-- norden_lib/server/lib/adapter/utils.lua
 -- HTTP fetch and misc utils
 
 
-if _NLIB_IS_FIVEM then
+if _NORDEN_LIB_IS_FIVEM then
     function Platform.Fetch(opts, callback)
         PerformHttpRequest(
             opts.url,
@@ -17,6 +17,6 @@ else
     Platform.Fetch = Platform._stub('Fetch')
 end
 
-Platform.export('NLib', 'Fetch', function(opts, callback)
+Platform.export('norden_lib', 'Fetch', function(opts, callback)
     Platform.Fetch(opts, callback)
 end)

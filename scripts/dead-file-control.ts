@@ -79,7 +79,7 @@ const IMPORTS_ORPHAN = { "shared/ts/core.ts": `export { orphan } ${from("./orpha
 const FLOORS = "--floors=7,5";
 
 function fixture(extra: Record<string, string> = {}, drop: string[] = []): string {
-	const dir = mkdtempSync(join(tmpdir(), "nlib-deadfile-"));
+	const dir = mkdtempSync(join(tmpdir(), "norden-deadfile-"));
 	const tree = { ...BASE, ...extra };
 	for (const d of drop) delete tree[d];
 	for (const [p, body] of Object.entries(tree)) {

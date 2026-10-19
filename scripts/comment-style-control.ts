@@ -56,7 +56,7 @@ import {
 
 // The OS temp dir, not the repo: a fixture in the tree would be swept up by the
 // very gate it tests, and other agents work in this tree.
-const root = join(tmpdir(), `nlib-comment-style-control-${process.pid}`);
+const root = join(tmpdir(), `norden-comment-style-control-${process.pid}`);
 const failures: string[] = [];
 
 function check(name: string, ok: boolean, detail = ""): void {

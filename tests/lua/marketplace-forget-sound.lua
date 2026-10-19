@@ -40,7 +40,7 @@
 --   FORGET_CONTROL=1 bunx --bun --package fengari-node-cli fengari \
 --       scripts/run-lua-suite.lua tests/lua/marketplace-forget-sound.lua   # exits 1
 --
--- Run from the NLib resource root.
+-- Run from the Norden Lib resource root.
 
 local CONTROL = os.getenv('FORGET_CONTROL') == '1'
 
@@ -216,7 +216,7 @@ do
 end
 
 -- The old three-argument call still means what it meant, because tDetector,
--- tRadar and nlib.soundstore all use it and have no scoped maps.
+-- tRadar and norden_lib.soundstore all use it and have no scoped maps.
 do
     local installed = { { filename = 'horn.wav', slug = 'horn' } }
     local flat = { HORN = 'horn.wav' }

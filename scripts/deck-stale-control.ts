@@ -3,7 +3,7 @@
  * Negative control for `deck-stale.ts`. Proves the gate can go red, and that it
  * goes red for the reason it claims.
  *
- *   bun run ../NLib/scripts/deck-stale-control.ts --id com.timmyg-studios.tradio
+ *   bun run ../norden_lib/scripts/deck-stale-control.ts --id com.timmyg-studios.tradio
  *
  * Why this is here
  *

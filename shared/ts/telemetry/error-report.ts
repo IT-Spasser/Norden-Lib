@@ -8,7 +8,7 @@
  * it was already one hop from a telemetry payload: it normalises a throw into
  * `name`/`message`/`stack`/`causes` and pairs it with a context carrying
  * `surface`, `location`, `version` and `panelVersion`. tRadio's two render
- * boundaries still use it, now across the `@nlib/shared` alias, and the copy
+ * boundaries still use it, now across the `@norden_lib/shared` alias, and the copy
  * that was in tRadio is gone rather than re-exported.
  *
  * ONE BEHAVIOUR CHANGED IN THE MOVE, deliberately: redaction is now

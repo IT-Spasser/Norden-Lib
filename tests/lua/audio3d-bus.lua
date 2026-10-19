@@ -18,7 +18,7 @@ TriggerClientEvent = function(event, target, payload)
     sent[#sent + 1] = { event = event, target = target, payload = payload }
 end
 
-nlib = {
+norden_lib = {
     platform = {
         now = function() return now end,
         getPlayers = function()
@@ -39,13 +39,13 @@ nlib = {
 }
 -- The bus readies the shared coordinate index itself; the real module is used so
 -- this suite exercises the same query path production does.
-nlib.spatial = dofile('shared/imports/spatial/shared.lua')
+norden_lib.spatial = dofile('shared/imports/spatial/shared.lua')
 
 local audio3d = dofile('shared/imports/audio3d/server.lua')
 
 local function reset()
     sent = {}
-    nlib.spatial.clear()
+    norden_lib.spatial.clear()
     now = now + 1000
 end
 

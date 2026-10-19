@@ -17,7 +17,7 @@ IsDuplicityVersion = function() return false end
 GetCurrentResourceName = function() return 'tELS' end
 AddEventHandler = function() end
 
-nlib = {
+norden_lib = {
     platform = {
         getMyId = function() return myId end,
         getMySeat = function()

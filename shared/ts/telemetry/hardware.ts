@@ -115,7 +115,7 @@ export function rendererString(): string | undefined {
 }
 
 /**
- * The machine context, in exactly the dimensions `nlib.environment_reported`
+ * The machine context, in exactly the dimensions `norden_lib.environment_reported`
  * declares — and nothing else.
  *
  * FIVE FACTS THIS PROBE PROVED AVAILABLE HAVE NO SLOT IN THE CONTRACT and
@@ -127,7 +127,7 @@ export function rendererString(): string | undefined {
  *     whether a crash mechanism still exists in the build the player is running.
  *   • `performance.memory.jsHeapSizeLimit` — 3.76 GB headless, 4.29 GB headed in
  *     the same probe. It is what decides whether a renderer OOM was plausible at
- *     all, and `nlib.crash_reported` carries only `uptimeSeconds`.
+ *     all, and `norden_lib.crash_reported` carries only `uptimeSeconds`.
  *   • `performance.memory.usedJSHeapSize`.
  *   • the screen size — 3440×1440 measured — and `devicePixelRatio`.
  *
@@ -172,7 +172,7 @@ export function readHardware(): HardwareSnapshot {
   };
 }
 
-/** The dimensions and measures for one `nlib.environment_reported` row. */
+/** The dimensions and measures for one `norden_lib.environment_reported` row. */
 export function environmentRow(hw: HardwareSnapshot): {
   dimensions: Record<string, string>;
   measures: Record<string, number>;

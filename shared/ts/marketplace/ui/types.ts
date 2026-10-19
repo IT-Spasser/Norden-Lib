@@ -79,7 +79,7 @@ export interface OpenData {
    * `theme` item can be previewed on the product instead of as a swatch strip.
    *
    * A URL and not a flag, and supplied by the CONSUMER rather than derived here:
-   * NLib has no business naming tRadio, and the file is reachable only because
+   * Norden Lib has no business naming tRadio, and the file is reachable only because
    * tRadio's own `fxmanifest.lua` publishes it. A consumer that sells no themes
    * sends nothing and its cards fall back exactly as before.
    */

@@ -4,7 +4,7 @@ local Host = { version = 1 }
 local installed = false
 function Host.install(slots)
     assert(not installed, 'Menu host already installed')
-    local S, resource, engine = nlib.menu.schema, GetCurrentResourceName(), exports['NLib']
+    local S, resource, engine = norden_lib.menu.schema, GetCurrentResourceName(), exports['norden_lib']
     assert(type(slots) == 'table', 'Host slots required')
     local config = S.copy(slots)
     for id, slot in pairs(config) do
@@ -71,7 +71,7 @@ function Host.install(slots)
         return true
     end)
     AddEventHandler('onResourceStop', function(owner)
-        if owner == 'NLib' then links = {}; return end
+        if owner == 'norden_lib' then links = {}; return end
         if not links[owner] then return end
         local parents = {}
         for _, entry in pairs(links[owner]) do parents[entry.parent] = true end
@@ -83,7 +83,7 @@ function Host.install(slots)
         links[owner] = nil
     end)
     installed = true
-    TriggerEvent('nlib:menu:hostReady', resource)
+    TriggerEvent('norden_lib:menu:hostReady', resource)
     return true
 end
 return Host

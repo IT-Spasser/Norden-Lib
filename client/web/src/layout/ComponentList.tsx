@@ -1,4 +1,4 @@
-import type { Component, Layout } from "@nlib/shared/hud-geometry";
+import type { Component, Layout } from "@norden_lib/shared/hud-geometry";
 import { Eye, EyeOff } from "lucide-solid";
 import { For, Show } from "solid-js";
 import { NuiButton } from "@/components/ui/nui-field";
@@ -23,26 +23,26 @@ export default function ComponentList(props: {
   return (
     <Show
       when={props.components.length}
-      fallback={<p class="nlib-layout__empty">No HUD components registered.</p>}
+      fallback={<p class="norden-layout__empty">No HUD components registered.</p>}
     >
-      <ul class="nlib-layout__list">
+      <ul class="norden-layout__list">
         <For each={props.components}>
           {(component) => {
             const layout = () => props.layoutOf(component);
             const selected = () => props.selected === component.key;
             return (
-              <li class={["nlib-layout__row", { "nlib-layout__row--selected": selected() }]}>
+              <li class={["norden-layout__row", { "norden-layout__row--selected": selected() }]}>
                 <button
                   type="button"
-                  class="nlib-layout__row-select"
+                  class="norden-layout__row-select"
                   aria-current={selected() ? "true" : undefined}
                   onClick={() => props.onSelect(component.key)}
                 >
-                  <span class="nlib-layout__row-name">{component.label}</span>
-                  <span class="nlib-layout__row-owner">{component.owner}</span>
+                  <span class="norden-layout__row-name">{component.label}</span>
+                  <span class="norden-layout__row-owner">{component.owner}</span>
                 </button>
                 <NuiButton
-                  class="nlib-layout__row-visible"
+                  class="norden-layout__row-visible"
                   disabled={props.finishing || !component.canHide}
                   aria-label={
                     layout().visible ? `Hide ${component.label}` : `Show ${component.label}`
@@ -68,7 +68,7 @@ export default function ComponentList(props: {
       {/* Anchoring is derived from where you drop it, so it is reported, not chosen. */}
       <Show when={active()}>
         {(component) => (
-          <p class="nlib-layout__pinned">
+          <p class="norden-layout__pinned">
             Stays in {anchorLabel(props.layoutOf(component()).anchor)} at other resolutions
           </p>
         )}

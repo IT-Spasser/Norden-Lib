@@ -14,7 +14,7 @@ end
 
 function DialogState.generateId()
     _idCounter = _idCounter + 1
-    return 'nlib_dialog_' .. tostring(_idCounter)
+    return 'norden_lib_dialog_' .. tostring(_idCounter)
 end
 
 -- Dialog registry

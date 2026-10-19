@@ -7,7 +7,7 @@
  * modal:
  *
  * - `components/MarketplacePanel.tsx` wraps it in `.mp-backdrop` + `.mp-panel`
- *   and is what `exports.NLib:OpenMarketplace` opens. tRadio's in-game path
+ *   and is what `exports.norden_lib:OpenMarketplace` opens. tRadio's in-game path
  *   still uses that.
  * - `components/Dialog.tsx` mounts it INSIDE a dialog tab panel, for a tab
  *   declared `view: "marketplace"`. That is the integrated path: `/tdet` and
@@ -20,14 +20,14 @@
  * "dismiss the modal" in one and "dismiss the dialog" in the other.
  *
  * Why browse/preview/install all go through Lua rather than a direct fetch is
- * explained in `@nlib/shared/marketplace/ui` (`browse.ts`) and in
- * `client/cl_marketplace.lua`: CEF's origin is `cfx-nui-NLib` and the
+ * explained in `@norden_lib/shared/marketplace/ui` (`browse.ts`) and in
+ * `client/cl_marketplace.lua`: CEF's origin is `cfx-nui-norden_lib` and the
  * marketplace host sends no Access-Control-Allow-Origin.
  */
 
 import type { JSX } from "@solidjs/web";
-import { createEscapeLayer } from "@nlib/shared/escape-layer";
-import { localInstallKind } from "@nlib/shared/marketplace/local-name";
+import { createEscapeLayer } from "@norden_lib/shared/escape-layer";
+import { localInstallKind } from "@norden_lib/shared/marketplace/local-name";
 import {
   browseMarketplace,
   ErrorPane,
@@ -46,7 +46,7 @@ import {
   PreviewOverlay,
   patchInstalledNames,
   summarizeInspection,
-} from "@nlib/shared/marketplace/ui";
+} from "@norden_lib/shared/marketplace/ui";
 // See the note on the Lucide imports in `../MarketplacePanel.tsx`: the package
 // form in an app, `~icons/lucide` in `shared/ts/**`, and nothing mixed.
 import IconLoaderCircle from "lucide-solid/icons/loader-circle";
@@ -75,7 +75,7 @@ export interface MarketplaceBrowserProps {
    * tab is selected. So this path is correct and untested — a host that wants to
    * HIDE the browser rather than unmount it is what it is for, and that is a
    * host worth having, because unmounting is what loses an install result (see
-   * the ledger in `@nlib/shared/marketplace/ui`).
+   * the ledger in `@norden_lib/shared/marketplace/ui`).
    */
   active: boolean;
   /** Chrome rendered at the start of the header row (the modal's title). */
@@ -367,7 +367,7 @@ export function MarketplaceBrowser(props: MarketplaceBrowserProps) {
     // `data` is sent once per open and the signal holding it keeps that object,
     // so re-applying it after an unmount re-applies a `readdir` from before any
     // install this session performed. `patchInstalledNames` is the correction —
-    // see the ledger's header in `@nlib/shared/marketplace/ui`. Without it,
+    // see the ledger's header in `@norden_lib/shared/marketplace/ui`. Without it,
     // leaving the Marketplace tab and coming back offered Install for an item
     // already on disk, which is the report `../local-name.ts` exists to answer.
     setInstalledLayouts(patchInstalledNames(data.installedLayouts ?? [], "ui"));
@@ -468,7 +468,7 @@ export function MarketplaceBrowser(props: MarketplaceBrowserProps) {
         // `type = p.itemType`; this component kept its own `pendingInstallTypes`
         // side-table to remember what it had asked for, which duplicated a field
         // already on the payload and could not survive the unmount the ledger in
-        // `@nlib/shared/marketplace/ui` now covers.
+        // `@norden_lib/shared/marketplace/ui` now covers.
         const type = data.type;
         if (data.ok) {
           setInstallState(data.slug, { state: "installed" });
@@ -712,7 +712,7 @@ export function MarketplaceBrowser(props: MarketplaceBrowserProps) {
               <IconSearch class="mp-search-icon" />
               <input
                 type="search"
-                class="nlib-nui-control nlib-nui-input"
+                class="norden-nui-control norden-nui-input"
                 aria-label="Search marketplace items"
                 placeholder="Search items…"
                 value={search()}

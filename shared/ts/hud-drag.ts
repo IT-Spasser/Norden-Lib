@@ -34,7 +34,7 @@ import {
  * Two independent conditions, deliberately overlapping, because getting this
  * wrong means a player presses a key and their remote jumps instead:
  *
- *  1. `[data-hud-btn]` — the attribute NLib's own `HudBinder` scans for. It is
+ *  1. `[data-hud-btn]` — the attribute Norden Lib's own `HudBinder` scans for. It is
  *     not "a convention that controls carry it": it is the ONLY thing that makes
  *     a skin element a control at all, because it is what `scan()` binds a click
  *     to. A new key added to a faceplate therefore excludes itself from dragging
@@ -95,7 +95,7 @@ export function isHudControl(target: EventTarget | null): boolean {
  *
  * Not cosmetic slop. A press and release on the background with no travel is a
  * CLICK, and committing one writes a placement: `onCommit` is a KVP write and a
- * `commit` notification in NLib, so a player tapping the chassis of their remote
+ * `commit` notification in Norden Lib, so a player tapping the chassis of their remote
  * re-saved its position every time. A zero-delta `pointermove` is routine —
  * pressure and tilt changes emit one, and CEF emits one on button-down — so
  * `moved` could not be "a pointermove arrived".

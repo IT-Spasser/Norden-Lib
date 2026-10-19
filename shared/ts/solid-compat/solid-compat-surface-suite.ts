@@ -23,15 +23,15 @@
  *
  * TWO THINGS ARE INJECTED RATHER THAN IMPORTED, AND BOTH ARE FORCED
  *
- * This file is physically inside NLib, so a bare import here resolves against
- * NLib — not against the consumer. Measured in `NLib/shared/ts/node_modules`:
+ * This file is physically inside Norden Lib, so a bare import here resolves against
+ * Norden Lib — not against the consumer. Measured in `norden_lib/shared/ts/node_modules`:
  *
  *   · `solid-js` IS INSTALLED THERE, ON 1.9.12. So `await import("solid-js")`
  *     from this file would hand back the SOLID 1 surface and every "is this name
  *     supplied" answer below would be computed against the wrong package — and
  *     silently, because Solid 1 has MORE names than Solid 2, so the test would
  *     pass while measuring nothing. This is the same trap recorded in the plugin
- *     header, where `createRequire` resolving the "real" Solid from NLib kept a
+ *     header, where `createRequire` resolving the "real" Solid from Norden Lib kept a
  *     build green while 40 of one consumer's test files died at collection.
  *   · `vitest` IS NOT INSTALLED THERE AT ALL, so `import { describe } from
  *     "vitest"` would fail to resolve and this module could not even load. Were
@@ -83,7 +83,7 @@ export interface SurfaceSuiteOptions {
   /**
    * THE CONSUMER'S OWN DYNAMIC IMPORTS — see this file's header. Written as
    * `() => import("solid-js")` at the CALL SITE so they resolve from the
-   * consumer's root rather than from NLib's Solid 1.9.12.
+   * consumer's root rather than from Norden Lib's Solid 1.9.12.
    *
    * `solid-js/store` IS ABSENT ON PURPOSE. Solid 2 has no counterpart at all;
    * the store APIs moved into bare `solid-js`, so the shim file supplies that

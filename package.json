@@ -1,12 +1,12 @@
 {
-  "name": "nlib",
-  "version": "1.0.0",
+  "name": "norden_lib",
+  "version": "2.0.0",
   "license": "MIT",
   "private": true,
   "description": "Shared UI and utility library for FiveM resources",
   "secretGate": {
     "ignore": {
-      "tests/lua/config-validate.lua": "a nlib.config VALIDATOR fixture, not a config: its `licenseKey = 'abc123'` is a synthetic input proving a declared string key validates. The config rule matches it only because the basename contains `config`. Ignored by exact path rather than by widening the rule or by allowing `licenseKey` everywhere."
+      "tests/lua/config-validate.lua": "a norden_lib.config VALIDATOR fixture, not a config: its `licenseKey = 'abc123'` is a synthetic input proving a declared string key validates. The config rule matches it only because the basename contains `config`. Ignored by exact path rather than by widening the rule or by allowing `licenseKey` everywhere."
     }
   },
   "scripts": {
@@ -36,7 +36,7 @@
     "test:lua:control": "bun run scripts/framerelay-control.ts && bun run scripts/runtimetxd-control.ts && bun run scripts/primitives-control.ts",
     "typecheck": "bunx tsc --noEmit -p client/web/tsconfig.json",
     "typecheck:shared": "cd shared/ts && bunx tsc --noEmit -p tsconfig.json",
-    "typecheck:internal": "bun -e \"if (!(await Bun.file('internal/shared-ts/package.json').exists())) { console.log('typecheck:internal: SKIPPED — no internal/ in this tree, which is a published clone of NLib.'); process.exit(0); } process.exit(Bun.spawnSync(['bun','run','typecheck'],{cwd:'internal/shared-ts',stdout:'inherit',stderr:'inherit'}).exitCode ?? 1)\"",
+    "typecheck:internal": "bun -e \"if (!(await Bun.file('internal/shared-ts/package.json').exists())) { console.log('typecheck:internal: SKIPPED — no internal/ in this tree, which is a published clone of Norden Lib.'); process.exit(0); } process.exit(Bun.spawnSync(['bun','run','typecheck'],{cwd:'internal/shared-ts',stdout:'inherit',stderr:'inherit'}).exitCode ?? 1)\"",
     "typecheck:server": "bunx tsc --noEmit -p server/tsconfig.json",
     "check:imports": "bun run scripts/check-relative-imports.ts",
     "check:classes": "cd client/web && bun run check:classes",

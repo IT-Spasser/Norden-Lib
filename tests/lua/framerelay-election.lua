@@ -12,8 +12,8 @@
 --
 -- So this suite runs TWO CLIENTS over ONE statebag world. Each gets its own
 -- `shared/imports/occupancy/client.lua` (dofile returns a fresh module per call) and
--- its own relay instance; `asClient` swaps which one `nlib.platform` and
--- `nlib.occupancy` resolve to, the way the game would by running them in two
+-- its own relay instance; `asClient` swaps which one `norden_lib.platform` and
+-- `norden_lib.occupancy` resolve to, the way the game would by running them in two
 -- processes.
 --
 -- Every rule below fails SILENTLY in game when it is got wrong:
@@ -31,7 +31,7 @@
 --
 --   FRAMERELAY_CONTROL=election   both clients report themselves the controller.
 --     This defects THE REAL CODE PATH: `publishTick` computes `mine` from
---     `nlib.occupancy.isController()`, so the module genuinely admits two writers
+--     `norden_lib.occupancy.isController()`, so the module genuinely admits two writers
 --     and the election assertions must FLIP. It is the pre-election bug, replayed.
 --
 --   FRAMERELAY_CONTROL=clock      the world's clock stops advancing.
@@ -159,13 +159,13 @@ end
 
 local current = nil
 
-nlib = setmetatable({}, {
+norden_lib = setmetatable({}, {
     __index = function(_, key)
         if key == 'platform' or key == 'occupancy' then
             if current == nil then error('no client is current', 2) end
             return current[key]
         end
-        error('the relay asked nlib for an unexpected module: ' .. tostring(key), 2)
+        error('the relay asked norden_lib for an unexpected module: ' .. tostring(key), 2)
     end,
 })
 
@@ -207,7 +207,7 @@ local function newClient(id)
     return client
 end
 
---- Make `client` the one `nlib` answers for, re-poll its seat, and run `body`.
+--- Make `client` the one `norden_lib` answers for, re-poll its seat, and run `body`.
 local function asClient(client, body)
     current = client
     client.occupancy.poll()

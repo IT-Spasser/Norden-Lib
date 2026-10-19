@@ -26,7 +26,7 @@ export function register(target: InstallTarget): void {
   const existing = registry.get(key);
   if (existing && existing.installPath !== target.installPath) {
     console.warn(
-      `[NLib/marketplace] "${key}" re-registered with different installPath — last-writer-wins`
+      `[norden_lib/marketplace] "${key}" re-registered with different installPath — last-writer-wins`
     );
   }
   const protectedInventory =

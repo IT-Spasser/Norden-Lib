@@ -172,19 +172,19 @@ test('an unbranded resource gets the title as plain text, with no art', function
 end)
 
 test('a title equal to the resource name is not printed twice', function()
-    local f = fixture('NLib', 'NLib')
-    f.vc({ name = 'NLib', current = '1.0.0', fetch = current })
+    local f = fixture('norden_lib', 'norden_lib')
+    f.vc({ name = 'norden_lib', current = '1.0.0', fetch = current })
     f.run(1100)
     local text = f.text()
     local count = 0
     for line in text:gmatch('[^\r\n]+') do
         -- The plain word on a line of its own, i.e. the title line. The figlet
         -- rows spell it in `_/`, so they cannot match.
-        if line:gsub('%^%d', ''):gsub('\27%[[%d;]*m', ''):match('^%s*NLib%s*') then
+        if line:gsub('%^%d', ''):gsub('\27%[[%d;]*m', ''):match('^%s*Norden Lib%s*') then
             count = count + 1
         end
     end
-    assert(count == 0, 'NLib printed a redundant title line ' .. count .. ' time(s)')
+    assert(count == 0, 'norden_lib printed a redundant title line ' .. count .. ' time(s)')
 end)
 
 -- The regression this guards: migrating a stored or wire value to the title.

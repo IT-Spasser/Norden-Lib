@@ -69,9 +69,9 @@ const shot = async (name: string) => {
 try {
   page.on("pageerror", (error: Error) => errors.push(error.message));
   await page.addInitScript(() => {
-    (window as any).GetParentResourceName = () => "NLib";
+    (window as any).GetParentResourceName = () => "norden_lib";
   });
-  await page.route("https://nlib/**", async (route: any) => {
+  await page.route("https://norden_lib/**", async (route: any) => {
     const event = new URL(route.request().url()).pathname.slice(1);
     calls.push({ event, data: route.request().postDataJSON() });
     if (event === "marketplaceInspect" && holdNextAck) {

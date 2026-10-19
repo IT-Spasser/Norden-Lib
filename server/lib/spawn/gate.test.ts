@@ -202,7 +202,7 @@ for (const shape of [POSIX, WINDOWS]) {
 
     it("refuses a resource that is not in the family", () => {
       const plan = resolveSpawn("tCAD", { program: "pocketbase", args: SERVE }, probes());
-      expect((plan as Answer).error).toContain("not in NLib's spawn family");
+      expect((plan as Answer).error).toContain("not in Norden Lib's spawn family");
     });
 
     it("refuses when the engine cannot name the caller", () => {
@@ -440,7 +440,7 @@ for (const shape of [POSIX, WINDOWS]) {
     });
 
     it("refuses an undeclared variable", () => {
-      // LD_PRELOAD into a process NLib spawns is code execution with the
+      // LD_PRELOAD into a process Norden Lib spawns is code execution with the
       // containment rule intact, which is why this is a list and not a filter.
       const plan = resolveSpawn(
         "tRadio",
@@ -454,7 +454,7 @@ for (const shape of [POSIX, WINDOWS]) {
   describe(`${shape.label}: catalog-supplied paths (prepend)`, () => {
     const SIDECAR_ARGS = [shape.at("tAI"), "4", "neutts"];
 
-    it("puts the script NLib chose in front of the caller's arguments", () => {
+    it("puts the script Norden Lib chose in front of the caller's arguments", () => {
       const plan = resolveSpawn("tAI", { program: "tts-sidecar", args: SIDECAR_ARGS }, probes());
       expect((plan as Answer).binary).toBe(shape.node);
       expect((plan as Answer).argv).toEqual([shape.sidecar, ...SIDECAR_ARGS]);

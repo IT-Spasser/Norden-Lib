@@ -75,12 +75,12 @@ local function suspend(active)
     emit('hidden', active)
 end
 function I.text(active)
-    if active and (not visible or modal or (not typing and _NLIB_IS_FIVEM
+    if active and (not visible or modal or (not typing and _NORDEN_LIB_IS_FIVEM
         and type(IsNuiFocused) == 'function' and yes(IsNuiFocused()))) then return false end
     if typing and not active then suppressUntilRelease = true end
     local hadFocus = typing
     typing = active == true
-    if _NLIB_IS_FIVEM and (typing or hadFocus) then
+    if _NORDEN_LIB_IS_FIVEM and (typing or hadFocus) then
         SetNuiFocus(typing, false)
         SetNuiFocusKeepInput(false)
     end
@@ -96,7 +96,7 @@ function I.setVisible(active, onClose)
     -- Closing while suspended must not leave the browser hidden, or the next open
     -- draws nothing.
     suspend(false)
-    if not visible or not _NLIB_IS_FIVEM then return end
+    if not visible or not _NORDEN_LIB_IS_FIVEM then return end
     local current, repeats = generation, {}
     Platform.createThread(function()
         while visible and current == generation do
@@ -184,7 +184,7 @@ end
 --- interface, since it sits alongside that resource's own open command in the
 --- player's keybind list.
 function I.bindSearchKey(command, key, label)
-    if not _NLIB_IS_FIVEM or type(command) ~= 'string' or command == '' then return false end
+    if not _NORDEN_LIB_IS_FIVEM or type(command) ~= 'string' or command == '' then return false end
     RegisterCommand(command, function()
         if visible then I.text(not typing) end
     end, false)

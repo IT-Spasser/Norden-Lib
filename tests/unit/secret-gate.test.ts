@@ -39,7 +39,7 @@ describe("the pattern list has exactly one home", () => {
   test("the TS list equals what a real Lua VM reports from the Lua file", () => {
     // fengari, the same VM tests/lua/* run in. Asserting against the file we
     // just parsed would be asserting that a parser agrees with itself.
-    const script = path.join(os.tmpdir(), `nlib-secret-patterns-${process.pid}.lua`);
+    const script = path.join(os.tmpdir(), `norden-secret-patterns-${process.pid}.lua`);
     fs.writeFileSync(
       script,
       [

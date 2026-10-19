@@ -10,7 +10,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 /**
  * The exact subset of Vite's plugin interface this file implements. Importing
- * `Plugin` instead resolves against NLib's `vite`, and the consumer's own `tsc`
+ * `Plugin` instead resolves against Norden Lib's `vite`, and the consumer's own `tsc`
  * then gives up with TS2321 at its `defineConfig` call, naming neither this file
  * nor either package. Widening any member to the real type brings that back.
  */
@@ -138,7 +138,7 @@ export function solid1CompatShim(options: Solid1CompatShimOptions): CompatShimPl
   // Matches any file inside that package's tree, however deep.
   const vendorDirs = vendorPackages.map((pkg) => `/node_modules/${pkg}/`);
 
-  // Resolved against the CONSUMER's root, never `import.meta.url`, which is NLib
+  // Resolved against the CONSUMER's root, never `import.meta.url`, which is Norden Lib
   // and still on Solid 1. `configResolved` rebinds both to `config.root`;
   // `process.cwd()` is only a fallback for a host that resolves before then.
   let rootDir = process.cwd();
@@ -176,7 +176,7 @@ export function solid1CompatShim(options: Solid1CompatShimOptions): CompatShimPl
         if (!process.env.VITEST) {
           // The importer is the consumer's ROOT, not `importer`: Vite resolves
           // relative to the importer, and a shim file's own path resolves
-          // `solid-js` against NLib's Solid 1. Do not catch and rethrow the
+          // `solid-js` against Norden Lib's Solid 1. Do not catch and rethrow the
           // MISSING_EXPORT that mis-resolution produces -- naming which
           // `solid-js` it found is the only readable part of it.
           const delegated = await this.resolve(realSpecifier, path.join(rootDir, "noop.js"), {

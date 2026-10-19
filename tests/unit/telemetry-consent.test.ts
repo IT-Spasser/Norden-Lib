@@ -4,8 +4,8 @@
  * THE MODEL THIS SUITE DEFENDS, which is the owner's and not an
  * implementation detail:
  *
- *     nlib_telemetry SET   -> the convar is the answer, the hub switch is HIDDEN
- *     nlib_telemetry UNSET -> the switch is visible and owns the answer
+ *     norden_lib_telemetry SET   -> the convar is the answer, the hub switch is HIDDEN
+ *     norden_lib_telemetry UNSET -> the switch is visible and owns the answer
  *     neither              -> OFF
  *
  * It is deliberately **not** an OR of two switches. A switch that is visible,
@@ -35,12 +35,12 @@ let root: string;
 let convars: Record<string, string>;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), "nlib-consent-"));
+  root = mkdtempSync(join(tmpdir(), "norden-consent-"));
   convars = {};
   // The FiveM globals `consent.ts` reaches through, stubbed. The REAL module is
   // under test — nothing here substitutes its logic, only its host.
   g.GetConvar = (name: string, fallback: string) => convars[name] ?? fallback;
-  g.GetCurrentResourceName = () => "NLib";
+  g.GetCurrentResourceName = () => "norden_lib";
   g.GetResourcePath = () => root;
 });
 
@@ -98,7 +98,7 @@ describe("the convar hides the switch", () => {
   test("an UNPARSEABLE value is still a decision — off, and locked", () => {
     /**
      * UNSET and SET-TO-NONSENSE are different answers and both matter. An
-     * operator who wrote `set nlib_telemetry maybe` plainly intended to decide;
+     * operator who wrote `set norden_lib_telemetry maybe` plainly intended to decide;
      * treating that as unset would show them a switch whose state they think
      * they already chose. So the value they wrote is reported back instead of a
      * control.

@@ -31,7 +31,7 @@ export interface Theme {
   skin?: MenuSkin;
 }
 
-// Presentation, not colour: 'default' is the shared look NLib's dialogs and toasts
+// Presentation, not colour: 'default' is the shared look Norden Lib's dialogs and toasts
 // use, 'vmenu' the legacy one. A closed set, because it selects a stylesheet
 // rather than supplying a value to one.
 export type MenuSkin = "default" | "vmenu";

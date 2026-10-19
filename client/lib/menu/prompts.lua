@@ -4,14 +4,14 @@
 -- while the field was open. GTA's onscreen keyboard -- what the pause menu uses --
 -- avoids both. One prompt for the whole interface, since there is one screen.
 
-if _NLIB_SIDE ~= 'client' then return end
+if _NORDEN_LIB_SIDE ~= 'client' then return end
 
 MenuPrompt = {}
 local P = MenuPrompt
 
 -- Registered at call time with the caller's title. Arbitrary but global to the
 -- game session, hence the prefix.
-local TEXT_ENTRY = 'NLIB_MENU_INPUT'
+local TEXT_ENTRY = 'NORDEN_LIB_MENU_INPUT'
 
 local prompting = false
 
@@ -36,7 +36,7 @@ function P.text(title, initial, maximum, context)
     assert(MenuSchema.text(title, 128), 'Invalid input title')
     assert(type(maximum) == 'number' and maximum % 1 == 0 and maximum >= 1 and maximum <= 128, 'Invalid input length')
     assert(type(initial) == 'string' and #initial <= maximum and not initial:find('%c'), 'Invalid initial input')
-    if not _NLIB_IS_FIVEM then error('Text input is unavailable on this platform', 0) end
+    if not _NORDEN_LIB_IS_FIVEM then error('Text input is unavailable on this platform', 0) end
     if prompting then error('Another input is already active', 0) end
     local function active() return context and context.isActive and context.isActive() end
     if not active() then error('Action cancelled', 0) end

@@ -32,7 +32,7 @@ describe("production UI build selection", () => {
   });
 
   test("missing artifacts refuse packaging before touching prior output", () => {
-    const root = mkdtempSync(join(tmpdir(), "nlib-prod-test-"));
+    const root = mkdtempSync(join(tmpdir(), "norden-prod-test-"));
     try {
       writeFileSync(join(root, "dist"), "prior output sentinel");
       class Zip {
@@ -66,11 +66,11 @@ describe("production UI build selection", () => {
     // stopped existing; nothing was checking the reverse -- a path added to
     // fxmanifest.lua and never added to `include`. That release builds clean and
     // fails at start on a customer's server, which is the worst place to find it.
-    const root = mkdtempSync(join(tmpdir(), "nlib-manifest-test-"));
+    const root = mkdtempSync(join(tmpdir(), "norden-manifest-test-"));
     try {
       writeFileSync(
         join(root, "fxmanifest.lua"),
-        "shared_scripts { '@NLib/imports.lua', 'shared/sh_utils.lua' }\n" +
+        "shared_scripts { '@norden_lib/imports.lua', 'shared/sh_utils.lua' }\n" +
           "server_scripts { 'server/sv_main.lua', 'server/sv_brand_new.lua' }\n"
       );
       writeFileSync(join(root, "shared.lua"), "x");
@@ -86,7 +86,7 @@ describe("production UI build selection", () => {
       expect(() => runProd({ name: "test", root, uiBuilds: [], include }, Zip)).toThrow(
         "server/sv_brand_new.lua"
       );
-      // '@NLib/imports.lua' is another resource's path and is not this release's
+      // '@norden_lib/imports.lua' is another resource's path and is not this release's
       // to stage, so it must not count as missing.
       expect(() => runProd({ name: "test", root, uiBuilds: [], include }, Zip)).not.toThrow(
         "imports.lua"
@@ -96,7 +96,7 @@ describe("production UI build selection", () => {
     }
   });
 
-  test("NLib release selects the script that generates all three runtime artifacts", () => {
+  test("norden_lib release selects the script that generates all three runtime artifacts", () => {
     const release = readFileSync(new URL("../../scripts/prod.ts", import.meta.url), "utf8");
     const pkg = JSON.parse(
       readFileSync(new URL("../../client/web/package.json", import.meta.url), "utf8")

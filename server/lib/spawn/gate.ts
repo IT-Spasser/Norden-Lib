@@ -239,7 +239,7 @@ function matchInvocation(shape: Invocation, tokens: readonly string[]): Matched 
  * `realpath` on both sides rather than a string prefix test. A prefix test
  * passes for `tRadio/../tCAD/x` before normalisation and for a symlink that
  * resolves to `/usr/bin/bash` after it; this is the only thing standing between
- * "NLib may spawn" and "any resource may run anything", so it compares the paths
+ * "norden_lib may spawn" and "any resource may run anything", so it compares the paths
  * the kernel will actually use.
  */
 function contained(probes: Probes, root: string, relative: string): string {
@@ -267,7 +267,7 @@ function pickPath(probes: Probes, root: string, candidates: readonly string[]): 
  * glibc's interpreter, by the only name it has on x86-64.
  *
  * Hard-coded rather than read from the binary's `PT_INTERP`, because the name is
- * the ABI — every x86-64 glibc build names it this — and the alternative is NLib
+ * the ABI — every x86-64 glibc build names it this — and the alternative is Norden Lib
  * parsing an ELF header to decide what to exec. The bundling script takes the
  * real interpreter from `PT_INTERP` and installs it under this name precisely so
  * nothing at runtime has to look.
@@ -363,7 +363,7 @@ export function admit(resource: string): Caller | Refusal {
   if (!caller) {
     return {
       error:
-        `${resource} is not in NLib's spawn family. Spawning through NLib is for ` +
+        `${resource} is not in Norden Lib's spawn family. Spawning through Norden Lib is for ` +
         "first-party t* resources only; run your own child processes with your own " +
         "add_unsafe_child_process_permission line.",
     };

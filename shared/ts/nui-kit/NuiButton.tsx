@@ -1,13 +1,13 @@
-// The one button every NLib-derived NUI surface draws, shared so that a panel
+// The one button every Norden Lib-derived NUI surface draws, shared so that a panel
 // mounted inside another resource's editor is the same object as the one in a
-// NLib dialog rather than a look-alike.
+// Norden Lib dialog rather than a look-alike.
 //
-// It lives here and not in NLib's own `components/ui/nui-field.tsx` because the
+// It lives here and not in Norden Lib's own `components/ui/nui-field.tsx` because the
 // marketplace components next door are imported by tELS, tDetector and tRadar,
-// and nothing in NLib's app is reachable from a sibling resource — each one is
+// and nothing in Norden Lib's app is reachable from a sibling resource — each one is
 // a separate FiveM resource with its own CEF page and its own bundle, so the
 // only sharing that exists is at build time through this package.
-// `nui-field.tsx` re-exports this, so NLib's own 11 import sites are unchanged.
+// `nui-field.tsx` re-exports this, so Norden Lib's own 11 import sites are unchanged.
 //
 // Deliberately self-contained, matching `admin-ui/index.tsx`: solid-js is the
 // only code import. No icon set (the three consumers have unplugin-icons but
@@ -33,7 +33,7 @@ export function NuiButton(
       {...rest}
       type={props.type ?? "button"}
       data-tone={props.tone ?? "default"}
-      class={`nlib-nui-control nlib-nui-button ${props.class ?? ""}`}
+      class={`norden-nui-control norden-nui-button ${props.class ?? ""}`}
     />
   );
 }

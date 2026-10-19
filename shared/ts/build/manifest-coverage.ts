@@ -85,7 +85,7 @@ export function manifestCoverage(source: string, include: string[]): ManifestCov
 
   for (const block of SCRIPT_BLOCKS) {
     for (const entry of readBlock(manifestSource, block) ?? []) {
-      // `@NLib/imports.lua` is another resource's file, loaded by FiveM from
+      // `@norden_lib/imports.lua` is another resource's file, loaded by FiveM from
       // that resource. Nothing for this release to stage.
       if (entry.startsWith("@")) continue;
       entries.push(entry);

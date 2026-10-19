@@ -1,10 +1,10 @@
 --[[
-    NLib — RUNTIME TXD LIFETIME: CREATE ONCE, NEVER AGAIN
+    Norden Lib — RUNTIME TXD LIFETIME: CREATE ONCE, NEVER AGAIN
 
     Loaded into the CONSUMER's VM like every other module under shared/imports/:
-    `nlib.runtimetxd`. Client only — every native it touches is a graphics native.
+    `norden_lib.runtimetxd`. Client only — every native it touches is a graphics native.
 
-        local txds = nlib.runtimetxd.create('tdet_scr_txd')
+        local txds = norden_lib.runtimetxd.create('tdet_scr_txd')
         local txd  = txds.ensure()
         local name = txds.textureName('tdet_screen', serial)
 
@@ -73,7 +73,7 @@ local RuntimeTxd = {}
 --- @return table instance
 function RuntimeTxd.create(prefix)
     assert(type(prefix) == 'string' and prefix ~= '',
-        'nlib.runtimetxd.create: a non-empty name prefix is required')
+        'norden_lib.runtimetxd.create: a non-empty name prefix is required')
 
     local instance = {}
 
@@ -135,7 +135,7 @@ function RuntimeTxd.create(prefix)
     --- @param serial number|nil
     function instance.textureName(stem, serial)
         assert(type(stem) == 'string' and stem ~= '',
-            'nlib.runtimetxd.textureName: a non-empty stem is required')
+            'norden_lib.runtimetxd.textureName: a non-empty stem is required')
         if serial == nil then return ('%s_%s'):format(stem, instance.tag()) end
         return ('%s_%s_%d'):format(stem, instance.tag(), serial)
     end

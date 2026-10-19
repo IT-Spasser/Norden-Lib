@@ -1,9 +1,9 @@
 -- Typed KVP storage, prefixed per community so one box's servers stay isolated.
--- The prefix is the nlib_community_id convar, else sv_projectName, else nothing.
+-- The prefix is the norden_lib_community_id convar, else sv_projectName, else nothing.
 --
---   nlib.kvp.getString('tels_hud_layout', 'default')
---   nlib.kvp.setFloat('tels_hud_scale', 1.5)
---   nlib.kvp.delete('tels_hud_scale')
+--   norden_lib.kvp.getString('tels_hud_layout', 'default')
+--   norden_lib.kvp.setFloat('tels_hud_scale', 1.5)
+--   norden_lib.kvp.delete('tels_hud_scale')
 --
 -- Every getter takes an optional default, returned when the key was never set.
 
@@ -21,7 +21,7 @@ do
     -- namespacing off while sv_projectName sits there unused. The TypeScript
     -- side (shared/ts/kvp.ts) already fell through; this one did not, so the same
     -- server could read one namespace from Lua and another from JS.
-    for _, convar in ipairs({ "nlib_community_id", "sv_projectName" }) do
+    for _, convar in ipairs({ "norden_lib_community_id", "sv_projectName" }) do
         local cleaned = sanitize(GetConvar(convar, ""))
         if cleaned ~= "" then
             _prefix = cleaned
@@ -74,10 +74,10 @@ end
 
 --- Build an accessor set whose keys all carry `opts`.
 ---
----     local prefs = nlib.kvp.view({ prefix = 'tafk:', nilWhenUnset = true })
+---     local prefs = norden_lib.kvp.view({ prefix = 'tafk:', nilWhenUnset = true })
 ---     prefs.getBool('playerDisabled')          --> nil until the player sets it
 ---
----     local fx = nlib.kvp.view({ serverScoped = true })
+---     local fx = norden_lib.kvp.view({ serverScoped = true })
 ---     fx.getJson('radio_setting_fx_overrides') --> this server's tuning only
 ---
 local function buildAccessors(into, opts)

@@ -11,8 +11,8 @@ import { runProd } from "../shared/ts/build/index.ts";
 // warning: see stageFiles in ../shared/ts/build/core.ts.
 runProd(
   {
-    name: "NLib",
-    // NLib is the library, not a configurable resource: it ships no config.lua and
+    name: "norden_lib",
+    // Norden Lib is the library, not a configurable resource: it ships no config.lua and
     // has no credentials of its own. Declared so `createZip`'s credential sanitizer
     // treats "no config file staged" as expected here and as a refusal everywhere else.
     expectConfig: false,
@@ -37,7 +37,7 @@ runProd(
     ],
     include: [
       "fxmanifest.lua",
-      // Named as '@NLib/imports.lua' by every consumer's manifest.
+      // Named as '@norden_lib/imports.lua' by every consumer's manifest.
       "imports.lua",
       "README.md",
       "LICENSE",
@@ -47,7 +47,7 @@ runProd(
       "shared/sh_coords.lua",
       "shared/sh_utils.lua",
       "shared/lib",
-      // Loaded into a consumer's VM, so it ships even though NLib never runs it.
+      // Loaded into a consumer's VM, so it ships even though Norden Lib never runs it.
       "shared/imports",
 
       "client/cl_dialog.lua",

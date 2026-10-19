@@ -65,7 +65,7 @@ local function startScheduler()
 end
 
 function M.log(message)
-    print('[NLib/menu] ' .. tostring(message))
+    print('[norden_lib/menu] ' .. tostring(message))
 end
 
 -- An effect may be owned by an action or a list rather than a checkbox, and

@@ -2,10 +2,10 @@
  * `bun run thumb` — the store/docs hero and banner, composited from real gallery captures.
  *
  * The frame, the light rig and the guards are in `shared/ts/build/hero.ts`, which every other
- * resource's `scripts/thumb.ts` also calls; this file is only NLib's words and its layer
+ * resource's `scripts/thumb.ts` also calls; this file is only Norden Lib's words and its layer
  * placement.
  *
- * These layers come from `assets/gallery-hero/`, NOT `assets/gallery/`. NLib's NUI is
+ * These layers come from `assets/gallery-hero/`, NOT `assets/gallery/`. Norden Lib's NUI is
  * transparent over the game, and the gallery paints a backdrop behind it by default to make the
  * shots reviewable. ANY backdrop is wrong here — even one matching this frame's own black —
  * because the surfaces are small components on a large empty page, so the fill arrives as a
@@ -28,12 +28,12 @@ const REPO = path.resolve(import.meta.dir, "..");
 const shot = (name: string) => path.join(REPO, "assets", "gallery-hero", `${name}.png`);
 const out = (name: string) => path.join(REPO, "docs", "public", name);
 
-const headline = cliArg("headline") ?? "NLib";
+const headline = cliArg("headline") ?? "norden_lib";
 const subtitle = cliArg("subtitle") ?? "Shared UI and runtime for every t* resource";
 const only = cliArg("format");
 
 /**
- * Toasts and dialogs. Menus belong here too and are deliberately absent: NLib's menu currently
+ * Toasts and dialogs. Menus belong here too and are deliberately absent: Norden Lib's menu currently
  * rejects the gallery's own snapshot fixture and renders "No available menus — check your ACE
  * permissions" instead of the page, so every `menu--*.png` is a picture of an empty state. The
  * gallery does not catch it, because it waits on `.menu-panel`, which the empty state also has.

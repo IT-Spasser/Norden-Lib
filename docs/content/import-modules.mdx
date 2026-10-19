@@ -1,42 +1,42 @@
 ---
 title: "Import Modules"
-description: "The 40 Lua modules behind the nlib global — access, config, permission, platform, kvp, settings and the rest."
+description: "The 40 Lua modules behind the norden_lib global — access, config, permission, platform, kvp, settings and the rest."
 order: 3
-group: "NLib"
+group: "norden_lib"
 published: true
 ---
 
 ```lua title="fxmanifest.lua"
-dependencies { 'NLib' }
+dependencies { 'norden_lib' }
 
 shared_scripts {
-    '@NLib/imports.lua',
+    '@norden_lib/imports.lua',
 }
 ```
 
 ```lua
-local kvp = nlib.kvp
+local kvp = norden_lib.kvp
 ```
 
 Modules load on first access, so **you declare nothing**.
 
 ## Declaring modules
 
-`nlib_modules { 'coords', 'kvp' }` still works and makes a load eager, which fails at boot
-on a module that does not compile. Both spellings are accepted (`nlib_module`,
-`nlib_modules`).
+`norden_lib_modules { 'coords', 'kvp' }` still works and makes a load eager, which fails at boot
+on a module that does not compile. Both spellings are accepted (`norden_lib_module`,
+`norden_lib_modules`).
 
 <Callout type="warning">
-A name NLib does **not provide** raises nothing. The first `nlib.<name>` is then an export
+A name Norden Lib does **not provide** raises nothing. The first `norden_lib.<name>` is then an export
 proxy throwing `attempt to index a function value` wherever it is used. Pin
-`nlib_min_version` instead.
+`norden_lib_min_version` instead.
 </Callout>
 
 | Declare | Why |
 | --- | --- |
 | `realtime` | **Required.** The server bundle registers the `rt*` exports only if a manifest names it. |
 | `marketplace` | Required to register content types. Otherwise `registerType` returns `false` and warns; the resource starts, its types never register. |
-| `menu` | Needed when loading the module **is** the wiring — it defines the globals `MenuSchema` and `MenuCatalog`, which shared files may read with no `nlib.menu` access to trigger the load. |
+| `menu` | Needed when loading the module **is** the wiring — it defines the globals `MenuSchema` and `MenuCatalog`, which shared files may read with no `norden_lib.menu` access to trigger the load. |
 
 `occupancy` and `telemetry` are in `AUTOLOAD` and load themselves in every consumer.
 `telemetry` defaults to studio-authored resources; declare it to opt in.
@@ -60,7 +60,7 @@ Config.access = {
 ```
 
 ```lua
-local gate = nlib.access.gate(Config.access, { key = 'detector', label = 'the detector' })
+local gate = norden_lib.access.gate(Config.access, { key = 'detector', label = 'the detector' })
 
 RegisterNetEvent('tDetector:deploy', function()
     if not gate:allowed(source) then return end
@@ -83,7 +83,7 @@ end)
 The client half draws UI only:
 
 ```lua
-local gate = nlib.access.gate({ key = 'detector' })   -- same key as the server
+local gate = norden_lib.access.gate({ key = 'detector' })   -- same key as the server
 
 if gate:allowed() then showButton() end
 gate:onChange(function(allowed) toggleButton(allowed) end)
@@ -134,7 +134,7 @@ Validates an owner-edited `config.lua` once at startup and refuses to run on a b
 | `config.validate(tbl, spec)` | Same checks, returns `{ ok, errors, warnings }`, prints nothing. |
 
 ```lua
-local ok = nlib.config.check(Config, {
+local ok = norden_lib.config.check(Config, {
     file = 'shared/config.lua',
     keys = {
         detectionRangeMeters = { type = 'number', default = 500.0, min = 1, max = 2000 },
@@ -175,15 +175,15 @@ Vehicle coordinate maths, local ↔ world.
 
 ```lua
 local right, fwd, up, pos = GetEntityMatrix(GetVehiclePedIsIn(PlayerPedId(), false))
-local wx, wy, wz = nlib.coords.localToWorld(right, fwd, up, pos, 0.5, 1.0, 0.0)
+local wx, wy, wz = norden_lib.coords.localToWorld(right, fwd, up, pos, 0.5, 1.0, 0.0)
 ```
 
 ---
 
 ## demo
 
-Reports whether the server runs in demo mode — the `nlib_demo` convar, see
-[Convars](/docs/NLib/convars#demo-mode).
+Reports whether the server runs in demo mode — the `norden_lib_demo` convar, see
+[Convars](/docs/norden_lib/convars#demo-mode).
 
 | Function | Side | Description |
 | --- | --- | --- |
@@ -191,12 +191,12 @@ Reports whether the server runs in demo mode — the `nlib_demo` convar, see
 | `demo.dropWrite(what)` | server | `true` when the caller must skip a write. Prints one notice per target. |
 
 A resource on the normal primitives needs **nothing**. Your own writer that bypasses
-`nlib.fs` needs one line:
+`norden_lib.fs` needs one line:
 
 ```lua
 local function saveData(json)
-    if nlib.demo.dropWrite('data.json') then return true end
-    return nlib.fs.writeResourceFile('data.json', json)
+    if norden_lib.demo.dropWrite('data.json') then return true end
+    return norden_lib.fs.writeResourceFile('data.json', json)
 end
 ```
 
@@ -207,7 +207,7 @@ write-behind.
 </Callout>
 
 Never let `demo.active()` decide something a player benefits from being wrong about on the
-client. The client value is pushed by NLib, so it is correct whether the owner wrote `set`
+client. The client value is pushed by Norden Lib, so it is correct whether the owner wrote `set`
 or `setr`.
 
 ---
@@ -215,11 +215,11 @@ or `setr`.
 ## devgate
 
 A gate for a feature that exists on your own servers and is **absent** from the shipped
-build. `nlib.devgate(name)` returns a predicate for the convar `name`, read on every call,
+build. `norden_lib.devgate(name)` returns a predicate for the convar `name`, read on every call,
 on both sides.
 
 ```lua title="client/cl_feature.lua"
-local isInternal = nlib.devgate('my_resource_convar')
+local isInternal = norden_lib.devgate('my_resource_convar')
 
 if isInternal() then
     RegisterCommand('my_internal_tool', runTool, false)
@@ -253,7 +253,7 @@ the wrapping, dashed rules, `^colour` codes and the `[resource]` prefix.
 | `Diag.said(key)` / `Diag.reset()` | Has this `once` key printed? Forget every `once` key. |
 
 ```lua
-nlib.diag.fatal('Config does not exist. tRadio cannot start.', {
+norden_lib.diag.fatal('Config does not exist. tRadio cannot start.', {
     cause = 'config/config.lua failed to load. Almost always a Lua syntax error.',
     fix   = 'Scroll UP: FiveM printed the exact file and line just before this message.',
     once  = 'no-config',
@@ -272,8 +272,8 @@ files. The partial upload that breaks a config file takes the explanation with i
 
 ## kvp
 
-Typed KVP wrapper, prefixed per community server via `nlib_community_id` (needs `setr`) or
-`sv_projectName` — see [Convars](/docs/NLib/convars).
+Typed KVP wrapper, prefixed per community server via `norden_lib_community_id` (needs `setr`) or
+`sv_projectName` — see [Convars](/docs/norden_lib/convars).
 
 | Function | Description |
 | --- | --- |
@@ -299,7 +299,7 @@ defaults.
 | `store:reset(key)` | Back to the default, and remove from KVP. |
 
 ```lua
-local store = nlib.settings.create({
+local store = norden_lib.settings.create({
     { key = 'volume', type = 'float', default = 0.8 },
     { key = 'darkMode', type = 'bool', default = false },
 })
@@ -362,13 +362,13 @@ numbers you mean to print as strings, or anywhere but last.
 
 ## permission
 
-Admin and permission checks matching NLib's own rules.
+Admin and permission checks matching Norden Lib's own rules.
 
 | Server function | Description |
 | --- | --- |
-| `permission.isAdmin(src)` | `true` for `nlib.admin` or `nlib.superadmin`. |
+| `permission.isAdmin(src)` | `true` for `norden_lib.admin` or `norden_lib.superadmin`. |
 | `permission.level(src)` | `0` none, `1` admin, `2` superadmin. |
-| `permission.has(src, key)` | Any key, resolved by NLib — ACE, or a registered framework resolver. |
+| `permission.has(src, key)` | Any key, resolved by Norden Lib — ACE, or a registered framework resolver. |
 | `permission.hasBatch(src, keys)` | A key list in one round trip. `{ [key] = boolean }`. |
 | `permission.hasAll(src, keys)` | `true` only if every key is held. An empty list is `true`. |
 
@@ -378,16 +378,16 @@ Admin and permission checks matching NLib's own rules.
 | `permission.onChange(fn)` | `fn(isAdmin, level)` on every change, and once immediately. |
 | `permission.refresh()` | Ask the server for a fresh answer. |
 
-- `isAdmin` is answered inside your resource, so it works while NLib is still starting.
-  `has` must ask NLib and returns `false` if NLib cannot answer, since a resolver may deny
+- `isAdmin` is answered inside your resource, so it works while Norden Lib is still starting.
+  `has` must ask Norden Lib and returns `false` if Norden Lib cannot answer, since a resolver may deny
   what ACE would grant.
-- Use `onChange`, not a single read of `exports['NLib']:IsAdmin()` at start — that export is
-  cached when **NLib** starts, so a revoked ace leaves a panel drawing its admin section
+- Use `onChange`, not a single read of `exports['norden_lib']:IsAdmin()` at start — that export is
+  cached when **Norden Lib** starts, so a revoked ace leaves a panel drawing its admin section
   until the player reconnects.
 
 <Callout type="warning">
 **In demo mode `level(src)` returns `2` for everybody**, so `isAdmin(src)` is true for
-everybody — see [`nlib_demo`](/docs/NLib/convars#demo-mode). `has(src, key)` is unaffected.
+everybody — see [`norden_lib_demo`](/docs/norden_lib/convars#demo-mode). `has(src, key)` is unaffected.
 The client answer is a cached decision in a process the player controls, so every privileged
 net event re-resolves the ace server-side.
 </Callout>
@@ -403,7 +403,7 @@ server (`source == 65535`), not a local `TriggerEvent` from another resource or 
 menu. A rejection is reported once per event name, never per call.
 
 ```lua
-nlib.net.fromServer('myres:serverDefaults', function(defaults)
+norden_lib.net.fromServer('myres:serverDefaults', function(defaults)
     applyServerDefaults(defaults)
 end)
 ```
@@ -412,7 +412,7 @@ end)
 gate, applied once. The handler is called as `fn(src, ...)`.
 
 ```lua
-nlib.net.fromClient('myres:saveLayout', {
+norden_lib.net.fromClient('myres:saveLayout', {
     allow    = function(src) return gate:allowed(src) end,
     onDenied = function(src) TriggerClientEvent('myres:denied', src) end,
 }, function(src, layout)
@@ -428,7 +428,7 @@ end)
 
 <Callout type="warning">
 Without `allow`, `fromClient` is a source guard and a rate limit — **not** a permission
-gate. Pass `allow`, with a `nlib.access` gate inside it rather than a second mechanism.
+gate. Pass `allow`, with a `norden_lib.access` gate inside it rather than a second mechanism.
 </Callout>
 
 A rate-limited call is dropped **silently**, so a feature that must reopen a panel it just
@@ -440,11 +440,11 @@ The "may I open my panel?" handshake: the client asks, the server decides fresh 
 open, and the answer is one of three things.
 
 ```lua
-nlib.opengate.serve({
+norden_lib.opengate.serve({
     key      = 'settings',
     allow    = function(src) return gate:allowed(src) end,
     configOk = function() return myresConfigOk() end,
-    payload  = function(src) return { isAdmin = nlib.permission.isAdmin(src) } end,
+    payload  = function(src) return { isAdmin = norden_lib.permission.isAdmin(src) } end,
 })
 ```
 
@@ -460,7 +460,7 @@ Checks run in order: rate limit, `configOk`, then `allow`. A panel open to every
 `allow = function() return true end`.
 
 ```lua
-local panel = nlib.opengate.panel({
+local panel = norden_lib.opengate.panel({
     key      = 'settings',
     onOpen   = function(data) openSettingsDialog(data) end,
     onDenied = function() toast("You don't have permission to use this.") end,
@@ -519,7 +519,7 @@ predicates above; they test both shapes.
 </Callout>
 
 ```lua
-nlib.platform.bindKey({
+norden_lib.platform.bindKey({
     id      = 'toggle',
     product = 'tRadar',
     action  = 'Toggle the radar',
@@ -530,7 +530,7 @@ nlib.platform.bindKey({
 
 Defaults: `group` `keyboard`, `pair` `true`, `default` `''`, which appends *"(unbound)"* to
 the label. The positional form `bindKey(key, cb, eventType, bindingId, label)` also works.
-Each bind is reported to the [keybind registry](/docs/NLib/exports#keybind-registry).
+Each bind is reported to the [keybind registry](/docs/norden_lib/exports#keybind-registry).
 
 <Callout type="warning">
 **The command token IS the stored binding.** Renaming one silently discards every player's
@@ -580,7 +580,7 @@ rate-limited ping and can briefly name a seat the player has left.
 - `seat`, `vehicle`, `netId`, `partner` and `isController` are front-seat-only and `nil` for
   a rear passenger, so `state.seat ~= nil` reads as "may I operate this". A rear passenger
   appears only in `tier` and the `cabin*` fields, and only `onCabinChange` fires for them.
-- `nlib:occupancy:moved` is one event name for every resource; its payload is a hint, since
+- `norden_lib:occupancy:moved` is one event name for every resource; its payload is a hint, since
   the seat is re-read from the host.
 - Neither sweep runs until you start it.
 
@@ -601,7 +601,7 @@ versioning and forward migration.
 | `store:locked()` | Why writes are refused, or `nil`. |
 
 ```lua
-local store = nlib.jsonstore.open({ log = nlib.logger.create('tDetector') })
+local store = norden_lib.jsonstore.open({ log = norden_lib.logger.create('tDetector') })
 store:write({ props = placements })
 ```
 
@@ -629,13 +629,13 @@ One function. `fs.writeResourceFile(relPath, contents, resource, log)` returns `
 `log` only controls the one-time warning.
 
 ```lua
-local ok, err = nlib.fs.writeResourceFile('data.json', encoded)
-if not ok then log('could not write data.json — ' .. err, nlib.logger.ERROR) end
+local ok, err = norden_lib.fs.writeResourceFile('data.json', encoded)
+if not ok then log('could not write data.json — ' .. err, norden_lib.logger.ERROR) end
 ```
 
 `SaveResourceFile` is tried first, falling back to the **calling resource's own** Node
 bridge, which exists only if that resource calls `registerWriteResourceFile()` from
-`NLib/shared/ts/fs/server.ts` and rebuilds its bundle; otherwise `err` says so by name. No
+`norden_lib/shared/ts/fs/server.ts` and rebuilds its bundle; otherwise `err` says so by name. No
 `server.cfg` line changes this.
 
 <Callout type="warning">
@@ -658,8 +658,8 @@ Reconciles a stored list of operator-dropped files against what is in the folder
 | `assets.AUDIO` | `{ "wav", "ogg", "mp3" }`. |
 
 ```lua
-local list, changed, reason = nlib.assets.sync(installedSounds, 'layouts/sounds',
-                                               { extensions = nlib.assets.AUDIO })
+local list, changed, reason = norden_lib.assets.sync(installedSounds, 'layouts/sounds',
+                                               { extensions = norden_lib.assets.AUDIO })
 ```
 
 <Callout type="warning">
@@ -670,7 +670,7 @@ a scan failure.
 </Callout>
 
 `changed` reports **membership**, not length, so a one-in-one-out swap reports `true`.
-Retained records come back byte-identical. `scan` needs NLib's Node bundle
+Retained records come back byte-identical. `scan` needs Norden Lib's Node bundle
 (`ScanResourceFiles`); a missing export reads back as `"unavailable"` rather than throwing.
 
 ---
@@ -681,7 +681,7 @@ Positional device audio: the server decides who is near enough to hear a vehicle
 device, and the client pushes one batched frame per tick into the consumer's own NUI.
 
 ```lua
-local bus = nlib.audio3d.createBus({
+local bus = norden_lib.audio3d.createBus({
     event  = 'tradar:worldSound',
     range  = Config.audioRange,
     fields = { kind = { type = 'string', max = 16 } },
@@ -737,7 +737,7 @@ statebag, for every other client in scope to read.
 | `relay.publishedVehicle()` / `relay.publishedSeq()` | State. |
 
 ```lua
-local relay = nlib.framerelay.create({
+local relay = norden_lib.framerelay.create({
     key       = 'tdetScreenFrame',
     frame     = function() return localFrame end,
     hasScreen = function(vehicle) return tdetGetAttachedProp(vehicle) ~= nil end,
@@ -795,7 +795,7 @@ it when a prop needs a non-unit scale: scale lives in the basis-vector lengths o
 
 Keeps a registration against a **dependency** alive across that dependency's restarts. The
 worked example is in
-[Menu Consumers](/docs/NLib/menu-consumers#shared-lifecycle-adapter-api-v1).
+[Menu Consumers](/docs/norden_lib/menu-consumers#shared-lifecycle-adapter-api-v1).
 
 | Member | Description |
 | --- | --- |
@@ -815,7 +815,7 @@ worked example is in
 ## menuhost
 
 Lets one resource expose navigation slots that **other** resources register links into. See
-[Menu Consumers](/docs/NLib/menu-consumers#optional-host-api-v1).
+[Menu Consumers](/docs/norden_lib/menu-consumers#optional-host-api-v1).
 
 | Member | Description |
 | --- | --- |
@@ -827,18 +827,18 @@ Lets one resource expose navigation slots that **other** resources register link
 Per slot, `enabled` defaults to on, an absent `resources` allowlist admits any resource, and
 an unranked entry sorts at `1000`. A slot's `menu` must be one of the host's own pages and a
 plugin's `menu` one of the plugin's. The caller comes from `GetInvokingResource()`, so the
-host cannot register on its own behalf. `install` fires `nlib:menu:hostReady` before
+host cannot register on its own behalf. `install` fires `norden_lib:menu:hostReady` before
 returning — wait on that, not on the host resource starting.
 
 ---
 
 ## menu
 
-Loads NLib's menu validators into your VM: `nlib.menu.schema` is `MenuSchema`,
-`nlib.menu.catalog` is `MenuCatalog`.
+Loads Norden Lib's menu validators into your VM: `norden_lib.menu.schema` is `MenuSchema`,
+`norden_lib.menu.catalog` is `MenuCatalog`.
 
 Loading it also **defines the bare globals `MenuSchema` and `MenuCatalog`**. If your shared
-files read those globals, declare `nlib_module { 'menu' }`, or the lazy load has not run and
+files read those globals, declare `norden_lib_module { 'menu' }`, or the lazy load has not run and
 they are `nil`.
 
 ---
@@ -846,7 +846,7 @@ they are `nil`.
 ## healthcheck
 
 Ordered HTTP GET probes against a base URL, with retries, delivering one aggregate result.
-`nlib.healthcheck(opts)` and `.check(opts)` are the same call and return **nothing**.
+`norden_lib.healthcheck(opts)` and `.check(opts)` are the same call and return **nothing**.
 Everything arrives at `opts.callback` as
 `{ success, steps, attempts, failedStep, message, url }`, each step being
 `{ name, passed, status, error }`.
@@ -871,7 +871,7 @@ server-side installed-sound registry.
 | --- | --- |
 | `marketplace.openPanel(resource, layoutNames, soundEntries, opts)` | Open the standalone panel. |
 | `marketplace.provide(resource, layoutNames, soundEntries, opts)` | The same payload into a tab of a dialog you already opened. Takes no focus. |
-| `marketplace.baseUrl()` | The studio API host. Re-read per call, so `nlib_api_base_url` needs no rejoin. |
+| `marketplace.baseUrl()` | The studio API host. Re-read per call, so `norden_lib_api_base_url` needs no rejoin. |
 
 `opts` carries `initialTab` (`uis` or `sounds`), `previewFn`, `previewState` and
 `panelPreviewUrl`, which lets a `theme` be shown on a real dispatch panel instead of as a
@@ -886,14 +886,14 @@ there reads as not-installed — layouts are answered from `installedLayouts`.
 | Server function | Description |
 | --- | --- |
 | `marketplace.standardTypes(resourceName, opts)` | Register the standard `ui` and `sound` types and wire their lifecycle events. |
-| `marketplace.registerType(kind, installPath, warn)` | One type. `true` when NLib accepted it. |
+| `marketplace.registerType(kind, installPath, warn)` | One type. `true` when Norden Lib accepted it. |
 | `marketplace.upsertSound(installed, slug)` | The slug already owning that filename, or `nil`. |
 | `marketplace.removeSound(installed, toneWavMap, slug, scopedMaps)` | The filename removed, or `nil`. |
 | `marketplace.forgetSoundFile(filename, flatMap, scopedMaps)` | `changed`. |
 | `marketplace.soundConflict(conflict, slug, meta, warnEvent, warn)` | `true` only when a client was really messaged. |
 
 ```lua
-nlib.marketplace.standardTypes(GetCurrentResourceName(), {
+norden_lib.marketplace.standardTypes(GetCurrentResourceName(), {
     note = note, warn = warn,
     layouts = { installed = onLayoutInstalled, uninstalled = onLayoutRemoved },
     sounds  = { warnEvent = 'tdet:soundOverwriteWarning',
@@ -909,29 +909,29 @@ a type. `note` and `warn` take **one argument**, a message — not a logger plus
 
 ## hud
 
-A transport bridge for a consumer with its **own** NUI that wants its widget in NLib's
+A transport bridge for a consumer with its **own** NUI that wants its widget in Norden Lib's
 shared HUD editor.
 
 <Callout type="warning">
-**This one is not reached through `nlib`.** Load it by path —
-`client_scripts { '@NLib/shared/imports/hud/client.lua' }` — because loading the file is
-what registers the `__nlib_hud_ready` NUI callback and NLib's start/stop handlers. As
-`nlib.hud` you get the boolean `true`, not the API.
+**This one is not reached through `norden_lib`.** Load it by path —
+`client_scripts { '@norden_lib/shared/imports/hud/client.lua' }` — because loading the file is
+what registers the `__norden_lib_hud_ready` NUI callback and Norden Lib's start/stop handlers. As
+`norden_lib.hud` you get the boolean `true`, not the API.
 </Callout>
 
 | Function | Description |
 | --- | --- |
-| `NLibHud.register(id, definition)` | `ok, err`. |
-| `NLibHud.unregister(id)` | Also purges the cache, so the widget cannot come back. |
-| `NLibHud.set(id, layout)` | `ok, err`. |
-| `NLibHud.edit()` | Open the shared editor. |
+| `nordenLibHud.register(id, definition)` | `ok, err`. |
+| `nordenLibHud.unregister(id)` | Also purges the cache, so the widget cannot come back. |
+| `nordenLibHud.set(id, layout)` | `ok, err`. |
+| `nordenLibHud.edit()` | Open the shared editor. |
 
-- Updates arrive as `SendNUIMessage({ nlibHud = data })` — one wrapper key, not an `action`
-  string — queued until your NUI calls `__nlib_hud_ready`.
-- Definitions survive a NLib restart. Register once; never re-register on
-  `onClientResourceStart`. A registration made while NLib is stopped, or refused because the
+- Updates arrive as `SendNUIMessage({ nordenLibHud = data })` — one wrapper key, not an `action`
+  string — queued until your NUI calls `__norden_lib_hud_ready`.
+- Definitions survive a Norden Lib restart. Register once; never re-register on
+  `onClientResourceStart`. A registration made while Norden Lib is stopped, or refused because the
   HUD editor is open, is cached and retried for a minute.
-- When NLib stops you receive the last **committed** geometry with `phase = 'rollback'` and
+- When Norden Lib stops you receive the last **committed** geometry with `phase = 'rollback'` and
   `editing = false`. Handle that phase, or a stop mid-edit leaves a preview the player
   cannot cancel.
 
@@ -949,7 +949,7 @@ handler.
 | `ratelimit.reset()` | Drop the buckets themselves. Tests only. |
 
 ```lua
-local gate = nlib.ratelimit.bucket('requestVehicleProps', 1000)
+local gate = norden_lib.ratelimit.bucket('requestVehicleProps', 1000)
 
 RegisterNetEvent('tdet:requestVehicleProps', function()
     local src = source
@@ -972,11 +972,11 @@ directly only for something that is not a net event, or to put several events on
 
 ## realtime
 
-Rooms, typed events and the upstream control socket, over NLib's WebSocket router.
-`nlib_module { 'realtime' }` is **required**, or the `rt*` exports are never registered.
+Rooms, typed events and the upstream control socket, over Norden Lib's WebSocket router.
+`norden_lib_module { 'realtime' }` is **required**, or the `rt*` exports are never registered.
 
 <Callout type="warning">
-**Every function is colon-called.** `nlib.realtime:issueToken(...)` — the dot form passes
+**Every function is colon-called.** `norden_lib.realtime:issueToken(...)` — the dot form passes
 your first argument as `self` and fails in a way that does not name the cause.
 </Callout>
 
@@ -998,8 +998,8 @@ your first argument as `self` and fails in a way that does not name the cause.
 | `realtime:controlState()` | The state string, or `nil`. |
 
 ```lua
-nlib.realtime:setRooms(playerId, { 'radio:freq:154.125' })
-nlib.realtime:onEvent('ptt', function(playerId, sessionId, payload) end)
+norden_lib.realtime:setRooms(playerId, { 'radio:freq:154.125' })
+norden_lib.realtime:onEvent('ptt', function(playerId, sessionId, payload) end)
 ```
 
 Handler lists are per consumer VM, so two resources can subscribe to one event. A handler
@@ -1011,8 +1011,8 @@ that throws is caught and printed, not propagated. Audio frames do not come thro
 
 Announce a model runtime this resource started, and find one another resource already has up
 for the same weights. Colon-called, like `realtime`. The exports underneath are in
-[Exports](/docs/NLib/exports#local-inference); to *start* the engine, see
-[Child processes](/docs/NLib/exports#child-processes).
+[Exports](/docs/norden_lib/exports#local-inference); to *start* the engine, see
+[Child processes](/docs/norden_lib/exports#child-processes).
 
 | Function | Description |
 | --- | --- |
@@ -1022,9 +1022,9 @@ for the same weights. Colon-called, like `realtime`. The exports underneath are 
 | `inference:list()` | Everything registered, for diagnostics. |
 
 ```lua
-local shared = nlib.inference:lookup('text', 'qwen3-1.7b-q4_k_m')
+local shared = norden_lib.inference:lookup('text', 'qwen3-1.7b-q4_k_m')
 if not shared then
-    local handle = nlib.inference:advertise({
+    local handle = norden_lib.inference:advertise({
         capability = 'text',
         workload   = 'qwen3-1.7b-q4_k_m',
         url        = 'http://127.0.0.1:18291/v1',
@@ -1092,7 +1092,7 @@ plain table and can call nothing, not even `print`. A list in the sidecar **repl
 one in `config.lua` rather than appending.
 
 <Callout type="warning">
-If `nlib.diag` is unreachable, `credentialPaths` returns `{}` and the convar pass silently
+If `norden_lib.diag` is unreachable, `credentialPaths` returns `{}` and the convar pass silently
 does nothing — your convars are ignored and `applied` is empty, with no error. Check
 `applied` lists what you expected.
 </Callout>
@@ -1102,7 +1102,7 @@ does nothing — your convars are ignored and `applied` is empty, with no error.
 ## spatial
 
 A throttled index of player positions: the cached counterpart to
-`nlib.platform.getNearbyPlayers`.
+`norden_lib.platform.getNearbyPlayers`.
 
 | Function | Side | Description |
 | --- | --- | --- |
@@ -1128,9 +1128,9 @@ The diagnostics pipeline: scrubbing, fingerprinting, operation timing and the ba
 
 <Callout type="note">
 **You almost certainly do not need to call this.** It is in `AUTOLOAD` for studio-authored
-resources; declare `nlib_module { 'telemetry' }` to opt in from any other. Whether anything
-is *collected* is the `nlib_telemetry` convar — see
-[Convars](/docs/NLib/convars#diagnostics).
+resources; declare `norden_lib_module { 'telemetry' }` to opt in from any other. Whether anything
+is *collected* is the `norden_lib_telemetry` convar — see
+[Convars](/docs/norden_lib/convars#diagnostics).
 </Callout>
 
 | Function | Description |
@@ -1191,7 +1191,7 @@ cannot collide with.
 | `txds.count()` | How many times the native was **called**, not how many names. |
 
 ```lua
-local txds = nlib.runtimetxd.create('tdet_scr_txd')
+local txds = norden_lib.runtimetxd.create('tdet_scr_txd')
 local name = txds.textureName('tdet_screen', serial)
 ```
 
@@ -1233,7 +1233,7 @@ the attach/detach lifecycle; `propeditor` owns the orbit camera and the editing 
 `vehicleprop` and reach the editor through `instance.editor`.
 
 ```lua
-local prop = nlib.vehicleprop.create({
+local prop = norden_lib.vehicleprop.create({
     prefix = 'tdet', model = 'prop_cs_police_torch', decor = 'tdet_prop',
     saveEvent = 'tdet:savePlacement', removeEvent = 'tdet:removePlacement',
 })
@@ -1270,7 +1270,7 @@ handlers. Create one per resource, at load, and share `instance.editor.driver`.
 
 ## versioncheck
 
-`nlib.versioncheck(opts)` — the startup banner, version comparison and changelog. It is both
-callable and a table, so `nlib.versioncheck(opts)` and `.check(opts)` are the same call,
+`norden_lib.versioncheck(opts)` — the startup banner, version comparison and changelog. It is both
+callable and a table, so `norden_lib.versioncheck(opts)` and `.check(opts)` are the same call,
 alongside `.github(repo)`, `.studios(product, current)` and `.lean(...)`. It has its own
-page: [Version Check](/docs/NLib/versioncheck).
+page: [Version Check](/docs/norden_lib/versioncheck).

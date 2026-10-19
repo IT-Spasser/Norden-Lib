@@ -31,12 +31,12 @@ function TriggerServerEvent(name, ...) serverEvents[#serverEvents + 1] = { name 
 function AddEventHandler() end
 function GetCurrentResourceName() return 'test_resource' end
 
-nlib = { platform = { setInputMode = function() end, setKeepInputActive = function() end } }
+norden_lib = { platform = { setInputMode = function() end, setKeepInputActive = function() end } }
 -- The REAL drivenprop, not a stub. The editor asks it which of the two
 -- attachment mechanisms a placement needs (`isUnitScale`) and borrows its
 -- driver, so a stub here would let the editor take the attached path for a
 -- scaled placement and this suite would never notice.
-nlib.drivenprop = dofile('shared/imports/drivenprop/shared.lua')
+norden_lib.drivenprop = dofile('shared/imports/drivenprop/shared.lua')
 
 local VEHICLE = 42
 

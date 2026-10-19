@@ -25,7 +25,7 @@
 -- whole cost.
 --
 
-if _NLIB_SIDE ~= 'client' then return end
+if _NORDEN_LIB_SIDE ~= 'client' then return end
 
 MenuContext = {}
 local C = MenuContext
@@ -127,7 +127,7 @@ function C.count() return #presenters end
 local function guard(stage, owner, fn, ...)
     local ok, result = pcall(fn, ...)
     if ok then return result end
-    print(('[NLib/menu] %s presenter %s failed: %s'):format(owner, stage, tostring(result)))
+    print(('[norden_lib/menu] %s presenter %s failed: %s'):format(owner, stage, tostring(result)))
     return nil
 end
 

@@ -65,7 +65,7 @@ const exhaustive: Required<CatalogueItem> = {
 
 describe("exhaustiveness: no wire field may be silently dropped", () => {
   // tradio-59's condition, and the reason for it is measured rather than
-  // hypothetical: while tRadio's camelCase and NLib's snake_case disagreed, every
+  // hypothetical: while tRadio's camelCase and Norden Lib's snake_case disagreed, every
   // field whose name differed read `undefined` — sound cards rendered no player
   // and theme cards no swatches, both falling through to the placeholder tile.
   // Nothing threw and nothing warned; it rendered a plausible wrong thing.

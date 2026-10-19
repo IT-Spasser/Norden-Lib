@@ -1,7 +1,7 @@
 import { Toast as ArkToast, createToaster, Toaster } from "@ark-ui/solid/toast";
 import type { JSX } from "@solidjs/web";
 import { Dynamic } from "@solidjs/web";
-import { type Layout, layoutRect } from "@nlib/shared/hud-geometry";
+import { type Layout, layoutRect } from "@norden_lib/shared/hud-geometry";
 import { CircleCheck, CircleX, Info, LoaderCircle, TriangleAlert } from "lucide-solid";
 import { createEffect, createSignal, onCleanup, Show } from "solid-js";
 import { onNuiEvent } from "@/lib/nui";
@@ -124,7 +124,7 @@ export default function Toast() {
   return (
     <Toaster
       toaster={toaster}
-      class="nlib-nui-toasts"
+      class="norden-nui-toasts"
       style={placementStyle()}
       aria-label="Notifications"
       tabindex={-1}
@@ -144,7 +144,7 @@ export default function Toast() {
           }
           data-toast-id={toast().id}
           tabindex={-1}
-          class="nlib-nui-surface nlib-nui-toast nlib-nui-lit flex shrink-0 items-start gap-3 rounded-xl border border-[var(--nui-border)] bg-[var(--nui-surface)] px-4 py-3 text-[var(--nui-text)]"
+          class="norden-nui-surface norden-nui-toast norden-nui-lit flex shrink-0 items-start gap-3 rounded-xl border border-[var(--nui-border)] bg-[var(--nui-surface)] px-4 py-3 text-[var(--nui-text)]"
           style={{
             position: "relative",
             inset: "auto",

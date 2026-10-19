@@ -1,8 +1,8 @@
--- NLib/shared/lib/adapter/shutdown.lua
+-- norden_lib/shared/lib/adapter/shutdown.lua
 -- resource shutdown / cleanup hooks
 
 
-local log = Logger.create('NLib/adapter/shutdown')
+local log = Logger.create('norden_lib/adapter/shutdown')
 
 local _shutdownCallbacks = {}
 
@@ -19,10 +19,10 @@ local function _runShutdown()
     end
 end
 
-if _NLIB_IS_FIVEM then
-    if not _NLIB_SHUTDOWN_REGISTERED then
-        _NLIB_SHUTDOWN_REGISTERED = true
-        local resourceName = GetCurrentResourceName and GetCurrentResourceName() or 'NLib'
+if _NORDEN_LIB_IS_FIVEM then
+    if not _NORDEN_LIB_SHUTDOWN_REGISTERED then
+        _NORDEN_LIB_SHUTDOWN_REGISTERED = true
+        local resourceName = GetCurrentResourceName and GetCurrentResourceName() or 'norden_lib'
         AddEventHandler('onResourceStop', function(res)
             if res == resourceName then
                 _runShutdown()

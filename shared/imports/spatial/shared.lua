@@ -1,6 +1,6 @@
 -- cached coord index rebuilt every REFRESH_MS on both server and client.
 --
--- The cached counterpart to nlib.platform.getNearbyPlayers, which iterates
+-- The cached counterpart to norden_lib.platform.getNearbyPlayers, which iterates
 -- every player on every call and says so. Anything querying at audio rates
 -- wants this one.
 
@@ -14,9 +14,9 @@ local REFRESH_MS = 100
 local ready = false
 
 -- Resolved lazily rather than at load: a shared script can be loaded before
--- nlib's import system has finished initialising on the other side.
+-- norden_lib's import system has finished initialising on the other side.
 local function platform()
-    return nlib.platform
+    return norden_lib.platform
 end
 
 local function rebuildIndex()
