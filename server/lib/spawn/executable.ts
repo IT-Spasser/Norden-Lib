@@ -2,7 +2,7 @@
  * Putting the mode bit back on a shipped binary, on the platform where that is
  * a concept.
  *
- * Not defensiveness, and not tLib being helpful: it is the most likely way a
+ * Not defensiveness, and not NLib being helpful: it is the most likely way a
  * correct release fails on Linux, and every route a customer takes to their
  * server drops the bit. A zip has no concept of one, NTFS cannot store one, and
  * SFTP clients transfer contents rather than permissions — so the release is
@@ -10,10 +10,10 @@
  * sees is `EACCES` from spawn, which reads like a problem with their machine
  * rather than a missing `+x` on one file.
  *
- * It lives in tLib rather than only in each product because of what the gate
+ * It lives in NLib rather than only in each product because of what the gate
  * does with `loaderDir`: when a bundled loader is present, **the thing exec'd is
  * the loader**, not the binary the product resolved and chmod'd. A product
- * cannot fix the mode of a file it never names — it names a *program*, and tLib
+ * cannot fix the mode of a file it never names — it names a *program*, and NLib
  * resolves every path — so the chmod has to happen where the exec does. The
  * inner binary does not need it: ld.so opens and maps its target, so read
  * permission is sufficient, which is the long-known way to run a file that has
@@ -49,7 +49,7 @@ export const REAL_MODE_BITS: ModeBits = {
  *
  * A `chmod` that cannot be done — a read-only mount, a file owned by another
  * user — is left to the spawn, which fails with the file name and the syscall in
- * it. Reporting it here would mean a refusal from tLib *instead of* the real
+ * it. Reporting it here would mean a refusal from NLib *instead of* the real
  * error, and the real error is the better message.
  */
 export function ensureExecutable(target: string, fs: ModeBits = REAL_MODE_BITS): void {

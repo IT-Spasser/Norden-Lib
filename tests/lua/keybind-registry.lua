@@ -1,4 +1,4 @@
--- Run from tLib: bunx --bun --package fengari-node-cli fengari scripts/run-lua-suite.lua tests/lua/keybind-registry.lua
+-- Run from NLib: bunx --bun --package fengari-node-cli fengari scripts/run-lua-suite.lua tests/lua/keybind-registry.lua
 --
 -- Oracle for `client/cl_keybinds.lua`, the CROSS-resource keybind registry.
 --

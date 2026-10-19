@@ -31,7 +31,7 @@ import {
  * scripts, because it is a Solid app and because a theme's own `jsText` runs
  * inside it, and it must not be able to touch this document, its storage or its
  * session. The in-game NUI makes that bite harder than the web does: the embedder
- * there is `cfx-nui-tLib`, which holds the player's open admin panel.
+ * there is `cfx-nui-NLib`, which holds the player's open admin panel.
  *
  * The frame is sized at the layout size and SCALED.
  *

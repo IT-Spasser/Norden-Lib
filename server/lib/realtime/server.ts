@@ -61,7 +61,7 @@ export class RealtimeServer {
     });
   }
 
-  // Binds no port: tLib owns exactly one external socket, the router in
+  // Binds no port: NLib owns exactly one external socket, the router in
   // server/http, and realtime is a mount on it at /rt. The router hands upgrades
   // on that path to handleUpgrade below.
   start(): void {

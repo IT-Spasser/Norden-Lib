@@ -1,14 +1,14 @@
 --[[
-    tlib.audio3d — the transport half of positional device audio (SERVER).
+    nlib.audio3d — the transport half of positional device audio (SERVER).
 
-    Its NUI half is tLib/internal/shared-ts/audio3d. This side answers one question and
+    Its NUI half is NLib/internal/shared-ts/audio3d. This side answers one question and
     nothing else: WHO is close enough to be told that a device made a noise.
 
     ## The emitter is the vehicle
 
     These are dash-mounted devices. A bus never looks at where the player who
     sent the sound is standing — it resolves the vehicle they are aboard through
-    tlib.occupancy and fans out around THAT. A sender who is not in a vehicle
+    nlib.occupancy and fans out around THAT. A sender who is not in a vehicle
     emits nothing at all, which is the correct answer for a device bolted to a
     dashboard: there is no dashboard.
 
@@ -36,7 +36,7 @@
 
     ## Usage
 
-        local bus = tlib.audio3d.createBus({
+        local bus = nlib.audio3d.createBus({
             event  = 'tradar:worldSound',
             range  = Config.audioRange,
             fields = { kind = { type = 'string', max = 16 } },
@@ -66,14 +66,14 @@ local DEFAULT_MAX_PER_SECOND = 20
 --- one beep into an event for every player on the server.
 local MAX_RANGE = 250
 
-local function platform() return tlib.platform end
-local function occupancy() return tlib.occupancy end
+local function platform() return nlib.platform end
+local function occupancy() return nlib.occupancy end
 
 --- The cached coordinate index. Readied here rather than in every consumer:
 --- a bus that queried an un-readied index would find nobody and emit silence,
 --- which is indistinguishable from "there was nobody there".
 local function spatial()
-    local s = tlib.spatial
+    local s = nlib.spatial
     s.setReady()
     return s
 end
@@ -278,9 +278,9 @@ end
 function audio3d.createBus(opts)
     opts = type(opts) == 'table' and opts or {}
     assert(type(opts.event) == 'string' and #opts.event > 0,
-        'tlib.audio3d.createBus: `event` is required')
+        'nlib.audio3d.createBus: `event` is required')
     assert(type(opts.range) == 'number' and opts.range > 0,
-        'tlib.audio3d.createBus: `range` is required and must be a positive number of metres')
+        'nlib.audio3d.createBus: `range` is required and must be a positive number of metres')
 
     local bus = setmetatable({
         event = opts.event,

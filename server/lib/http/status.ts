@@ -47,7 +47,7 @@ export class HttpReadiness {
       error:
         this.listenerError ??
         (this.publicUrlState === "failed"
-          ? "Public address unavailable; set tlib_http_public_url to your reachable address"
+          ? "Public address unavailable; set nlib_http_public_url to your reachable address"
           : null),
     };
   }
@@ -65,7 +65,7 @@ export class HttpReadiness {
 
   resolveAddress(ip: string | null): void {
     // A late discovery result from a stopped lifetime must not notify consumers
-    // or resurrect publication after tLib has been restarted.
+    // or resurrect publication after NLib has been restarted.
     if (this.listenerState === "stopped" || this.publicUrlState === "ready") return;
     this.publicUrl = ip ? resolvePublicUrl(this.override, ip, this.port).base : null;
     this.publicUrlState = this.publicUrl ? "ready" : "failed";

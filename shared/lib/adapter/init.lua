@@ -6,11 +6,11 @@ local isFiveM = (type(Citizen) == 'table' or type(Citizen) == 'userdata')
     and type(IsDuplicityVersion) == 'function'
 
 if not isFiveM then
-    error('[tLib] Unsupported runtime: only the FiveM adapter is available', 0)
+    error('[NLib] Unsupported runtime: only the FiveM adapter is available', 0)
 end
 
 Platform = { name = 'fivem' }
-_TLIB_IS_FIVEM = true
+_NLIB_IS_FIVEM = true
 
 function Platform.getPackageName()
     return GetCurrentResourceName()
@@ -20,8 +20,8 @@ function Platform.getSide()
     return IsDuplicityVersion() and 'server' or 'client'
 end
 
-_TLIB_PACKAGE = Platform.getPackageName()
-_TLIB_SIDE = Platform.getSide()
+_NLIB_PACKAGE = Platform.getPackageName()
+_NLIB_SIDE = Platform.getSide()
 
 function Platform.isFiveM() return true end
 

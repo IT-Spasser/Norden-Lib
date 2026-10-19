@@ -2,13 +2,13 @@
  * The one outbound POST. Clients report to this server; this server talks to the
  * website, and nothing else does. One sender, one request in flight, a doubling
  * breaker, and refusals that retrying cannot fix stop for the session. The
- * ingest authenticates with `TLIB_PUBLIC_KEY`; what distinguishes senders is
+ * ingest authenticates with `NLIB_PUBLIC_KEY`; what distinguishes senders is
  * `x-install-id`, not the key.
  * Design notes: docs/internal/telemetry-wire-contract.md.
  */
 
 import { INSTALL_ID_HEADER } from "../../../shared/ts/install-id";
-import { TLIB_PUBLIC_KEY } from "../../../shared/ts/marketplace/catalogue";
+import { NLIB_PUBLIC_KEY } from "../../../shared/ts/marketplace/catalogue";
 import { ANALYTICS_PATH, type AnalyticsBatchBody } from "../../../shared/ts/telemetry/payload";
 import { TELEMETRY_KEY_CONVAR } from "./consent";
 import { fGetConvar, fPerformHttpRequest } from "./fivem";
@@ -69,7 +69,7 @@ export interface TransportOptions {
   post?: PostFn;
   log?: (line: string) => void;
   /**
-   * The bearer token. Defaults to `TLIB_PUBLIC_KEY`, with `tlib_telemetry_key`
+   * The bearer token. Defaults to `NLIB_PUBLIC_KEY`, with `nlib_telemetry_key`
    * overriding it for a dev run. A seam so a suite can reach the
    * `no-credential` branch, which the real value never produces.
    */
@@ -119,7 +119,7 @@ function credential(): string {
   } catch {
     override = "";
   }
-  return override || TLIB_PUBLIC_KEY;
+  return override || NLIB_PUBLIC_KEY;
 }
 
 function retryAfterMs(headers: Record<string, string>): number {
@@ -175,7 +175,7 @@ export function createTransport(opts: TransportOptions): Transport {
       // cooldown rather than twice it.
       b.cooldownMs = Math.min(b.cooldownMs * 2, BREAKER_MAX_COOLDOWN_MS);
       log(
-        `[tLib] diagnostics ${label} sink unreachable (HTTP ${status}); pausing for ${Math.round(wait / 1000)}s`
+        `[NLib] diagnostics ${label} sink unreachable (HTTP ${status}); pausing for ${Math.round(wait / 1000)}s`
       );
     }
   }
@@ -209,7 +209,7 @@ export function createTransport(opts: TransportOptions): Transport {
     const drops = opts.store.readDrops();
     if (drops > 0) {
       log(
-        `[tLib] diagnostics queue dropped ${drops} event(s) to stay bounded — the sink was ` +
+        `[NLib] diagnostics queue dropped ${drops} event(s) to stay bounded — the sink was ` +
           "unreachable or one client flooded. The feed has a gap of that size."
       );
     }
@@ -248,7 +248,7 @@ export function createTransport(opts: TransportOptions): Transport {
         const permanent = permanentReason(status);
         if (permanent) {
           b.permanentlyStopped = permanent;
-          log(`[tLib] diagnostics disabled for this session: ${permanent}`);
+          log(`[NLib] diagnostics disabled for this session: ${permanent}`);
           // Dropped rather than returned: a batch nothing will ever accept is a
           // queue that can never drain.
           return;
@@ -272,7 +272,7 @@ export function createTransport(opts: TransportOptions): Transport {
         } catch (e) {
           // An interval callback that throws in FiveM's Node runtime is an
           // unhandled error on the console every minute.
-          log(`[tLib] diagnostics flush threw: ${e instanceof Error ? e.message : String(e)}`);
+          log(`[NLib] diagnostics flush threw: ${e instanceof Error ? e.message : String(e)}`);
         }
       }, FLUSH_INTERVAL_MS);
     },

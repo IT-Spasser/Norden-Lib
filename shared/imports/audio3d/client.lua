@@ -1,9 +1,9 @@
 --[[
-    tlib.audio3d — the transport half of positional device audio (CLIENT).
+    nlib.audio3d — the transport half of positional device audio (CLIENT).
 
     Receives what the server fanned out, resolves where each emitter actually is
     from this client's own copy of the world, and feeds the NUI half
-    (tLib/internal/shared-ts/audio3d) one batched frame per tick.
+    (NLib/internal/shared-ts/audio3d) one batched frame per tick.
 
     ## Positions are resolved here, not streamed
 
@@ -26,7 +26,7 @@
     `(action, data)` shape most resources' own `sendHud` uses.
 
     Handing such a `sendHud` straight in builds `{ action = <table> }`, and
-    tLib's own `onNuiEvent` (shared/ts/nui.ts) refuses any message whose `action`
+    NLib's own `onNuiEvent` (shared/ts/nui.ts) refuses any message whose `action`
     is not a string — so every frame is dropped by the browser, silently, and the
     feature looks exactly like it was never wired up. tRadar shipped that.
 
@@ -39,7 +39,7 @@
             sendHud(msg.action, msg)
         end
 
-        local rx = tlib.audio3d.createReceiver({
+        local rx = nlib.audio3d.createReceiver({
             event = 'tradar:worldSound',
             range = Config.audioRange,
             send  = sendWorldAudio,       -- this resource's own NUI sender, bridged
@@ -75,7 +75,7 @@ local DEFAULT_KEEPALIVE_MS = 6000
 --- this stops us resolving an entity and encoding a position for it every tick.
 local CULL_FACTOR = 1.25
 
-local function platform() return tlib.platform end
+local function platform() return nlib.platform end
 
 --- Camera forward vector from GTA's pitch/yaw, in the engine's Z-up frame.
 local function forwardFrom(rotation)
@@ -246,17 +246,17 @@ end
 
 --- Build a receiver.
 ---
---- `send` is the consumer's OWN NUI sender, not tLib's: a resource that declares
+--- `send` is the consumer's OWN NUI sender, not NLib's: a resource that declares
 --- its own `ui_page` has its own browser and its own ready-handshake queue, and
---- routing through tLib's would deliver these frames to the wrong page.
+--- routing through NLib's would deliver these frames to the wrong page.
 function audio3d.createReceiver(opts)
     opts = type(opts) == 'table' and opts or {}
     assert(type(opts.event) == 'string' and #opts.event > 0,
-        'tlib.audio3d.createReceiver: `event` is required')
+        'nlib.audio3d.createReceiver: `event` is required')
     assert(type(opts.send) == 'function',
-        'tlib.audio3d.createReceiver: `send` is required — this resource\'s own NUI sender')
+        'nlib.audio3d.createReceiver: `send` is required — this resource\'s own NUI sender')
     assert(type(opts.range) == 'number' and opts.range > 0,
-        'tlib.audio3d.createReceiver: `range` is required and must be a positive number of metres')
+        'nlib.audio3d.createReceiver: `range` is required and must be a positive number of metres')
 
     local rx = setmetatable({
         event = opts.event,

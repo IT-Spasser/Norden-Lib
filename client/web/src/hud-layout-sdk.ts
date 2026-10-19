@@ -1,4 +1,4 @@
-import { layoutRect, MAX_OFFSET, REFERENCE_HEIGHT } from "@tlib/shared/hud-geometry";
+import { layoutRect, MAX_OFFSET, REFERENCE_HEIGHT } from "@nlib/shared/hud-geometry";
 import type { HudLayoutClient, HudLayoutUpdate as Update } from "../../../shared/ts/hud-layout";
 
 type Binding = {
@@ -57,7 +57,7 @@ function apply(id: string) {
   binding.onEdit?.(update.editing);
 }
 window.addEventListener("message", (event: MessageEvent) => {
-  const data: unknown = event.data?.tlibHud;
+  const data: unknown = event.data?.nlibHud;
   if (!valid(data)) return;
   if (!bindings.has(data.id) && latest.size >= 64) return;
   latest.set(data.id, data);
@@ -79,7 +79,7 @@ function ready() {
       const controller = new AbortController();
       const deadline = setTimeout(() => controller.abort(), 2000);
       try {
-        const response = await fetch(`https://${host}/__tlib_hud_ready`, {
+        const response = await fetch(`https://${host}/__nlib_hud_ready`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: "{}",
@@ -94,7 +94,7 @@ function ready() {
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
     readyPromise = undefined;
-    console.warn("[tLib HUD] Consumer handshake failed; load @tLib/shared/imports/hud/client.lua.");
+    console.warn("[NLib HUD] Consumer handshake failed; load @NLib/shared/imports/hud/client.lua.");
   })();
   return readyPromise;
 }
@@ -123,6 +123,6 @@ const api: HudLayoutClient = {
   },
   ready,
 };
-(window as Window & { tLibHudLayout?: typeof api }).tLibHudLayout = api;
+(window as Window & { NLibHudLayout?: typeof api }).NLibHudLayout = api;
 
 export type { Update };

@@ -13,7 +13,7 @@ fx_version 'bodacious'
 game 'gta5'
 
 shared_scripts {
-    '@tLib/imports.lua',
+    '@NLib/imports.lua',
     'shared/utils.lua',
 }
 
@@ -66,7 +66,7 @@ describe("manifest coverage", () => {
   });
 
   test("a cross-resource @ path is another resource's to ship", () => {
-    expect(manifestCoverage(MANIFEST, COMPLETE).missing).not.toContain("@tLib/imports.lua");
+    expect(manifestCoverage(MANIFEST, COMPLETE).missing).not.toContain("@NLib/imports.lua");
   });
 
   test("a data_file target counts: tELS shipped without its ytyp", () => {

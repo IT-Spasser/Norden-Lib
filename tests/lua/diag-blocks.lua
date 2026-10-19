@@ -64,7 +64,7 @@ local block = diag.render('fatal', 'Config does not exist.', {
 assert(block[1] == block[#block], 'the block opens and closes with the same rule')
 assert(block[1]:find('^1', 1, true), 'a fatal block is red')
 assert(block[1]:find('[tRadio]', 1, true),
-    'and is scoped to the calling resource, not to tLib')
+    'and is scoped to the calling resource, not to NLib')
 assert(table.concat(block, '\n'):find('FATAL: Config does not exist.', 1, true),
     'fatal prefixes its title, so the severity is in the first line an operator reads')
 assert(table.concat(block, '\n'):find('To fix:', 1, true), 'one fix reads as a singular instruction')

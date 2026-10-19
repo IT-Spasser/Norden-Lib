@@ -2,18 +2,18 @@
 title: "Version Check"
 description: "Print a startup status box, compare versions and show the operator a changelog and an update link."
 order: 5
-group: "tLib"
+group: "NLib"
 published: true
 ---
 
-Call `tlib.versioncheck` on the server. Nothing needs declaring.
+Call `nlib.versioncheck` on the server. Nothing needs declaring.
 
 ```lua
 local current = GetResourceMetadata(GetCurrentResourceName(), 'version', 0)
-tlib.versioncheck({
+nlib.versioncheck({
     name = 'MyResource',
     current = current,
-    fetch = tlib.versioncheck.github('owner/repository'),
+    fetch = nlib.versioncheck.github('owner/repository'),
     info = {
         { key = 'Status', event = 'myresource:startupStatus', required = true },
     },
@@ -28,8 +28,8 @@ unavailable check must not return the installed version and claim it is current.
 
 | Provider | Use it for |
 | --- | --- |
-| `tlib.versioncheck.github(repo)` | A release published on GitHub. `github(nil)` makes no request and reports the repository as not configured. |
-| `tlib.versioncheck.studios(product, current)` | A TIMMYG Studios catalogue product, through the product changelog API. Eight-second timeout. |
+| `nlib.versioncheck.github(repo)` | A release published on GitHub. `github(nil)` makes no request and reports the repository as not configured. |
+| `nlib.versioncheck.studios(product, current)` | A TIMMYG Studios catalogue product, through the product changelog API. Eight-second timeout. |
 | your own function | Anything else — a private endpoint, a cached result you hold. |
 
 ## Branding

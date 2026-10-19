@@ -2,7 +2,7 @@
 // Orphan-file gate: a .ts/.tsx file that nothing imports and no entry point
 // names. The negative control is scripts/dead-file-control.ts.
 //
-// tLib is a PUBLISHED MIT library, consumed by eleven resources here and by
+// NLib is a PUBLISHED MIT library, consumed by eleven resources here and by
 // third parties outside this repo, so "no importer" is the normal state of a
 // library file and can never be the verdict on its own. A knip/ts-prune-shaped
 // answer flags the entire public API.
@@ -19,7 +19,7 @@
 //   2. scripts/public-entries.json — the measured record of deep paths
 //      consumers import by relative path outside that map. 61 of them:
 //      build/*, fs/server, secrets/release, modules/*, telemetry/*.
-//   3. The import graph, through relative specifiers, `@tlib/shared/*`, `@/*`.
+//   3. The import graph, through relative specifiers, `@nlib/shared/*`, `@/*`.
 //   4. Paths written as STRINGS rather than imported — the ui_page html's
 //      module src, and anything a package.json script hands to `bun`. That last
 //      is the only thing keeping shared/ts/build/cef-output-contract-control.ts
@@ -98,10 +98,10 @@ class Gate {
 		let base: string | null = null;
 		if (spec.startsWith(".")) {
 			base = slash(join(dirname(fromFile), spec));
-		} else if (spec === "@tlib/shared") {
+		} else if (spec === "@nlib/shared") {
 			base = "shared/ts/index.ts";
-		} else if (spec.startsWith("@tlib/shared/")) {
-			base = `shared/ts/${spec.slice("@tlib/shared/".length)}`;
+		} else if (spec.startsWith("@nlib/shared/")) {
+			base = `shared/ts/${spec.slice("@nlib/shared/".length)}`;
 		} else if (spec.startsWith("@/") && fromFile.startsWith("client/web/")) {
 			base = `client/web/src/${spec.slice(2)}`;
 		} else {
@@ -143,8 +143,8 @@ class Gate {
 		return out;
 	}
 
-	// The deep paths consumers import directly. tLib is a published MIT library,
-	// so a file with no caller inside tLib is the normal case and the import
+	// The deep paths consumers import directly. NLib is a published MIT library,
+	// so a file with no caller inside NLib is the normal case and the import
 	// keeping it alive lives in another resource or in a third party's tree.
 	// "No importer" can therefore never be the verdict on its own, and the
 	// public surface has to be a recorded fact rather than an inference.
@@ -252,15 +252,15 @@ class Gate {
 		// here does not mean there were no matches.
 		const r = spawnSync(
 			"rg",
-			["-NIoe", "(tLib/shared/ts/|@tlib/shared/)[A-Za-z0-9_./-]+", "--glob", "!tLib/**", "."],
+			["-NIoe", "(NLib/shared/ts/|@nlib/shared/)[A-Za-z0-9_./-]+", "--glob", "!NLib/**", "."],
 			{ cwd: resolve(this.root, ".."), encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
 		);
 		for (const line of (r.stdout ?? "").split("\n")) {
 			const t = line.trim();
 			if (!t) continue;
-			const sub = t.includes("tLib/shared/ts/")
-				? t.slice(t.indexOf("tLib/shared/ts/") + "tLib/shared/ts/".length)
-				: t.slice(t.indexOf("@tlib/shared/") + "@tlib/shared/".length);
+			const sub = t.includes("NLib/shared/ts/")
+				? t.slice(t.indexOf("NLib/shared/ts/") + "NLib/shared/ts/".length)
+				: t.slice(t.indexOf("@nlib/shared/") + "@nlib/shared/".length);
 			const hit = this.resolveSpec("shared/ts/x.ts", `./${sub}`);
 			if (hit) found.add(hit);
 		}

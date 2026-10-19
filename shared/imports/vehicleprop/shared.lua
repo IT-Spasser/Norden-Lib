@@ -1,8 +1,8 @@
 --[[
-    tLib — the in-vehicle prop: model registry, placement store and lifecycle.
+    NLib — the in-vehicle prop: model registry, placement store and lifecycle.
 
     Loaded into the CONSUMER's VM: it creates objects the consumer's own files
-    look at, and it instantiates `tlib.propeditor`, which registers NUI
+    look at, and it instantiates `nlib.propeditor`, which registers NUI
     callbacks against the consumer's `ui_page`. `shared.lua` because the pure
     rules are asked on both sides -- what to spawn, and what a save may store.
 
@@ -126,15 +126,15 @@ local MODEL_LOAD_WAIT_MS = 10
 ---   onClose       function? passed through to the editor
 ---   onGizmoChange function? (isActive, prop) -> (), for consumer-visible globals
 function VehicleProp.create(descriptor)
-    assert(type(descriptor) == 'table', 'tlib.vehicleprop.create: descriptor table required')
+    assert(type(descriptor) == 'table', 'nlib.vehicleprop.create: descriptor table required')
     for _, key in ipairs({ 'prefix', 'model', 'decor', 'saveEvent', 'removeEvent' }) do
         assert(type(descriptor[key]) == 'string' and descriptor[key] ~= '',
-            ('tlib.vehicleprop.create: descriptor.%s must be a non-empty string'):format(key))
+            ('nlib.vehicleprop.create: descriptor.%s must be a non-empty string'):format(key))
     end
 
     local d = descriptor
     local BUILTIN = assert(VehicleProp.normaliseModelName(d.model),
-        'tlib.vehicleprop.create: descriptor.model is not a usable archetype name')
+        'nlib.vehicleprop.create: descriptor.model is not a usable archetype name')
 
     local instance = {}
 
@@ -206,7 +206,7 @@ function VehicleProp.create(descriptor)
         if not DoesEntityExist(vehicle) then return nil end
         local data = placements[tostring(GetEntityModel(vehicle))]
         if type(data) ~= 'table' then return nil end
-        return tlib.propeditor.placementView(data, instance.resolveModel)
+        return nlib.propeditor.placementView(data, instance.resolveModel)
     end
 
     --- Replaces the placement table, in place. The consumer's receive handler.
@@ -225,7 +225,7 @@ function VehicleProp.create(descriptor)
 
     --- Blocks until the model is loaded, or gives up after ~1s. Declared above
     --- the editor because the descriptor takes it BY VALUE, and
-    --- `tlib.propeditor.create` asserts it is a function at call time.
+    --- `nlib.propeditor.create` asserts it is a function at call time.
     local function loadPropModel(modelName)
         local hash = GetHashKey(instance.resolveModel(modelName))
         if not IsModelValid(hash) then return false end
@@ -248,7 +248,7 @@ function VehicleProp.create(descriptor)
     -- than by the consumer because the editor and the lifecycle share one prop,
     -- so there is exactly one implementation of the mark.
     --
-    local editor = tlib.propeditor.create({
+    local editor = nlib.propeditor.create({
         prefix      = d.prefix,
         decor       = d.decor,
         saveEvent   = d.saveEvent,
@@ -341,7 +341,7 @@ function VehicleProp.create(descriptor)
         -- Unit scale attaches; anything else is DRIVEN. `AttachEntityToEntity`
         -- cannot carry a scale -- measured, with the full write-up and the
         -- handedness invariant at propeditor/client.lua's `TWO MECHANISMS` block.
-        if tlib.drivenprop.isUnitScale(placement.scale) then
+        if nlib.drivenprop.isUnitScale(placement.scale) then
             AttachEntityToEntity(
                 prop, vehicle, 0,
                 placement.x  or 0.0, placement.y  or 0.0, placement.z  or 0.0,

@@ -15,7 +15,7 @@
  * Extracting it is the alternative to a second copy. It is deliberately pure: a
  * string in, two numbers out. No DOM, no Solid, no fetch — so a Node/bun test or a
  * non-Solid consumer can call it, and so it can be imported by a tree that aliases
- * `@tlib/shared` without dragging the component graph in behind it.
+ * `@nlib/shared` without dragging the component graph in behind it.
  *
  * The tiers, in descending order of trust
  *

@@ -1,15 +1,15 @@
 /**
- * tLib's diagnostics core.
+ * NLib's diagnostics core.
  *
  * NOT exported from `shared/ts/index.ts`. The top-level barrel is imported by
  * every consumer's NUI bundle, and this directory reaches `document`,
  * `localStorage`, `performance.memory` and a WebGL context — pulling it into a
  * barrel would put all of that in the dependency graph of a bundle that never
  * asked for diagnostics, and three of the four throw outside a browser. A
- * consumer imports `@tlib/shared/telemetry` explicitly, which is also how
+ * consumer imports `@nlib/shared/telemetry` explicitly, which is also how
  * `escape-layer` and `prop-editor` are reached.
  *
- * And nothing here is `tlib.diag`. `tlib.diag` is 75 curated OPERATOR-ERROR
+ * And nothing here is `nlib.diag`. `nlib.diag` is 75 curated OPERATOR-ERROR
  * diagnostics — a bad config key, a missing file, a convar set to nonsense —
  * and its own header says "Nothing here decides anything. It prints." Those are
  * not faults anybody can fix from a dashboard: they are a customer typing a
@@ -56,7 +56,7 @@ export type {
 // telemetry concern: it travels on every tWeb-bound request — marketplace
 // browse, install, community configs, the update check — whether or not
 // diagnostics are on. Re-exporting it from the diagnostics barrel is how the
-// next reader comes to believe `tlib_telemetry` governs it. Import it from
+// next reader comes to believe `nlib_telemetry` governs it. Import it from
 // `shared/ts/install-id` instead.
 export {
   ANALYTICS_PATH,

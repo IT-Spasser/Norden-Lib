@@ -22,7 +22,7 @@
  * with the committed blank. There is no copy anywhere when that happens.
  *
  * So the value does not belong in the tracked file at all; it belongs in the
- * gitignored sidecar (`tlib.secrets`). With the sidecar in place there is
+ * gitignored sidecar (`nlib.secrets`). With the sidecar in place there is
  * nothing to strip, and the only thing left for a hook to do is say so when
  * somebody types a credential into the tracked file anyway. A refusal with the
  * key name and the fix in it does that; a silent strip hides it.
@@ -41,10 +41,10 @@ import * as path from "node:path";
  * and Git for Windows runs hooks under its own `sh` anyway.
  */
 export const PRE_COMMIT = `#!/bin/sh
-# Managed by tLib — shared/ts/secrets/hook.ts writes this file.
-# ⛔ Do not edit here. Run \`bun run ../tLib/scripts/secret-gate.ts --write-hooks\`
+# Managed by NLib — shared/ts/secrets/hook.ts writes this file.
+# ⛔ Do not edit here. Run \`bun run ../NLib/scripts/secret-gate.ts --write-hooks\`
 #    (or \`bun run secrets:install-hooks\`) to refresh it; a control asserts every
-#    resource's copy is byte-identical to tLib's.
+#    resource's copy is byte-identical to NLib's.
 #
 # Layer 1 of 3. Refuses a commit that stages a credential-shaped key with a
 # value in a config file. Layer 2 blanks the staged copy of a release; layer 3
@@ -56,17 +56,17 @@ set -e
 
 gate=""
 if [ -f "scripts/secret-gate.ts" ]; then
-  gate="scripts/secret-gate.ts"          # we are tLib
-elif [ -f "../tLib/scripts/secret-gate.ts" ]; then
-  gate="../tLib/scripts/secret-gate.ts"  # the sibling layout every clone uses
+  gate="scripts/secret-gate.ts"          # we are NLib
+elif [ -f "../NLib/scripts/secret-gate.ts" ]; then
+  gate="../NLib/scripts/secret-gate.ts"  # the sibling layout every clone uses
 fi
 
 if [ -z "$gate" ]; then
-  # Loud, and non-blocking. A missing sibling tLib is a checkout problem, not a
+  # Loud, and non-blocking. A missing sibling NLib is a checkout problem, not a
   # secret; blocking every commit on it would get the hook uninstalled, and then
   # there is no layer 1 at all. CI remains the guarantee.
-  echo "⚠ secret gate SKIPPED: no ../tLib/scripts/secret-gate.ts found." >&2
-  echo "  Clone tLib beside this repo to get the pre-commit check back." >&2
+  echo "⚠ secret gate SKIPPED: no ../NLib/scripts/secret-gate.ts found." >&2
+  echo "  Clone NLib beside this repo to get the pre-commit check back." >&2
   echo "  CI still asserts HEAD, so this is a convenience you are missing, not a hole." >&2
   exit 0
 fi

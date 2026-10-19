@@ -1,7 +1,7 @@
 import { Dialog as ArkDialog } from "@ark-ui/solid/dialog";
 import { Tabs } from "@ark-ui/solid/tabs";
 import { createForm } from "@tanstack/solid-form";
-import type { OpenData } from "@tlib/shared/marketplace/ui";
+import type { OpenData } from "@nlib/shared/marketplace/ui";
 import { ArrowUpRight, Check, Settings2, ShieldAlert, X } from "lucide-solid";
 import {
   createEffect,
@@ -226,7 +226,7 @@ function DialogSession(props: {
    * together meant one `dialogChange` round trip PER STEP of a drag — and
    * `tRadar/client/cl_settings.lua` answers each one with an `UpdateDialogField`
    * push back, so a single drag of a slider was a NUI→Lua→NUI round trip per
-   * pixel, in every resource that uses a tLib dialog.
+   * pixel, in every resource that uses a NLib dialog.
    */
   function previewField(id: string, value: DialogValue) {
     if (!alive || !props.open) return;
@@ -460,7 +460,7 @@ function DialogSession(props: {
       }
     >
       <ArkDialog.Positioner
-        class="tlib-nui-dialog-positioner fixed inset-0 z-[9999] flex items-center justify-center p-3"
+        class="nlib-nui-dialog-positioner fixed inset-0 z-[9999] flex items-center justify-center p-3"
         data-state={props.open ? "open" : "closed"}
       >
         <ArkDialog.Content
@@ -479,7 +479,7 @@ function DialogSession(props: {
           }}
           inert={!props.open}
           aria-hidden={!props.open ? "true" : undefined}
-          class="tlib-nui-surface tlib-nui-dialog tlib-nui-lit pointer-events-auto relative flex max-w-full flex-col overflow-hidden rounded-[var(--nui-radius-lg)] border border-[var(--nui-border)] bg-[var(--nui-surface)] outline-none"
+          class="nlib-nui-surface nlib-nui-dialog nlib-nui-lit pointer-events-auto relative flex max-w-full flex-col overflow-hidden rounded-[var(--nui-radius-lg)] border border-[var(--nui-border)] bg-[var(--nui-surface)] outline-none"
           style={{
             width: SIZE_W[dialog().size] ?? SIZE_W.md,
             "max-height": "85vh",
@@ -487,7 +487,7 @@ function DialogSession(props: {
           }}
         >
           <header
-            class="tlib-nui-ruled-b flex shrink-0 cursor-grab items-start justify-between gap-3 px-4 py-2.5 active:cursor-grabbing"
+            class="nlib-nui-ruled-b flex shrink-0 cursor-grab items-start justify-between gap-3 px-4 py-2.5 active:cursor-grabbing"
             onPointerDown={beginDrag}
             onPointerMove={moveDrag}
             onPointerUp={endDrag}
@@ -505,7 +505,7 @@ function DialogSession(props: {
               </Show>
             </div>
             <ArkDialog.CloseTrigger
-              class="tlib-nui-control rounded p-1 text-[var(--nui-muted)] hover:bg-[var(--nui-hover)]"
+              class="nlib-nui-control rounded p-1 text-[var(--nui-muted)] hover:bg-[var(--nui-hover)]"
               aria-label="Close dialog"
             >
               <X size={16} />
@@ -530,13 +530,13 @@ function DialogSession(props: {
               class="flex min-h-0 flex-1"
             >
               <Show when={tabs().length}>
-                <aside class="tlib-nui-ruled-r flex w-36 shrink-0 flex-col overflow-y-auto p-1.5">
+                <aside class="nlib-nui-ruled-r flex w-36 shrink-0 flex-col overflow-y-auto p-1.5">
                   <Tabs.List class="flex flex-col gap-0.5">
                     <For each={tabs()}>
                       {(tab) => (
                         <>
                           <Show when={tab.separator}>
-                            <hr class="tlib-nui-rule my-1" />
+                            <hr class="nlib-nui-rule my-1" />
                           </Show>
                           <Show
                             when={tab.action}
@@ -545,7 +545,7 @@ function DialogSession(props: {
                                 value={tab.id}
                                 id={`${tabIds}-${tab.id}-tab`}
                                 aria-controls={`${tabIds}-${tab.id}-panel`}
-                                class="tlib-nui-control rounded-[var(--nui-radius)] border border-transparent px-2.5 py-1.5 text-left text-sm text-[var(--nui-muted)] data-[selected]:border-[var(--nui-border)] data-[selected]:bg-[var(--nui-hover)] data-[selected]:text-[var(--nui-text)]"
+                                class="nlib-nui-control rounded-[var(--nui-radius)] border border-transparent px-2.5 py-1.5 text-left text-sm text-[var(--nui-muted)] data-[selected]:border-[var(--nui-border)] data-[selected]:bg-[var(--nui-hover)] data-[selected]:text-[var(--nui-text)]"
                               >
                                 {tab.label}
                               </Tabs.Trigger>
@@ -554,7 +554,7 @@ function DialogSession(props: {
                             <button
                               type="button"
                               onClick={() => action(tab.id)}
-                              class="tlib-nui-control flex items-center justify-between gap-1 rounded-[var(--nui-radius)] border border-transparent px-2.5 py-1.5 text-left text-sm text-[var(--nui-muted)] hover:bg-[var(--nui-hover)]"
+                              class="nlib-nui-control flex items-center justify-between gap-1 rounded-[var(--nui-radius)] border border-transparent px-2.5 py-1.5 text-left text-sm text-[var(--nui-muted)] hover:bg-[var(--nui-hover)]"
                             >
                               {tab.label}
                               <ArrowUpRight size={13} />
@@ -617,7 +617,7 @@ function DialogSession(props: {
                 </div>
               </Show>
             </Tabs.Root>
-            <footer class="tlib-nui-ruled-t flex shrink-0 flex-wrap items-center justify-end gap-2 px-4 py-2.5">
+            <footer class="nlib-nui-ruled-t flex shrink-0 flex-wrap items-center justify-end gap-2 px-4 py-2.5">
               <Show when={attempted() && Object.keys(errors()).length}>
                 <p role="alert" class="mr-auto text-xs text-[var(--nui-danger)]">
                   Check the highlighted fields.
@@ -629,7 +629,7 @@ function DialogSession(props: {
                 </p>
               </Show>
               {/* AFFIRMATIVE LEFT. See the note in `layout/LayoutEditor.tsx`
-                  for the count behind that and why all four of tLib's
+                  for the count behind that and why all four of NLib's
                   affirmative/cancel pairs moved together rather than one. */}
               <NuiButton type="submit" tone="primary" disabled={submitting()}>
                 <Check size={14} />
@@ -645,30 +645,30 @@ function DialogSession(props: {
            * since the beginning (`menu/Menu.tsx`, `.dialog-cancel` /
            * `.dialog-confirm`) — same eyebrow, same heading-then-question, same
            * pair — restated in nui-kit's own classes because the menu's are
-           * scoped under `.tlib-menu` and resolve to nothing here. There is no
+           * scoped under `.nlib-menu` and resolve to nothing here. There is no
            * second confirm design and there must not be one.
            */}
           <Show when={confirming()}>
             {(pending) => (
-              <div class="tlib-nui-confirm-shade">
+              <div class="nlib-nui-confirm-shade">
                 <div
-                  class="tlib-nui-confirm"
+                  class="nlib-nui-confirm"
                   role="alertdialog"
                   aria-modal="true"
                   aria-labelledby={`${tabIds}-confirm-title`}
                   aria-describedby={`${tabIds}-confirm-question`}
                 >
-                  <p class="tlib-nui-confirm-eyebrow">
+                  <p class="nlib-nui-confirm-eyebrow">
                     <ShieldAlert aria-hidden="true" />
                     CONFIRM ACTION
                   </p>
-                  <h2 id={`${tabIds}-confirm-title`} class="tlib-nui-confirm-title">
+                  <h2 id={`${tabIds}-confirm-title`} class="nlib-nui-confirm-title">
                     {dialog().fields.find((field) => field.id === pending().fieldId)?.label ?? ""}
                   </h2>
-                  <p id={`${tabIds}-confirm-question`} class="tlib-nui-confirm-question">
+                  <p id={`${tabIds}-confirm-question`} class="nlib-nui-confirm-question">
                     {pending().question}
                   </p>
-                  <div class="tlib-nui-confirm-actions">
+                  <div class="nlib-nui-confirm-actions">
                     {/* Affirmative left, as everywhere else. Autofocused because
                         the form behind is inert and focus would otherwise be
                         stranded on an unreachable element. */}
@@ -711,17 +711,17 @@ function DialogSession(props: {
               <Show
                 when={first()?.section && first()?.section !== groups()[index() - 1]?.[0].section}
               >
-                <h3 class="tlib-nui-ruled-b pb-1.5 text-xs font-medium tracking-wide text-[var(--nui-muted)]">
+                <h3 class="nlib-nui-ruled-b pb-1.5 text-xs font-medium tracking-wide text-[var(--nui-muted)]">
                   {first()?.section}
                 </h3>
               </Show>
-              <div class="tlib-nui-field-row">
+              <div class="nlib-nui-field-row">
                 <For each={ids}>
                   {(id) => {
                     const field = () => fieldById().get(id)!;
                     return (
                       <div
-                        class="tlib-nui-field-cell"
+                        class="nlib-nui-field-cell"
                         data-shrink={field()?.flex === "shrink"}
                         data-labelless={hasLabelledSibling() && LABELLESS.has(field()?.type ?? "")}
                       >

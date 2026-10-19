@@ -2,7 +2,7 @@
  * Telemetry module entry. One call from `server/main.ts`.
  *
  * Installs EAGERLY: the exports must exist before any consumer's Lua runs, and a
- * consumer's `onResourceStart` can beat tLib's own. Every export body is
+ * consumer's `onResourceStart` can beat NLib's own. Every export body is
  * wrapped, because an export that throws returns `undefined` and the real error
  * resurfaces elsewhere as `"undefined" is not valid JSON`.
  * Design notes: docs/internal/telemetry-wire-contract.md.
@@ -30,7 +30,7 @@ export function stampContext(events: unknown, context: unknown): unknown[] {
   // `surface`, not `senderKind`: `senderKind` is which process POSTed and is
   // always this one, while `surface` is where the fault happened. Collapsing
   // them makes every client-side fault read as a server fault. There is no
-  // `tlibVersion`: tWeb's taxonomy declares no slot for one.
+  // `nlibVersion`: tWeb's taxonomy declares no slot for one.
   for (const key of ["resource", "resourceVersion", "surface"] as const) {
     const value =
       key === "resourceVersion"
@@ -51,7 +51,7 @@ export function stampContext(events: unknown, context: unknown): unknown[] {
 
 /**
  * The studio base URL. `shared/sh_api.lua` is the single definition and it is
- * Lua, in tLib's shared VM -- not reachable from this bundle, so
+ * Lua, in NLib's shared VM -- not reachable from this bundle, so
  * `sv_telemetry.lua` pushes the resolved value in rather than this file keeping
  * a second copy of the normalisation.
  */
@@ -73,7 +73,7 @@ export function installTelemetry(): void {
 
   // And reaped. `start()` opens a 60s interval that nothing cancelled:
   // `stop()` was on the Transport interface and implemented, and had no caller
-  // anywhere, so every tLib restart left the previous run's flush timer alive
+  // anywhere, so every NLib restart left the previous run's flush timer alive
   // in the same Node VM — holding a store and a breaker that no longer belong
   // to anything.
   fOn("onResourceStop", (resource: unknown) => {
@@ -121,7 +121,7 @@ export function installTelemetry(): void {
       // measure slot for them, so the console is where a gap becomes visible.
       if (typeof batch.dropped === "number" && batch.dropped > 0) {
         console.log(
-          `[tLib] diagnostics: a client dropped ${batch.dropped} event(s) before sending — ` +
+          `[NLib] diagnostics: a client dropped ${batch.dropped} event(s) before sending — ` +
             "its own buffer was full, which means it was producing faults faster than it could report them."
         );
       }
@@ -143,7 +143,7 @@ export function installTelemetry(): void {
   /**
    * The consent answer, for the hub.
    *
-   *   local c = json.decode(exports.tLib:DiagConsent())
+   *   local c = json.decode(exports.NLib:DiagConsent())
    *   -- { enabled, source, locked, convarValue, convar }
    *
    * `locked` is what hides a switch. There is no `provisioned` field.

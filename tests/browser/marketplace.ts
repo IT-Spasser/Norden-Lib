@@ -35,9 +35,9 @@ const card = (text: string) =>
 try {
   page.on("pageerror", (e: Error) => errors.push(e.message));
   await page.addInitScript(() => {
-    (window as any).GetParentResourceName = () => "tLib";
+    (window as any).GetParentResourceName = () => "NLib";
   });
-  await page.route("https://tlib/**", async (route: any) => {
+  await page.route("https://nlib/**", async (route: any) => {
     calls.push({
       event: new URL(route.request().url()).pathname.slice(1),
       data: route.request().postDataJSON(),

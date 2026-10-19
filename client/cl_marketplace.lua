@@ -2,7 +2,7 @@
 -- requests to the server and relays the results back.
 --
 -- Browsing and UI previews are NOT fetched by the NUI any more. They used to
--- be, and it could not work: CEF's origin is `cfx-nui-tLib`, the marketplace
+-- be, and it could not work: CEF's origin is `cfx-nui-NLib`, the marketplace
 -- sends no Access-Control-Allow-Origin, so the browser refused the read and the
 -- panel listed nothing in tDetector and tRadar. Both now go NUI → here → the
 -- server bundle (`marketplaceBrowse` / `marketplacePreview` below), which also
@@ -12,7 +12,7 @@
 -- element load is exempt from CORS. Do not "fix" that one into a fetch.
 -- Anything that inspects or writes locally goes through the server.
 
-local log = Logger.create('tLib/marketplace')
+local log = Logger.create('NLib/marketplace')
 
 -- The payload both entry points send. Identical on purpose: the embedded
 -- browser in a dialog tab and the standalone modal are the same component, so
@@ -44,7 +44,7 @@ local function registerExports()
     --- picks 'uis' or 'sounds'. There is no per-TYPE filter — `opts.type` was
     --- forwarded here and documented for a while, and nothing in the browser
     --- ever read it. See `OpenData` in shared/ts/marketplace/ui/types.ts.
-    Platform.export('tLib', 'OpenMarketplace', function(opts)
+    Platform.export('NLib', 'OpenMarketplace', function(opts)
         opts = type(opts) == 'table' and opts or {}
         SendNUIMessage({ action = 'openMarketplace', data = buildPayload(opts) })
         SetNuiFocus(true, true)
@@ -61,12 +61,12 @@ local function registerExports()
     -- surface, and opening the modal on top of it is the overlay-on-an-overlay
     -- this exists to replace. Same payload as OpenMarketplace, different
     -- action, so a consumer can switch between the two by name alone.
-    Platform.export('tLib', 'ProvideMarketplaceData', function(opts)
+    Platform.export('NLib', 'ProvideMarketplaceData', function(opts)
         opts = type(opts) == 'table' and opts or {}
         SendNUIMessage({ action = 'marketplaceData', data = buildPayload(opts) })
     end)
 
-    Platform.export('tLib', 'CloseMarketplace', function()
+    Platform.export('NLib', 'CloseMarketplace', function()
         SendNUIMessage({ action = 'closeMarketplace' })
         SetNuiFocus(false, false)
     end)
@@ -86,26 +86,26 @@ RegisterNUICallback('marketplaceInstall', function(data, cb)
         return
     end
     local version = type(data.version) == 'string' and data.version or ''
-    TriggerServerEvent('tlib:marketplace:install', data.resource or '', data.type, data.slug, version)
+    TriggerServerEvent('nlib:marketplace:install', data.resource or '', data.type, data.slug, version)
 end)
 
 RegisterNUICallback('marketplaceUninstall', function(data, cb)
     cb(1)
     if type(data) ~= 'table' then return end
     if type(data.type) ~= 'string' or type(data.slug) ~= 'string' then return end
-    TriggerServerEvent('tlib:marketplace:uninstall', data.resource or '', data.type, data.slug)
+    TriggerServerEvent('nlib:marketplace:uninstall', data.resource or '', data.type, data.slug)
 end)
 
 -- Browsing goes through the server too. It looks like a read the NUI could do
--- itself, and it cannot: CEF's origin is `cfx-nui-tLib` and the marketplace
+-- itself, and it cannot: CEF's origin is `cfx-nui-NLib` and the marketplace
 -- host sends no Access-Control-Allow-Origin, so a direct fetch returns a body
 -- the browser will not let the page read. See `server/sv_marketplace.lua`.
 RegisterNUICallback('marketplaceBrowse', function(data, cb)
     cb(1)
     if type(data) ~= 'table' or type(data.requestId) ~= 'string' then return end
-    TriggerServerEvent('tlib:marketplace:browse', data)
+    TriggerServerEvent('nlib:marketplace:browse', data)
 end)
-RegisterNetEvent('tlib:marketplace:browseResult', function(result)
+RegisterNetEvent('nlib:marketplace:browseResult', function(result)
     SendNUIMessage({ action = 'marketplaceBrowseResult', data = result })
 end)
 
@@ -128,9 +128,9 @@ RegisterNUICallback('marketplaceLike', function(data, cb)
     -- `next` is the state being asked for rather than a toggle, so a retry after
     -- a timeout cannot invert anything. `== true` keeps a missing value meaning
     -- un-like, which is the direction that adds nothing to a public count.
-    TriggerServerEvent('tlib:marketplace:like', { requestId = data.requestId, slug = data.slug, next = data.next == true })
+    TriggerServerEvent('nlib:marketplace:like', { requestId = data.requestId, slug = data.slug, next = data.next == true })
 end)
-RegisterNetEvent('tlib:marketplace:likeResult', function(result)
+RegisterNetEvent('nlib:marketplace:likeResult', function(result)
     SendNUIMessage({ action = 'marketplaceLikeResult', data = result })
 end)
 
@@ -140,9 +140,9 @@ end)
 RegisterNUICallback('marketplacePreview', function(data, cb)
     cb(1)
     if type(data) ~= 'table' or type(data.requestId) ~= 'string' or type(data.slug) ~= 'string' then return end
-    TriggerServerEvent('tlib:marketplace:preview', data)
+    TriggerServerEvent('nlib:marketplace:preview', data)
 end)
-RegisterNetEvent('tlib:marketplace:previewResult', function(result)
+RegisterNetEvent('nlib:marketplace:previewResult', function(result)
     SendNUIMessage({ action = 'marketplacePreviewResult', data = result })
 end)
 
@@ -152,9 +152,9 @@ end)
 RegisterNUICallback('marketplaceThemeJson', function(data, cb)
     cb(1)
     if type(data) ~= 'table' or type(data.requestId) ~= 'string' or type(data.slug) ~= 'string' then return end
-    TriggerServerEvent('tlib:marketplace:themeJson', data)
+    TriggerServerEvent('nlib:marketplace:themeJson', data)
 end)
-RegisterNetEvent('tlib:marketplace:themeJsonResult', function(result)
+RegisterNetEvent('nlib:marketplace:themeJsonResult', function(result)
     SendNUIMessage({ action = 'marketplaceThemeJsonResult', data = result })
 end)
 
@@ -164,13 +164,13 @@ RegisterNUICallback('marketplaceInspect', function(data, cb)
     if type(data) ~= 'table' or type(data.resource) ~= 'string'
         or type(data.type) ~= 'string' or type(data.slug) ~= 'string'
         or type(data.requestId) ~= 'string' then return end
-    TriggerServerEvent('tlib:marketplace:inspect', data.resource, data.type, data.slug, data.requestId)
+    TriggerServerEvent('nlib:marketplace:inspect', data.resource, data.type, data.slug, data.requestId)
 end)
-RegisterNetEvent('tlib:marketplace:inspectResult', function(result)
+RegisterNetEvent('nlib:marketplace:inspectResult', function(result)
     SendNUIMessage({ action = 'marketplaceInspectResult', data = result })
 end)
 
-RegisterNetEvent('tlib:marketplace:installResult', function(result)
+RegisterNetEvent('nlib:marketplace:installResult', function(result)
     SendNUIMessage({ action = 'marketplaceInstallResult', data = result })
     if type(result) == 'table' and result.ok then
         -- Counts, not a path. The server no longer sends `installedAt` -- see the
@@ -189,7 +189,7 @@ RegisterNetEvent('tlib:marketplace:installResult', function(result)
     end
 end)
 
-RegisterNetEvent('tlib:marketplace:uninstallResult', function(result)
+RegisterNetEvent('nlib:marketplace:uninstallResult', function(result)
     SendNUIMessage({ action = 'marketplaceUninstallResult', data = result })
     if type(result) == 'table' and result.ok then
         log(('uninstalled "%s"'):format(tostring(result.slug)), 2)

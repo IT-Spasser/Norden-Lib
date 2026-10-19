@@ -54,7 +54,7 @@ local listeners = {}
 local cabinListeners = {}
 
 local function platform()
-    return tlib.platform
+    return nlib.platform
 end
 
 local function snapshot(netId)
@@ -333,7 +333,7 @@ end
 
 --- Opt-in periodic re-read of every tracked player, for consumers that read
 --- `frontSeats`/`controllerOf` passively rather than gating on `isFrontSeat`.
---- Deliberately not started by default: a tLib import should not spawn a thread
+--- Deliberately not started by default: a NLib import should not spawn a thread
 --- in every resource that happens to load it.
 function occupancy.startSweep(intervalMs)
     if occupancy._sweeping then return end
@@ -377,7 +377,7 @@ end)
 -- cache over the same natives, and one ping from a client repairs all of them.
 local lastMoved = {} -- [src] = timestamp
 
-RegisterNetEvent('tlib:occupancy:moved', function()
+RegisterNetEvent('nlib:occupancy:moved', function()
     local src = source
     local now = GetGameTimer()
     if lastMoved[src] and (now - lastMoved[src]) < 100 then return end

@@ -1,15 +1,15 @@
 // config.ts — realtime transport configuration.
 //
-// Realtime no longer owns a socket. It is a mount on tLib's router (`/rt`,
+// Realtime no longer owns a socket. It is a mount on NLib's router (`/rt`,
 // see server/http/mounts.ts), so the listen port and bind address are the
-// router's — `tlib_http_port` / `tlib_http_host`. The old `tlib_realtime_port`
-// and `tlib_realtime_host` convars are gone; setting them now does nothing.
+// router's — `nlib_http_port` / `nlib_http_host`. The old `nlib_realtime_port`
+// and `nlib_realtime_host` convars are gone; setting them now does nothing.
 //
-// tLib has no config file. Deployment-specific values come from FiveM convars,
+// NLib has no config file. Deployment-specific values come from FiveM convars,
 // read at boot.
 //
 // convars:
-//   set tlib_realtime_public_url  "ws://host:7777/rt"   # override the URL handed to clients
+//   set nlib_realtime_public_url  "ws://host:7777/rt"   # override the URL handed to clients
 //
 // `set`, not `setr`: it is read here, server-side. The resolved URL is sent to
 // clients over the wire, so the override itself never needs replicating.
@@ -34,7 +34,7 @@ export interface RealtimeConfig {
 
 export function resolveConfig(): RealtimeConfig {
   return {
-    publicUrlOverride: strConvar("tlib_realtime_public_url", "") || null,
+    publicUrlOverride: strConvar("nlib_realtime_public_url", "") || null,
     authTimeoutMs: 10_000,
     tokenTtlMs: 60_000,
     maxSessionsPerPlayer: 2,

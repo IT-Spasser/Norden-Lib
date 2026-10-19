@@ -1,5 +1,5 @@
 // Binds the Node-side RealtimeServer to FiveM's export and event surface: the
-// rt* exports are synchronous Lua -> Node calls, the __tlib:rt:* events are
+// rt* exports are synchronous Lua -> Node calls, the __nlib:rt:* events are
 // asynchronous Node -> Lua pushes.
 //
 // Consumer Lua never touches either. imports/realtime/server.lua wraps them so
@@ -13,16 +13,16 @@ import { fEmit, fExports } from "./fivem";
 import { getCachedIP } from "./public-ip";
 import type { RealtimeServer } from "./server";
 
-const EVT_CONNECT = "__tlib:rt:connect";
-const EVT_DISCONNECT = "__tlib:rt:disconnect";
-const EVT_EVENT = "__tlib:rt:event";
+const EVT_CONNECT = "__nlib:rt:connect";
+const EVT_DISCONNECT = "__nlib:rt:disconnect";
+const EVT_EVENT = "__nlib:rt:event";
 
 export function registerBridge(getServer: () => RealtimeServer, cfg: RealtimeConfig): void {
   // The port is the router's now, not realtime's — see server/http/config.ts.
   const routerPort = () => resolveHttpConfig().port;
   const currentWsUrl = () => composeWsUrl(cfg.publicUrlOverride, getCachedIP(), routerPort());
 
-  // getServer() starts the WS server on first call, so tLib opens no port until
+  // getServer() starts the WS server on first call, so NLib opens no port until
   // a consumer actually uses realtime.
 
   fExports("rtIssueToken", (playerId: unknown, meta?: unknown) => {
@@ -87,7 +87,7 @@ export function registerBridge(getServer: () => RealtimeServer, cfg: RealtimeCon
     if (typeof tokenEndpointIn !== "string" || tokenEndpointIn.length === 0)
       return { ok: false, error: "tokenEndpoint" };
     startControl({ license: licenseIn, tokenEndpoint: tokenEndpointIn }, (level, msg) => {
-      const prefix = "[tLib/realtime/control]";
+      const prefix = "[NLib/realtime/control]";
       if (level === "error") console.error(`${prefix} ${msg}`);
       else if (level === "warn") console.warn(`${prefix} ${msg}`);
       else console.log(`${prefix} ${msg}`);

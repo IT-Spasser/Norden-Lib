@@ -26,7 +26,7 @@ function clock(start = 1_000_000) {
 }
 
 const event = (n: number) => ({
-  event: "tlib.error_reported",
+  event: "nlib.error_reported",
   at: n,
   dimensions: { fingerprint: `000000${(n % 100).toString().padStart(2, "0")}` },
   measures: { causeDepth: 0 },
@@ -57,7 +57,7 @@ describe("the ring", () => {
 
   test("⚠️ a `stack` survives the queue, and ONLY on the event that may carry one", () => {
     /**
-     * `tlib.error_reported` is the only event with a `stack` slot, and it is a
+     * `nlib.error_reported` is the only event with a `stack` slot, and it is a
      * SIBLING of `dimensions` rather than a member of it — the charset would
      * refuse it there and the refusal costs the whole event. A `stack` on any
      * other event is refused too, so it is stripped here rather than sent.
@@ -65,7 +65,7 @@ describe("the ring", () => {
     const store = createStore(clock().now);
     store.accept(0, [{ ...event(1), stack: "TypeError: x\n    at f (nui/a.js:1)" }] as never);
     store.accept(0, [
-      { ...event(2), event: "tlib.crash_reported", stack: "should not travel" },
+      { ...event(2), event: "nlib.crash_reported", stack: "should not travel" },
     ] as never);
     const taken = store.takeEvents();
     expect(taken[0]?.stack).toContain("TypeError");

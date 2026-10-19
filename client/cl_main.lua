@@ -2,11 +2,11 @@
 
 Permission_registerClientExports()
 
-local ui = Platform.createUI('tLib', 'tLib/client/ui/index.html')
+local ui = Platform.createUI('NLib', 'NLib/client/ui/index.html')
 
 -- Functions cannot cross a resource boundary as themselves; storeCallback hands
 -- back a key the caller can invoke.
-Platform.export('tLib', 'Platform', function()
+Platform.export('NLib', 'Platform', function()
     local t = {}
     for k, v in pairs(Platform) do
         if type(v) == 'function' then
@@ -36,7 +36,7 @@ HudLayout.init(ui)
 MenuClient.init(ui)
 
 Platform.onShutdown(function()
-    if _TLIB_IS_FIVEM then
+    if _NLIB_IS_FIVEM then
         -- setKeepInputActive is a separate latch; releasing focus does not clear it.
         SetNuiFocusKeepInput(false)
         SetNuiFocus(false, false)
@@ -47,7 +47,7 @@ end)
 
 -- Defer readiness signals until the NUI page has loaded its JS bundle and
 -- registered its window message listeners. The callback runs once the browser
--- posts '__tlib_nui_ready' back to Lua, at which point the adapter flushes any
+-- posts '__nlib_nui_ready' back to Lua, at which point the adapter flushes any
 -- SendNUIMessage calls buffered during load.
 local _hasLoaded = false
 
@@ -59,4 +59,4 @@ Platform.onNUIReady(function()
     -- menu component inside it being mounted and able to accept a catalog.
 end)
 
-Platform.wrapExport('tLib', 'HasLoaded', function() return _hasLoaded end)
+Platform.wrapExport('NLib', 'HasLoaded', function() return _hasLoaded end)

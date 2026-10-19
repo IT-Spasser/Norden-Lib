@@ -1,4 +1,4 @@
--- tlib.config: startup validation of an owner-edited config.lua.
+-- nlib.config: startup validation of an owner-edited config.lua.
 --
 -- Every assertion here maps to a rule in
 -- the shared config standard these resources follow, which in turn exists
@@ -160,7 +160,7 @@ assert(ok == true, 'check() returns true for a valid config')
 ok = config.check({}, spec())
 assert(ok == false, 'check() returns false for an invalid one')
 
-print('PASS: tlib.config reports every problem, names file/key/expected/found/fix, ' ..
+print('PASS: nlib.config reports every problem, names file/key/expected/found/fix, ' ..
     'suggests typos, honours deprecations, and never silently substitutes')
 
 -- configured(): the owner's value survives runtime mutation
@@ -205,4 +205,4 @@ assert(broken and broken.detectionRangeMeters == 'far',
 assert(config.configured() == nil,
     'configured() with no file returns nil when several configs were validated')
 
-print('PASS: tlib.config.configured preserves the owner\'s values against runtime mutation')
+print('PASS: nlib.config.configured preserves the owner\'s values against runtime mutation')

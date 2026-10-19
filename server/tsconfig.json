@@ -33,7 +33,7 @@
     // mechanically, which is the only way it stays caught.
     //
     // They do NOT flag an unused EXPORT, and must not be read as doing so.
-    // tLib is a published library: "no importer in this repo" is the normal
+    // NLib is a published library: "no importer in this repo" is the normal
     // state of a public API file, and the orphan gate in `scripts/` is what
     // judges those, against the declared surface rather than the import graph.
     "noUnusedLocals": true,
@@ -47,8 +47,8 @@
     "types": ["bun"],
     "baseUrl": "..",
     "paths": {
-      "@tlib/shared": ["./shared/ts/index.ts"],
-      "@tlib/shared/*": ["./shared/ts/*"]
+      "@nlib/shared": ["./shared/ts/index.ts"],
+      "@nlib/shared/*": ["./shared/ts/*"]
     }
   },
   // Tests are colocated with their subjects here and are included deliberately:

@@ -16,7 +16,7 @@ local function host(side)
         CreateThreadNow = function(fn) env.immediate = true; fn() end,
         Wait = function(ms) return coroutine.yield(ms) end,
     }
-    env.GetCurrentResourceName = function() return 'tLib' end
+    env.GetCurrentResourceName = function() return 'NLib' end
     env.IsDuplicityVersion = function() return side == 'server' end
     env.GetGameTimer = function() return 4321 end
     env.GetInvokingResource = function() return 'consumer' end
@@ -55,7 +55,7 @@ local function host(side)
     env.GetPlayerPed = function(id) if id == 99 then error('disconnected') end; return 11 end
     env.GetPlayers = function() return { '42' } end
     env.LoadResourceFile = function(resource, path)
-        check(resource == 'tLib', 'platform import uses tLib resource')
+        check(resource == 'NLib', 'platform import uses NLib resource')
         -- loadfile is provided by the CLI; string.dump avoids relying on io.open,
         -- which the fengari runtime does not implement.
         return string.dump(assert(loadfile(path)))
@@ -92,12 +92,12 @@ for _, side in ipairs({'client', 'server'}) do
     end
     local p = env.Platform
     check(p.name == 'fivem' and p.isFiveM(), 'FiveM identity')
-    check(p.context().side == side and p.context().package == 'tLib', 'context follows host')
+    check(p.context().side == side and p.context().package == 'NLib', 'context follows host')
     check(p.context() == p.context(), 'context is cached')
     check(p.now() == 4321 and p.getInvokingResource() == 'consumer', 'clock and caller identity')
     check(not pcall(p._stub('missing')), 'unsupported capability raises an error')
     local fn = function() return 7 end
-    p.export('tLib', 'Probe', fn)
+    p.export('NLib', 'Probe', fn)
     -- `storeCallback` ONLY. This used to also assert `env.exported.Probe == fn`,
     -- which encoded `wrapExport` being a bare `exports(name, fn)` — and that was
     -- the bug: the function named after guarding an export body did not guard it,
@@ -144,9 +144,9 @@ for _, side in ipairs({'client', 'server'}) do
     p.onResourceStop(function(name) stopped[#stopped + 1] = name end)
     p.onShutdown(function() shutdown = shutdown + 1 end)
     env.emit('onResourceStop', 'consumer')
-    check(stopped[1] == 'consumer' and shutdown == 0, 'consumer cleanup does not shut down tLib')
-    env.emit('onResourceStop', 'tLib')
-    check(stopped[2] == 'tLib' and shutdown == 1, 'own shutdown runs with lifecycle cleanup')
+    check(stopped[1] == 'consumer' and shutdown == 0, 'consumer cleanup does not shut down NLib')
+    env.emit('onResourceStop', 'NLib')
+    check(stopped[2] == 'NLib' and shutdown == 1, 'own shutdown runs with lifecycle cleanup')
 
     if side == 'server' then
         check(env.nuiType == nil and not loaded['client/lib/adapter/player.lua'], 'server avoids client native loading')
@@ -227,11 +227,11 @@ for _, side in ipairs({'client', 'server'}) do
         p.Fetch({url = 'https://example.invalid'}, fn)
         check(env.http[2] == fn and env.http[3] == 'GET' and env.http[6].followLocation, 'HTTP native contract')
     else
-        check(env.nuiType == '__tlib_nui_ready', 'client installs NUI handshake')
+        check(env.nuiType == '__nlib_nui_ready', 'client installs NUI handshake')
         local ui = p.createUI('test', 'client/ui/index.html')
         p.sendUIEvent(ui, 'probe', {value = 2})
         check(env.message == nil and not p.isNUIReady(), 'messages buffer until browser ready')
-        env.emit('__cfx_nui:__tlib_nui_ready', {}, function(reply) check(reply.ok, 'ready reply') end)
+        env.emit('__cfx_nui:__nlib_nui_ready', {}, function(reply) check(reply.ok, 'ready reply') end)
         check(p.isNUIReady() and env.message.name == 'probe', 'ready flushes outbound messages')
         p.setInputMode(ui, 1); p.setKeepInputActive(ui, true)
         check(env.focus[1] and env.keepInput and p.getInputMode() == 1, 'focus/input preserved')
@@ -239,7 +239,7 @@ for _, side in ipairs({'client', 'server'}) do
         check(not env.focus[1] and not env.keepInput and p.getInputMode() == 0, 'focus release clears keep-input')
         local pressed, released = 0, 0
         p.bindKey('Enter', {press = function() pressed = pressed + 1 end, release = function() released = released + 1 end})
-        env.commands['+tLib_key_Enter'](); env.commands['-tLib_key_Enter']()
+        env.commands['+NLib_key_Enter'](); env.commands['-NLib_key_Enter']()
         check(pressed == 1 and released == 1 and env.mapping[4] == 'RETURN', 'key aliases and release mapping preserved')
         env.inVehicle = true
         check(p.getPlayerVehicle() == 22 and p.getVehicleNetId(22) == 99, 'vehicle native handles preserved')

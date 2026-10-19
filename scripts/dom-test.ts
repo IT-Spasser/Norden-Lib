@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * `bun run test:dom` — tLib's DOM component suite.
+ * `bun run test:dom` — NLib's DOM component suite.
  *
  * A wrapper rather than an inline `cd client/web && bun test …` for three
  * reasons, each of which is a way the inline form passes while measuring
@@ -88,7 +88,7 @@ const HAS_INTERNAL =
   existsSync(resolve(ROOT, "internal", "shared-ts", "ui", "undo-redo.tsx"));
 const DEFAULT_MINIMUM_TESTS = HAS_INTERNAL ? 126 : 126 - INTERNAL_ONLY_TESTS;
 
-const raw = process.env.TLIB_DOM_TEST_MIN;
+const raw = process.env.NLIB_DOM_TEST_MIN;
 let MINIMUM_TESTS = DEFAULT_MINIMUM_TESTS;
 if (raw !== undefined) {
   // `Number("")` is 0, not NaN, so a digits-only test is required rather
@@ -97,7 +97,7 @@ if (raw !== undefined) {
   const parsed = /^\d+$/.test(raw) ? Number(raw) : Number.NaN;
   if (!Number.isInteger(parsed) || parsed < 0) {
     console.error(
-      `test:dom: TLIB_DOM_TEST_MIN is not a non-negative integer: ${JSON.stringify(raw)}`
+      `test:dom: NLIB_DOM_TEST_MIN is not a non-negative integer: ${JSON.stringify(raw)}`
     );
     process.exit(1);
   }

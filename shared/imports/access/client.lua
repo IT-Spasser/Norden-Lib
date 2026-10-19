@@ -1,9 +1,9 @@
 --[[
-    tLib/shared/imports/access — the CLIENT MIRROR.
+    NLib/shared/imports/access — the CLIENT MIRROR.
 
     Usage in a consumer (client scripts):
 
-        local radio = tlib.access.gate({ key = 'radio' })
+        local radio = nlib.access.gate({ key = 'radio' })
 
         if radio:allowed() then showRadioButton() end
         radio:onChange(function(allowed) toggleRadioButton(allowed) end)
@@ -86,7 +86,7 @@ function access.gate(opts)
         value     = false,
         answered  = false,
         listeners = {},
-        event     = ('%s:tlib:access:%s'):format(RESOURCE, key),
+        event     = ('%s:nlib:access:%s'):format(RESOURCE, key),
     }, Gate)
 
     RegisterNetEvent(self.event, function(value) deliver(self, value) end)

@@ -31,7 +31,7 @@
  * The label split
  *
  * `installAction` returns a TOKEN, not a sentence. `INSTALL_ACTION_LABEL` is
- * the default English copy, which is what tLib's own NUI marketplace renders
+ * the default English copy, which is what NLib's own NUI marketplace renders
  * because that surface is English-only (every string in `ui/` is a literal).
  *
  * A host that localises — tRadio's panel runs every string through `t()` — maps

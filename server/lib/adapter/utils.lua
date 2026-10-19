@@ -1,8 +1,8 @@
--- tLib/server/lib/adapter/utils.lua
+-- NLib/server/lib/adapter/utils.lua
 -- HTTP fetch and misc utils
 
 
-if _TLIB_IS_FIVEM then
+if _NLIB_IS_FIVEM then
     function Platform.Fetch(opts, callback)
         PerformHttpRequest(
             opts.url,
@@ -17,6 +17,6 @@ else
     Platform.Fetch = Platform._stub('Fetch')
 end
 
-Platform.export('tLib', 'Fetch', function(opts, callback)
+Platform.export('NLib', 'Fetch', function(opts, callback)
     Platform.Fetch(opts, callback)
 end)

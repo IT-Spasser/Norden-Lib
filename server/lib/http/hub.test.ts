@@ -131,7 +131,7 @@ describe("every hub page is read-only", () => {
 
 // The diagnostics panel is GONE, and this is the test that stops it coming
 // back by accident. The hub is app discovery; the setting's state lives in
-// `tlib_telemetry_status`, and the per-install-id disclosure the panel carried
+// `nlib_telemetry_status`, and the per-install-id disclosure the panel carried
 // lives in `docs/content/convars.mdx`.
 describe("the hub carries no diagnostics surface", () => {
   test("no page mentions diagnostics, the convar or the install id", () => {
@@ -144,7 +144,7 @@ describe("the hub carries no diagnostics surface", () => {
     ]) {
       expect(html).not.toContain("Diagnostics");
       expect(html).not.toContain("diagnostics");
-      expect(html).not.toContain("tlib_telemetry");
+      expect(html).not.toContain("nlib_telemetry");
       expect(html).not.toContain("per-install id");
       expect(html).not.toContain("<h2");
       expect(html).not.toContain('class="panel"');
@@ -157,8 +157,8 @@ describe("the hub carries no diagnostics surface", () => {
     const html = renderIndex([app(), app({ mount: "/db", id: "db", title: "Database" })], "305 RP");
     console.log(html);
     expect(html).toContain("2 destinations available");
-    expect(html.indexOf("</ul>")).toBeLessThan(html.indexOf("<footer>tLib</footer>"));
+    expect(html.indexOf("</ul>")).toBeLessThan(html.indexOf("<footer>NLib</footer>"));
     // Nothing between the card list and the footer.
-    expect(html).toContain("</ul><footer>tLib</footer>");
+    expect(html).toContain("</ul><footer>NLib</footer>");
   });
 });

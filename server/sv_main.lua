@@ -1,9 +1,9 @@
 Discovery.registerExports()
 Permission.registerExports()
 ServerSettings.registerExports()
-Platform.wrapExport('tLib', 'HasLoaded', function() return true end)
+Platform.wrapExport('NLib', 'HasLoaded', function() return true end)
 
--- `ensure [folder]` can start dependents before tLib is ready.
+-- `ensure [folder]` can start dependents before NLib is ready.
 -- track which ones died during boot, restart them once we're up.
 local _failedDependents = {}
 local _booting = true
@@ -13,7 +13,7 @@ local _bootHandler = AddEventHandler('onResourceStop', function(res)
     if res ~= GetCurrentResourceName() then
         local n = GetNumResourceMetadata(res, 'dependency')
         for d = 0, n - 1 do
-            if GetResourceMetadata(res, 'dependency', d) == 'tLib' then
+            if GetResourceMetadata(res, 'dependency', d) == 'NLib' then
                 _failedDependents[res] = true
                 break
             end
@@ -33,14 +33,14 @@ CreateThread(function()
     RemoveEventHandler(_bootHandler)
 end)
 
-local vc = load(LoadResourceFile(GetCurrentResourceName(), 'shared/imports/versioncheck/server.lua'), '@@tLib/shared/imports/versioncheck/server.lua')()
+local vc = load(LoadResourceFile(GetCurrentResourceName(), 'shared/imports/versioncheck/server.lua'), '@@NLib/shared/imports/versioncheck/server.lua')()
 
 vc({
-    name    = 'tLib',
+    name    = 'NLib',
     current = GetResourceMetadata(GetCurrentResourceName(), 'version', 0),
     author  = 'TIMMYG Studios',
     fetch   = vc.github('tommy141x/tLib'),
-    -- tLib printed more loose startup lines than any other resource here --
+    -- NLib printed more loose startup lines than any other resource here --
     -- `listening on`, `hub:`, the spawn catalogue, and a full command line per
     -- spawned process -- while its own banner carried nothing but a version.
     -- These two rows are the facts worth keeping; the rest is gone or shortened
@@ -51,7 +51,7 @@ vc({
     -- refuses to draw because an optional subsystem is absent is worse than one
     -- with a missing row.
     info = {
-        { key = 'Hub',    event = 'tlib:vcInfo:hub' },
-        { key = 'Spawns', event = 'tlib:vcInfo:spawns' },
+        { key = 'Hub',    event = 'nlib:vcInfo:hub' },
+        { key = 'Spawns', event = 'nlib:vcInfo:spawns' },
     },
 })

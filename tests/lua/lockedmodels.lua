@@ -52,7 +52,7 @@ check('nil model is not locked', m.isLocked(nil) == false)
 
 -- Configured
 
-convars = { tlib_locked_models = '18charger21tr,fpiu21tr' }
+convars = { nlib_locked_models = '18charger21tr,fpiu21tr' }
 m = load_module()
 check('locks a configured name', m.isLocked('18charger21tr') == true)
 check('locks the second name', m.isLocked('fpiu21tr') == true)
@@ -67,7 +67,7 @@ check('list() is a copy', m.isLocked('18charger21tr') == true)
 
 -- Case and whitespace: a server.cfg value is typed by a human
 
-convars = { tlib_locked_models = ' 18Charger21TR , FPIU21tr ' }
+convars = { nlib_locked_models = ' 18Charger21TR , FPIU21tr ' }
 m = load_module()
 check('matching is case-insensitive', m.isLocked('18charger21tr') == true)
 check('whitespace around entries is ignored', m.isLocked('fpiu21tr') == true)
@@ -75,7 +75,7 @@ check('a mixed-case query matches too', m.isLocked('FPIU21TR') == true)
 
 -- Hash forms: tUnit keys by hash-as-string, tELS by name
 
-convars = { tlib_locked_models = '18charger21tr' }
+convars = { nlib_locked_models = '18charger21tr' }
 m = load_module()
 local signed = GetHashKey('18charger21tr')
 local unsigned = signed < 0 and signed + 0x100000000 or signed
@@ -88,7 +88,7 @@ check('an unrelated hash is not locked', m.isLocked(tostring(GetHashKey('police3
 -- assertion above that depends on it must flip. A set that matched everything,
 -- or nothing, would otherwise pass half of this file by accident.
 
-convars = { tlib_locked_models = '' }
+convars = { nlib_locked_models = '' }
 m = load_module()
 check('control: an empty value locks nothing', m.isLocked('18charger21tr') == false)
 check('control: and reports nothing configured', m.any() == false)

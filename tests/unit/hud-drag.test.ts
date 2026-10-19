@@ -5,7 +5,7 @@
 // `matches` covers exactly the selector grammar HUD_CONTROL_SELECTOR uses and
 // nothing else — it is a harness, not a claim about CEF's selector engine. Two
 // things carry that claim instead: `selector covers every element HudBinder
-// attaches a listener to`, which reads tLib's own binder source rather than a
+// attaches a listener to`, which reads NLib's own binder source rather than a
 // list written from memory, and running the real thing in the game.
 
 import { afterAll, beforeAll, beforeEach, expect, test } from "bun:test";
@@ -241,7 +241,7 @@ test("a control's DESCENDANT is not grab surface either", () => {
   s.detach();
 });
 
-// Mutation proof: the guard is derived from tLib's own binder, not from memory.
+// Mutation proof: the guard is derived from NLib's own binder, not from memory.
 // A skin element is a CONTROL precisely when HudBinder attaches an event
 // listener to it, so that — and not a list written here — is what the guard has
 // to cover. Bind a second attribute in hud-template.ts and this fails, instead
@@ -401,7 +401,7 @@ test("the surface cannot be dragged off screen, on either axis or either side", 
     up();
     for (const layout of [previewed, s.layout]) {
       const rect = layoutRect(REMOTE, layout, s.viewport);
-      // tLib's universal rule: min(extent, viewportAxis, max(96, extent * 0.4)).
+      // NLib's universal rule: min(extent, viewportAxis, max(96, extent * 0.4)).
       const needX = Math.min(rect.width, s.viewport.width, Math.max(96, rect.width * 0.4));
       const needY = Math.min(rect.height, s.viewport.height, Math.max(96, rect.height * 0.4));
       expect(rect.left).toBeGreaterThanOrEqual(needX - rect.width - 1e-6);
@@ -486,7 +486,7 @@ test("a press that twitches below the threshold is still a click", () => {
   // A zero-delta `pointermove` is routine (pressure, tilt, CEF's own on
   // button-down) and so is a 1-2px twitch during a click, so "a pointermove
   // arrived" cannot be what makes a press a drag: every tap on the chassis
-  // would re-commit the placement, which in tLib is a KVP write.
+  // would re-commit the placement, which in NLib is a KVP write.
   for (const [dx, dy] of [
     [0, 0],
     [2, 0],

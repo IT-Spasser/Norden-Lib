@@ -1,5 +1,5 @@
 /**
- * The payloads `scripts/gallery.ts` posts at tLib's UI to photograph it.
+ * The payloads `scripts/gallery.ts` posts at NLib's UI to photograph it.
  *
  * Deliberately NOT the fixtures in `tests/browser/*.ts`. Those are chosen to break things —
  * a 40-character label, a field with no options, a toast that never expires — because that is

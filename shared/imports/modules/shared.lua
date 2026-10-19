@@ -1,11 +1,11 @@
 -- Finds and loads content modules: a folder plus a `module.json` that declares
 -- what it is.
 --
---   tlib.modules.scan('layouts', 'layout')        -> { 'DRX-330', 'QRX-720' }
---   tlib.modules.scan('layouts/themes', 'theme')  -> { 'basic', 'dark' }
---   tlib.modules.load('layouts', 'QRX-720', 'ui.html')
+--   nlib.modules.scan('layouts', 'layout')        -> { 'DRX-330', 'QRX-720' }
+--   nlib.modules.scan('layouts/themes', 'theme')  -> { 'basic', 'dark' }
+--   nlib.modules.load('layouts', 'QRX-720', 'ui.html')
 --
--- Only scan/list/read need a directory listing, which comes from tLib's Node
+-- Only scan/list/read need a directory listing, which comes from NLib's Node
 -- bundle; `load` is a plain LoadResourceFile.
 --
 -- shared/ts/modules/manifest.ts is the written-out contract; this file is the
@@ -44,20 +44,20 @@ modules.RESERVED = { sounds = true, themes = true }
 --- @param id string
 --- @param err string
 function modules.onRefusal(basePath, id, err)
-    print(('[tLib/modules] skipped %s/%s — %s'):format(basePath, id, err))
+    print(('[NLib/modules] skipped %s/%s — %s'):format(basePath, id, err))
 end
 
 --- Folder names directly under basePath.
 ---
 --- FiveM's server Lua sandbox cannot enumerate a directory at all: io.popen is
 --- nil and io.readdir returns an empty list for every path, including the
---- resource's own root. So the listing comes from tLib's Node bundle. io.popen is
+--- resource's own root. So the listing comes from NLib's Node bundle. io.popen is
 --- kept as a second chance for a test harness or a runtime with no export; note
 --- the platform test is `OS ~= nil`, because the FiveM server reports "Windows"
 --- and an equality check against "Windows_NT" sent a `ls` to cmd.exe.
 local function listDirs(resourceName, basePath)
     local ok, encoded = pcall(function()
-        return exports.tLib:ListResourceDirs(resourceName, basePath)
+        return exports.NLib:ListResourceDirs(resourceName, basePath)
     end)
     if ok and type(encoded) == "string" then
         local decoded = json and json.decode(encoded)
@@ -89,13 +89,13 @@ end
 ---
 --- LoadResourceFile answers from the index built when the resource started, so a
 --- module dropped in afterwards is on disk but invisible until a restart. That
---- live-scan property IS the drop-in install mechanism, so fall through to tLib's
+--- live-scan property IS the drop-in install mechanism, so fall through to NLib's
 --- Node bundle before deciding the module is not there.
 local function readFile(resourceName, relPath)
     local contents = LoadResourceFile(resourceName, relPath)
     if contents and contents ~= '' then return contents end
     local ok, encoded = pcall(function()
-        return exports.tLib:ReadResourceFile(resourceName, relPath)
+        return exports.NLib:ReadResourceFile(resourceName, relPath)
     end)
     if ok and type(encoded) == "string" and encoded ~= '' then return encoded end
     return nil
@@ -239,7 +239,7 @@ end
 function modules.validate(raw, id, kind)
     if type(raw) ~= 'table' then return nil, 'module.json: expected a JSON object' end
     if raw.schema ~= modules.SCHEMA then
-        return nil, ('module.json: declares schema %s; this tLib understands %d')
+        return nil, ('module.json: declares schema %s; this NLib understands %d')
             :format(tostring(raw.schema), modules.SCHEMA)
     end
     if type(raw.kind) ~= 'string' or not modules.KINDS[raw.kind] then
@@ -321,7 +321,7 @@ function modules.list(basePath, kind, resourceName)
     resourceName = resourceName or GetCurrentResourceName()
 
     if type(kind) ~= 'string' or not modules.KINDS[kind] then
-        error('tlib.modules: kind must be one of layout, theme', 2)
+        error('nlib.modules: kind must be one of layout, theme', 2)
     end
     if not basePath:match('^[%w%-%_/\\%.]+$') then return {} end
 
@@ -377,7 +377,7 @@ function modules.hasFile(basePath, id, fileName, resourceName)
         return true
     end
     local ok, encoded = pcall(function()
-        return exports.tLib:ListResourceFiles(resourceName, basePath .. '/' .. id)
+        return exports.NLib:ListResourceFiles(resourceName, basePath .. '/' .. id)
     end)
     if not ok or type(encoded) ~= 'string' then return false end
     local decodeOk, files = pcall(function() return json.decode(encoded) end)

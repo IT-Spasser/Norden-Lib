@@ -1,7 +1,7 @@
 --[[
-    tLib — the one writer of a resource's JSON data file (server)
+    NLib — the one writer of a resource's JSON data file (server)
 
-        local store = tlib.jsonstore.open({ log = tlib.logger.create('tDetector') })
+        local store = nlib.jsonstore.open({ log = nlib.logger.create('tDetector') })
 
         store:section('props')            -- the section, or an empty table
         store:write({ props = placements })
@@ -114,7 +114,7 @@ function Store:write(sections)
             return
         end
 
-        local didWrite, werr = tlib.fs.writeResourceFile(self.file, encoded, self.resource, self._log)
+        local didWrite, werr = nlib.fs.writeResourceFile(self.file, encoded, self.resource, self._log)
         if not didWrite then
             local names = {}
             for name in pairs(sections) do names[#names + 1] = tostring(name) end
@@ -130,7 +130,7 @@ function Store:write(sections)
 
     if not ok then self._log('jsonstore: ' .. tostring(err), self._levels.ERROR) end
 
-    tlib.telemetry.record('jsonstore:write', 150, ((GetGameTimer and GetGameTimer()) or 0) - startedAt)
+    nlib.telemetry.record('jsonstore:write', 150, ((GetGameTimer and GetGameTimer()) or 0) - startedAt)
 
     self._saving = false
 
@@ -168,13 +168,13 @@ function Store:_replace(doc)
     local encOk, encoded = pcall(json.encode, doc)
     if not encOk then return false, ('json.encode failed (%s)'):format(tostring(encoded)) end
 
-    local didWrite, werr = tlib.fs.writeResourceFile(self.file, encoded, self.resource, self._log)
+    local didWrite, werr = nlib.fs.writeResourceFile(self.file, encoded, self.resource, self._log)
     if not didWrite then return false, tostring(werr) end
     return true
 end
 
 --- Set the write-behind mirror when a "successful" write did not reach the disk
---- -- the normal case under `tlib_demo`. Verified by re-probing rather than
+--- -- the normal case under `nlib_demo`. Verified by re-probing rather than
 --- trusted, because a dropped write is indistinguishable from a real one at the
 --- return value.
 function Store:_mirrorIfDropped(doc, owner, version)
@@ -198,7 +198,7 @@ end
 --- @return string|nil name, string|nil err
 function Store:_backup(raw, fromVersion)
     local name = ('%s.v%s.bak'):format(self.file, tostring(fromVersion))
-    local ok, err = tlib.fs.writeResourceFile(name, raw, self.resource, self._log)
+    local ok, err = nlib.fs.writeResourceFile(name, raw, self.resource, self._log)
     if not ok then return nil, tostring(err) end
     return name
 end
@@ -276,7 +276,7 @@ end
 ---   backup  string|nil   where the pre-migration bytes went
 ---   reason  string|nil   why, when the action is a refusal
 function Store:ensure(schema)
-    assert(type(schema) == 'table', 'tlib.jsonstore: ensure needs a schema table')
+    assert(type(schema) == 'table', 'nlib.jsonstore: ensure needs a schema table')
     local owner = schema.owner or self.resource
 
     self._schemaResults = self._schemaResults or {}
@@ -309,7 +309,7 @@ function Store:_ensure(schema, owner)
 
         if schema.quarantine then
             local name = ('%s.corrupt.%d'):format(self.file, os.time())
-            local ok = tlib.fs.writeResourceFile(name, raw, self.resource, self._log)
+            local ok = nlib.fs.writeResourceFile(name, raw, self.resource, self._log)
             if ok then
                 result.quarantine = name
                 self._log(('jsonstore: a copy of the unparseable %s was parked at %s')
@@ -518,7 +518,7 @@ end
 --- rather than aspirational. See docs/internal/jsonstore.md.
 ---
 --- @param opts table
----   log       function  a tlib.logger.create handle. Required: every recovery
+---   log       function  a nlib.logger.create handle. Required: every recovery
 ---                       branch below is silent without it, and a silent
 ---                       recovery is the failure this module exists to end.
 ---   file      string?   default 'data.json'
@@ -529,7 +529,7 @@ end
 --- @return table store
 function JsonStore.open(opts)
     opts = opts or {}
-    assert(type(opts.log) == 'function', 'tlib.jsonstore.open: opts.log is required')
+    assert(type(opts.log) == 'function', 'nlib.jsonstore.open: opts.log is required')
 
     local resource = opts.resource or GetCurrentResourceName()
     local file = opts.file or 'data.json'
@@ -541,7 +541,7 @@ function JsonStore.open(opts)
             resource = resource,
             file     = file,
             _log     = opts.log,
-            _levels  = tlib.logger,
+            _levels  = nlib.logger,
             _saving  = false,
             _pending = nil,
         }, Store)

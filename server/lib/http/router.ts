@@ -52,7 +52,7 @@ export class Router {
         this.log(
           "error",
           `port ${this.cfg.port} is already in use — the hub and every resource ` +
-            `behind it will be unreachable. Set 'tlib_http_port' to a free port.`
+            `behind it will be unreachable. Set 'nlib_http_port' to a free port.`
         );
       } else {
         this.log("error", `listener error: ${err.message}`);

@@ -4,7 +4,7 @@
  * A history is an OBJECT you construct, one per editor, and nesting is expressed
  * by nesting the objects. The module-level singleton it replaced was a live bug
  * the moment a second editor exists on a page, and one already does: tRadio's
- * settings app hosts tLib's shared `PropEditor` inside itself, so one Ctrl+Z
+ * settings app hosts NLib's shared `PropEditor` inside itself, so one Ctrl+Z
  * walked the outer app's history and restored state the player cannot see. There
  * is deliberately no default instance exported.
  *

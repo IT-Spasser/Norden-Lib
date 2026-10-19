@@ -27,7 +27,7 @@ end
 -- host
 local env = setmetatable({}, { __index = _G })
 env._G = env
-env._TLIB_IS_FIVEM = true
+env._NLIB_IS_FIVEM = true
 env.handlers = {}
 env.nextCookie = 0
 
@@ -60,11 +60,11 @@ env.TriggerServerEvent = function() end
 -- a fake filesystem with FiveM's real refusal rules
 --
 -- `files[resource][path] = contents`. `writable[resource]` mirrors the measured
--- native: only a resource tLib is allowed to write into accepts a write, an
+-- native: only a resource NLib is allowed to write into accepts a write, an
 -- unknown resource raises, and everything else returns false.
-local files = { tLib = {}, consumer = {}, vehicle = {}, other = {} }
-local writable = { tLib = true }
-local existing = { tLib = true, consumer = true, vehicle = true, other = true }
+local files = { NLib = {}, consumer = {}, vehicle = {}, other = {} }
+local writable = { NLib = true }
+local existing = { NLib = true, consumer = true, vehicle = true, other = true }
 
 env.LoadResourceFile = function(resource, path)
     return (files[resource] or {})[path]
@@ -89,7 +89,7 @@ env.GetResourceByFindIndex = function(i) return env.resourceList[i + 1] end
 env.GetResourceState = function() return 'started' end
 env.GetHashKey = function(s) return #tostring(s) end
 env.GetInvokingResource = function() return 'consumer' end
-env.GetCurrentResourceName = function() return 'tLib' end
+env.GetCurrentResourceName = function() return 'NLib' end
 
 -- Which resources ship a server bundle and so register their OWN
 -- `WriteResourceFile`. This is the whole cross-resource write mechanism: an
@@ -97,7 +97,7 @@ env.GetCurrentResourceName = function() return 'tLib' end
 -- target and the sandbox has nothing to object to. `vehicle` is deliberately
 -- absent -- a plain asset pack has no bundle, which is the one case that
 -- genuinely has to be staged.
-local hasBridge = { tLib = true, other = true }
+local hasBridge = { NLib = true, other = true }
 
 -- Each resource's own Node exports, modelling the real refusal rules:
 -- `exports[X]:WriteResourceFile(X, ...)` writes, and `exports[X]` asked to
@@ -123,7 +123,7 @@ env.exports = setmetatable({}, {
                         return true
                     end
                 end
-                if resourceName == 'tLib' and method == 'AppendToManifest' then
+                if resourceName == 'NLib' and method == 'AppendToManifest' then
                     return function(_self, target, key, filePath)
                         if not writable[target] then return false end
                         env.manifestWrites[#env.manifestWrites + 1] =
@@ -205,7 +205,7 @@ end
 
 -- 1. a refused export is a failure, and stages the file
 seedLocal()
-writable = { tLib = true }
+writable = { NLib = true }
 local disc = create()
 check(disc:getConfigs().car ~= nil, 'the local config loaded')
 
@@ -217,8 +217,8 @@ check(info.errorKind == 'denied', 'the sandbox refusal is identified as a permis
 check(targetPath == 'demo.json', 'the target path comes from the vehicle manifest')
 
 -- The staged copy is the file the vehicle should end up with, contents and all.
-local staged = fileTable('tLib', 'export-staging/vehicle/demo.json')
-check(staged ~= nil, 'the finished file is written into tLib where a write is always allowed')
+local staged = fileTable('NLib', 'export-staging/vehicle/demo.json')
+check(staged ~= nil, 'the finished file is written into NLib where a write is always allowed')
 check(staged.car.siren.maxHz == 745, 'and it contains the exported config')
 check(staged.car._local == nil, 'with the internal _local marker stripped')
 check(info.stagedPath == 'export-staging/vehicle/demo.json', 'the staged path is reported back')
@@ -231,7 +231,7 @@ check(info.stagedPath == 'export-staging/vehicle/demo.json', 'the staged path is
 -- halves are asserted, because the staging case passes just as well when the
 -- bridge attempt was never made at all.
 seedLocal()
-writable = { tLib = true }   -- SaveResourceFile still refuses everything else
+writable = { NLib = true }   -- SaveResourceFile still refuses everything else
 local bridgeDisc = create()
 env.logs = {}
 local bOk, bPath, bInfo = bridgeDisc:exportConfig('car', 'other')
@@ -241,11 +241,11 @@ check(bInfo.status ~= 'staged', 'and is NOT staged -- staging is only for a targ
 local delivered = fileTable('other', bPath)
 check(delivered ~= nil and delivered.car ~= nil, 'the config reached the target resource itself')
 check(delivered.car.siren.maxHz == 745, 'with its contents intact')
-check(fileTable('tLib', 'export-staging/other/' .. tostring(bPath)) == nil,
-    'and nothing was staged into tLib for it')
+check(fileTable('NLib', 'export-staging/other/' .. tostring(bPath)) == nil,
+    'and nothing was staged into NLib for it')
 
 -- The three steps. There is deliberately NO "one-time grant" line any more:
--- `add_filesystem_permission tLib write *` was measured and does not lift the
+-- `add_filesystem_permission NLib write *` was measured and does not lift the
 -- refusal, because the sandbox objects to which resource is writing. These
 -- assertions used to require that advice; they now require its ABSENCE, so a
 -- future edit cannot quietly put false instructions back in front of operators.
@@ -270,7 +270,7 @@ print('PASS discovery-export: a refused write fails honestly, stages the file an
 -- 2. with the write permitted, the export completes
 seedLocal()
 files.vehicle = {}
-writable = { tLib = true, consumer = true, vehicle = true }   -- the blanket grant is on
+writable = { NLib = true, consumer = true, vehicle = true }   -- the blanket grant is on
 disc = create()
 env.logs = {}
 ok, targetPath, info = disc:exportConfig('car', 'vehicle')
@@ -317,7 +317,7 @@ print('PASS discovery-export: a raising target is caught, not left to unwind (' 
 -- 5. move back to local really removes the external copy
 seedLocal()
 files.vehicle = {}
-writable = { tLib = true, consumer = true, vehicle = true }
+writable = { NLib = true, consumer = true, vehicle = true }
 disc = create()
 check(disc:exportConfig('car', 'vehicle') == true, 'exported first')
 check(fileTable('vehicle', 'demo.json').car ~= nil, 'the vehicle holds it')
@@ -335,7 +335,7 @@ print('PASS discovery-export: move back to local deletes the external copy (' ..
 -- 6. …and says so when it cannot
 seedLocal()
 files.vehicle = {}
-writable = { tLib = true, consumer = true, vehicle = true }
+writable = { NLib = true, consumer = true, vehicle = true }
 disc = create()
 check(disc:exportConfig('car', 'vehicle') == true, 'exported first')
 writable.vehicle = nil   -- the grant goes away before the move back
@@ -367,7 +367,7 @@ print('PASS discovery-export: hasMetadata reflects GetResourceMetadata (' .. che
 -- 8. the net handler never reports a success that did not happen
 seedLocal()
 files.vehicle = {}
-writable = { tLib = true }
+writable = { NLib = true }
 disc = create()
 env.replies = {}
 emit('demo:exportConfig', 'car', 'vehicle')

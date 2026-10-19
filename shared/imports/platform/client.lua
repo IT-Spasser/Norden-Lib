@@ -1,9 +1,9 @@
--- Platform adapter for consumer resource VMs. tLib's own VM has an equivalent
+-- Platform adapter for consumer resource VMs. NLib's own VM has an equivalent
 -- surface in shared/lib/adapter/; the two are separate copies because a consumer's
--- natives must be invoked from the consumer's VM, not through a tLib export.
+-- natives must be invoked from the consumer's VM, not through a NLib export.
 
 if type(GetCurrentResourceName) ~= "function" or type(IsDuplicityVersion) ~= "function" then
-    error("[tLib] Unsupported runtime: only the FiveM platform adapter is available", 0)
+    error("[NLib] Unsupported runtime: only the FiveM platform adapter is available", 0)
 end
 
 local platform = { _engine = "fivem" }
@@ -379,7 +379,7 @@ platform.releaseCursor = releaseNuiFocus
 
 -- NUI focus with mode-level control. Mode 1 = cursor visible + UI input;
 -- mode 0 = cursor hidden, game input. Mirrors Platform.setInputMode in the
--- tLib VM so consumer code can call the same name either side.
+-- NLib VM so consumer code can call the same name either side.
 function platform.setInputMode(mode)
     if mode == 1 then
         SetNuiFocus(true, true)
@@ -430,7 +430,7 @@ end
 ---   click, and the only cure is exiting and re-entering. Exit-then-reopen
 ---   inside one frame is an ordinary user action: `/telsedit` is a toggle, and
 ---   tELS's settings dialog opens the editor immediately after closing itself.
---- - `tLib/client/cl_layout.lua` warns about the third part: never try to
+--- - `NLib/client/cl_layout.lua` warns about the third part: never try to
 ---   re-acquire focus from a deferred thread. This only ever releases.
 ---
 --- `session` is a snapshot of the caller's generation counter and `current` a
@@ -548,7 +548,7 @@ do
     ---
     --- That list is flat, sorted by resource, and shows only this string. Five
     --- different formats currently ship ("ELS: X", "Radio - X", "tDetector: x",
-    --- "LED Editor: X", and tLib's own bare "Open Menu"), so a player scanning
+    --- "LED Editor: X", and NLib's own bare "Open Menu"), so a player scanning
     --- ~70 rows cannot tell which product a row belongs to.
     ---
     --- The unbound suffix generalises a habit only tELS had: an entry with no
@@ -566,27 +566,27 @@ do
         return text
     end
 
-    -- Same resolution the other shared/imports modules use: `tlib.name` when the
-    -- table is present, falling back to the literal. `tLibName` in imports.lua is
+    -- Same resolution the other shared/imports modules use: `nlib.name` when the
+    -- table is present, falling back to the literal. `NLibName` in imports.lua is
     -- a local there and is NOT visible in a module chunk's environment.
-    local tLibName = (type(tlib) == 'table' and tlib.name) or 'tLib'
+    local NLibName = (type(nlib) == 'table' and nlib.name) or 'NLib'
 
     local function record(entry)
         _registry[#_registry + 1] = entry
-        -- Best-effort report to tLib so conflicts can be found ACROSS resources.
+        -- Best-effort report to NLib so conflicts can be found ACROSS resources.
         -- Intra-resource conflicts are findable here; the live ones are not —
         -- tELS's PA mic and tRadio's push-to-talk both default to B, and neither
         -- VM can see the other.
         --
         -- The pcall is NOT a version fallback — this module and
-        -- client/cl_keybinds.lua's `ReportKeybind` ship in the same tLib and
+        -- client/cl_keybinds.lua's `ReportKeybind` ship in the same NLib and
         -- cannot disagree about whether the export exists. It is there because
-        -- consumers call bindKey at FILE SCOPE, so tLib's own client VM may not
+        -- consumers call bindKey at FILE SCOPE, so NLib's own client VM may not
         -- have registered its exports yet, and a missing export RAISES rather
         -- than returning nil. A diagnostic must never take a player's keybinds
         -- down with it.
         pcall(function()
-            exports[tLibName]:ReportKeybind(entry)
+            exports[NLibName]:ReportKeybind(entry)
         end)
     end
 

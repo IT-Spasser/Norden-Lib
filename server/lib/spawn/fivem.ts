@@ -20,7 +20,7 @@ const g = globalThis as unknown as {
 
 export const fExports: ExportsFn = g.exports;
 export const fOn: OnFn = g.on;
-/** Used to feed tLib's own startup banner rather than printing extra lines. */
+/** Used to feed NLib's own startup banner rather than printing extra lines. */
 export const fEmit: EmitFn = g.emit;
 
 /**
@@ -79,8 +79,8 @@ export function resourceAuthors(resourceName: string): string[] {
 
 export function currentResource(): string {
   try {
-    return g.GetCurrentResourceName?.() ?? "tLib";
+    return g.GetCurrentResourceName?.() ?? "NLib";
   } catch {
-    return "tLib";
+    return "NLib";
   }
 }

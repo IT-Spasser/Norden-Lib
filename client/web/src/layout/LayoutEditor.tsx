@@ -1,4 +1,4 @@
-import { createEscapeLayer } from "@tlib/shared/escape-layer";
+import { createEscapeLayer } from "@nlib/shared/escape-layer";
 import {
   type Anchor,
   anchors,
@@ -20,9 +20,9 @@ import {
   sameLayout,
   scaleLayout,
   type Viewport,
-} from "@tlib/shared/hud-geometry";
-import { UndoHistory, type UndoState } from "@tlib/shared/undo";
-import { createUndoScope } from "@tlib/shared/undo-keys";
+} from "@nlib/shared/hud-geometry";
+import { UndoHistory, type UndoState } from "@nlib/shared/undo";
+import { createUndoScope } from "@nlib/shared/undo-keys";
 import {
   Check,
   Grip,
@@ -134,7 +134,7 @@ export default function LayoutEditor() {
    * stack that threw it away without asking: tELS prompts, the prop editor
    * prompts, tAFK prompts" — was WRONG about the prop editor, and being wrong
    * here sent a later audit down the wrong path. tELS and tAFK did prompt;
-   * tLib's own shared `PropEditor` did not, and had no dirty tracking anywhere
+   * NLib's own shared `PropEditor` did not, and had no dirty tracking anywhere
    * in its chain — Escape and Cancel both called `propEditorCancel` straight
    * out, in tRadar, tDetector and tRadio simultaneously. It prompts now, off the
    * same `isDirty()` this editor uses, so the claim is finally true; it was not
@@ -159,7 +159,7 @@ export default function LayoutEditor() {
    * One instance, scoped to this editor.
    *
    * This used to be `LayoutHistory`, a class that lived next door and was
-   * hard-typed to `Layout`. It is gone; `@tlib/shared/undo`'s `UndoHistory` is
+   * hard-typed to `Layout`. It is gone; `@nlib/shared/undo`'s `UndoHistory` is
    * the one primitive for the estate and carries both of the things that class
    * knew — `remove(key)` and a no-op guard — as general capabilities. The guard
    * is `sameLayout`, passed per tag at `register()` rather than hard-coded,
@@ -674,7 +674,7 @@ export default function LayoutEditor() {
       // about paint: focus walked straight through to Save, Cancel and the reset
       // buttons behind it, and Enter then pressed one.
       const scope =
-        (discarding() && surface.querySelector<HTMLElement>(".tlib-nui-confirm")) || surface;
+        (discarding() && surface.querySelector<HTMLElement>(".nlib-nui-confirm")) || surface;
       const controls = [...scope.querySelectorAll<HTMLElement>("button:not(:disabled)")].filter(
         (control) => control.tabIndex >= 0
       );
@@ -698,14 +698,14 @@ export default function LayoutEditor() {
      * for the same reason Escape is a registered layer: a raw window listener
      * has no notion of depth, so a press another editor has already consumed
      * still reaches this one. That is not hypothetical for the estate this
-     * primitive is for; tRadio's settings app hosts tLib's shared PropEditor
+     * primitive is for; tRadio's settings app hosts NLib's shared PropEditor
      * inside itself, and two raw listeners means one press undoes in both.
      */
     const direction = arrows[event.key],
       component = active();
     // The panel's own drag handle owns arrows while it is focused.
     if (!direction || !component || gesture?.pointer !== undefined) return;
-    if ((event.target as HTMLElement | null)?.closest(".tlib-layout__drag")) return;
+    if ((event.target as HTMLElement | null)?.closest(".nlib-layout__drag")) return;
     event.preventDefault();
     flushWheel();
     if (!gesture) {
@@ -763,7 +763,7 @@ export default function LayoutEditor() {
     // The question is about a session that no longer exists. Left standing, it
     // was still standing over the NEXT session: the watchdog closing the editor
     // (focus loss, a dialog, a dead renderer) with the prompt up meant the next
-    // `/tlibhud` opened straight into "Discard layout changes".
+    // `/nlibhud` opened straight into "Discard layout changes".
     setDiscarding(false);
     setComponents([]);
     placed = {};
@@ -981,14 +981,14 @@ export default function LayoutEditor() {
           // or a later setTheme stops repainting this surface.
           createRenderEffect(nuiThemeDeps, () => applyNuiTheme(undefined, element));
         }}
-        class="tlib-layout tlib-nui-surface"
+        class="nlib-layout nlib-nui-surface"
         tabindex={-1}
         role="dialog"
         aria-modal="true"
         aria-label="HUD layout editor"
       >
         <div
-          class="tlib-layout__safezone"
+          class="nlib-layout__safezone"
           style={{
             left: `${safeRect().left}px`,
             top: `${safeRect().top}px`,
@@ -999,13 +999,13 @@ export default function LayoutEditor() {
         {/* Guides exist only while something is actually lining up against them. */}
         <Show when={guides().x !== undefined}>
           <div
-            class="tlib-layout__guide tlib-layout__guide--x"
+            class="nlib-layout__guide nlib-layout__guide--x"
             style={{ left: `${guides().x}px` }}
           />
         </Show>
         <Show when={guides().y !== undefined}>
           <div
-            class="tlib-layout__guide tlib-layout__guide--y"
+            class="nlib-layout__guide nlib-layout__guide--y"
             style={{ top: `${guides().y}px` }}
           />
         </Show>
@@ -1026,7 +1026,7 @@ export default function LayoutEditor() {
         </For>
         <aside
           ref={attachPanel}
-          class={["tlib-layout__panel", { "tlib-layout__panel--dragging": panelDragging() }]}
+          class={["nlib-layout__panel", { "nlib-layout__panel--dragging": panelDragging() }]}
           style={
             panelPosition()
               ? {
@@ -1037,9 +1037,9 @@ export default function LayoutEditor() {
               : {}
           }
         >
-          <header class="tlib-layout__header">
+          <header class="nlib-layout__header">
             <NuiButton
-              class="tlib-layout__drag"
+              class="nlib-layout__drag"
               aria-label="Move editor panel"
               title="Drag to move · Arrow keys to reposition"
               disabled={finishing()}
@@ -1047,14 +1047,14 @@ export default function LayoutEditor() {
               onLostPointerCapture={endPanelDrag}
               onKeyDown={movePanelWithKeys}
             >
-              <span class="tlib-layout__header-icon">
+              <span class="nlib-layout__header-icon">
                 <LayoutDashboard aria-hidden="true" />
               </span>
-              <span class="tlib-layout__title">HUD layout</span>
-              <Grip class="tlib-layout__grip" aria-hidden="true" />
+              <span class="nlib-layout__title">HUD layout</span>
+              <Grip class="nlib-layout__grip" aria-hidden="true" />
             </NuiButton>
           </header>
-          <div class="tlib-layout__body">
+          <div class="nlib-layout__body">
             <ComponentList
               components={components()}
               layoutOf={current}
@@ -1069,11 +1069,11 @@ export default function LayoutEditor() {
             {/* The arrow keys are a real gesture here — one nudge per press, 10px
                 with Shift, one undo entry for a held burst — and this line was
                 the only place in the UI that could say so. */}
-            <p class="tlib-layout__help">
+            <p class="nlib-layout__help">
               Drag to move · Scroll to resize · Arrow keys nudge · Alt disables snapping
             </p>
-            <div class="tlib-layout__actions">
-              <div class="tlib-layout__history">
+            <div class="nlib-layout__actions">
+              <div class="nlib-layout__history">
                 {/*
                  * The label comes off the history now, so these say what they
                  * will take back — "Undo move Speedometer" — rather than just
@@ -1099,7 +1099,7 @@ export default function LayoutEditor() {
                 </NuiButton>
               </div>
               <NuiButton
-                class="tlib-layout__reset"
+                class="nlib-layout__reset"
                 disabled={finishing() || !active()}
                 title="Restore this component's default placement (undo available)"
                 onClick={resetSelected}
@@ -1108,7 +1108,7 @@ export default function LayoutEditor() {
                 Reset this
               </NuiButton>
               <NuiButton
-                class="tlib-layout__reset tlib-layout__reset-all"
+                class="nlib-layout__reset nlib-layout__reset-all"
                 disabled={finishing() || !components().length}
                 title="Restore every component's default placement (undo available)"
                 onClick={resetAll}
@@ -1119,34 +1119,34 @@ export default function LayoutEditor() {
             </div>
           </div>
           <Show when={notice()}>
-            <p class="tlib-layout__notice" role="status">
+            <p class="nlib-layout__notice" role="status">
               {notice()}
             </p>
           </Show>
           {/*
-           * AFFIRMATIVE LEFT, and all four of tLib's affirmative/cancel pairs
+           * AFFIRMATIVE LEFT, and all four of NLib's affirmative/cancel pairs
            * were moved together to get there.
            *
            * Counted rather than assumed. Before: this editor, the dialog footer
            * and the menu's confirmation all put Cancel left / affirmative right;
-           * the shared prop editor put Save left. So tLib was 3–1 the other way,
+           * the shared prop editor put Save left. So NLib was 3–1 the other way,
            * and the audit that raised this counted five surfaces when there are
            * six — it missed the dialog footer and the menu confirmation. Reversing
-           * only this one would have left tLib 2–2, which is worse than either
+           * only this one would have left NLib 2–2, which is worse than either
            * convention.
            *
            * Affirmative-left is the side the rest of the stack is already on — the
-           * prop editor (tLib's own, mounted by three consumers), tELS and tAFK —
+           * prop editor (NLib's own, mounted by three consumers), tELS and tAFK —
            * and it is the native order on Windows, which is the only OS a FiveM
            * client runs on. A player who confirms in the prop editor and then
-           * meets a tLib dialog must not have to re-read the buttons; that
+           * meets a NLib dialog must not have to re-read the buttons; that
            * inversion is the same class of defect as the accent repainting
            * between two surfaces.
            */}
           <footer>
             <NuiButton
               tone="primary"
-              class="tlib-layout__finish"
+              class="nlib-layout__finish"
               aria-label="Save HUD layout"
               disabled={finishing()}
               onClick={() => void finish(true)}
@@ -1154,39 +1154,39 @@ export default function LayoutEditor() {
               <Check aria-hidden="true" />
               {finishing() ? "Saving…" : "Save"}
             </NuiButton>
-            <NuiButton class="tlib-layout__discard" disabled={finishing()} onClick={requestCancel}>
+            <NuiButton class="nlib-layout__discard" disabled={finishing()} onClick={requestCancel}>
               <X aria-hidden="true" />
               Cancel
             </NuiButton>
           </footer>
           {/*
-           * The discard question, drawn with nui-kit's `.tlib-nui-confirm*`
+           * The discard question, drawn with nui-kit's `.nlib-nui-confirm*`
            * recipe — the same one the dialog's `confirm` field uses and the same
            * shape the menu has always had. One confirmation design in the
            * product, three surfaces that reach for it.
            *
-           * `tlib-nui-surface` on the shade rather than relying on an ancestor:
-           * this panel is themed from `--tlib-layout-*`, so the `--nui-*` tokens
+           * `nlib-nui-surface` on the shade rather than relying on an ancestor:
+           * this panel is themed from `--nlib-layout-*`, so the `--nui-*` tokens
            * the recipe reads are not otherwise in scope here and every colour in
            * it would resolve to nothing.
            */}
           <Show when={discarding()}>
-            <div class="tlib-nui-surface tlib-nui-confirm-shade">
+            <div class="nlib-nui-surface nlib-nui-confirm-shade">
               <div
-                class="tlib-nui-confirm"
+                class="nlib-nui-confirm"
                 role="alertdialog"
                 aria-modal="true"
-                aria-labelledby="tlib-layout-discard-title"
-                aria-describedby="tlib-layout-discard-question"
+                aria-labelledby="nlib-layout-discard-title"
+                aria-describedby="nlib-layout-discard-question"
               >
-                <p class="tlib-nui-confirm-eyebrow">
+                <p class="nlib-nui-confirm-eyebrow">
                   <ShieldAlert aria-hidden="true" />
                   CONFIRM ACTION
                 </p>
-                <h2 id="tlib-layout-discard-title" class="tlib-nui-confirm-title">
+                <h2 id="nlib-layout-discard-title" class="nlib-nui-confirm-title">
                   Discard layout changes
                 </h2>
-                <p id="tlib-layout-discard-question" class="tlib-nui-confirm-question">
+                <p id="nlib-layout-discard-question" class="nlib-nui-confirm-question">
                   The HUD goes back to where it was before you opened the editor. This cannot be
                   undone.
                 </p>
@@ -1196,7 +1196,7 @@ export default function LayoutEditor() {
                  * they point opposite ways on purpose.
                  *
                  * That footer is a primary action beside its escape hatch:
-                 * affirmative-left, the convention all four of tLib's
+                 * affirmative-left, the convention all four of NLib's
                  * affirmative/cancel pairs were moved to, and the native order
                  * on Windows — the only OS a FiveM client runs on.
                  *
@@ -1206,7 +1206,7 @@ export default function LayoutEditor() {
                  * affirmative slot, because "Keep editing" IS the affirmative
                  * answer to "discard?" — the primary action of this dialog is to
                  * NOT lose the work. tELS's discard guard, tUnit's
-                 * `CharacterEditor` footer and tLib's own shared `PropEditor`
+                 * `CharacterEditor` footer and NLib's own shared `PropEditor`
                  * prompt are all spelled this way.
                  *
                  * This editor was the odd one out: it put Discard left, with the
@@ -1220,7 +1220,7 @@ export default function LayoutEditor() {
                  * the captions are prose and an order assertion must not key on
                  * glyphs or on DOM position alone.
                  */}
-                <div class="tlib-nui-confirm-actions">
+                <div class="nlib-nui-confirm-actions">
                   <NuiButton
                     data-discard-answer="keep"
                     tone="primary"

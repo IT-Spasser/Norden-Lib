@@ -3,10 +3,10 @@ import type { CatalogueItem } from "./item.ts";
 /**
  * The one marketplace catalogue transport, compiled into every resource's SERVER
  * bundle at build time. The shape is v2's camelCase verbatim, because it is the
- * wire; tLib's own snake_case NUI shape is an adapter in
+ * wire; NLib's own snake_case NUI shape is an adapter in
  * `server/lib/marketplace/browse.ts` on top of this.
  *
- * SERVER-ONLY: it carries the tLib public key, so `shared/ts/index.ts`
+ * SERVER-ONLY: it carries the NLib public key, so `shared/ts/index.ts`
  * deliberately does not re-export the marketplace subtree. Do not add it to that
  * barrel, and do not import it from any `client/` or `web/` tree.
  *
@@ -37,7 +37,7 @@ function convar(name: string, fallback: string): string {
  * The wire header stays `x-resource-secret`: every shipped resource sends it and
  * tWeb authenticates on it, so renaming it is a live auth change.
  */
-export const TLIB_PUBLIC_KEY = "tgmp-7c4a2f19d83e6b05a91f0c47e2d85b3a"; // gitleaks:allow
+export const NLIB_PUBLIC_KEY = "tgmp-7c4a2f19d83e6b05a91f0c47e2d85b3a"; // gitleaks:allow
 
 /** Browse is a read behind a panel someone already has open — keep it short. */
 export const CATALOGUE_TIMEOUT_MS = 10_000;
@@ -51,7 +51,7 @@ export const CATALOGUE_TIMEOUT_MS = 10_000;
 export const MARKETPLACE_DEFAULT_BASE_URL = "https://timmygstudios.com";
 
 /** The convar that redirects every studio API call. */
-export const API_BASE_URL_CONVAR = "tlib_api_base_url";
+export const API_BASE_URL_CONVAR = "nlib_api_base_url";
 
 // Suffixes the callers append themselves; left on, they build `.../api/v1/api/v1/items`.
 // Longest first — `endsWith` is not ordered for us. Mirrors APPENDED in shared/sh_api.lua.
@@ -74,7 +74,7 @@ export function normalizeStudioBaseUrl(raw: unknown): string {
       if (!warnedAboutApiSuffix) {
         warnedAboutApiSuffix = true;
         console.warn(
-          `[tLib] ${API_BASE_URL_CONVAR} ends in "${suffix}"; callers append that themselves, so it was trimmed to "${url}".`
+          `[NLib] ${API_BASE_URL_CONVAR} ends in "${suffix}"; callers append that themselves, so it was trimmed to "${url}".`
         );
       }
       break;
@@ -139,7 +139,7 @@ export function studioHeaders(extra?: Record<string, string>): Record<string, st
 /** Headers for an AUTHENTICATED studio API call. The wire name does not change. */
 export function marketplaceHeaders(extra?: Record<string, string>): Record<string, string> {
   return studioHeaders({
-    "X-Resource-Secret": TLIB_PUBLIC_KEY,
+    "X-Resource-Secret": NLIB_PUBLIC_KEY,
     ...(extra ?? {}),
   });
 }

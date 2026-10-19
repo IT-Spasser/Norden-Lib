@@ -1,6 +1,6 @@
 # `solid-compat` — the Solid 1 → 2 compatibility layer
 
-One shared copy, kept here in tLib, consumed by five projects.
+One shared copy, kept here in NLib, consumed by five projects.
 
 ## What it solves
 
@@ -25,7 +25,7 @@ source is annotated with the measurement behind it. The three worst recorded
 here are a `[REACTIVE_WRITE_IN_OWNED_SCOPE]` throw with no build error; a
 `splitProps` multi-group bug that emptied every element of a motion component
 while rendering a correct-looking tree; and `createRequire` resolving the shim's
-"real" Solid from tLib, which is on Solid 1.9.12 — a build that stayed green
+"real" Solid from NLib, which is on Solid 1.9.12 — a build that stayed green
 while 40 test files vanished at collection.
 
 ## The five modules
@@ -50,7 +50,7 @@ Plus two files that are not shims:
 
 ```ts
 // vite.config.ts  (and vitest.config.ts — both need it)
-import { solid1CompatShim } from "../../tLib/shared/ts/solid-compat/solid-1-compat-plugin";
+import { solid1CompatShim } from "../../NLib/shared/ts/solid-compat/solid-1-compat-plugin";
 import { VENDOR_PACKAGES } from "./vite/solid-compat-vendors";
 ```
 
@@ -184,7 +184,7 @@ Three separate things can split it in two, and each has its own guard:
 | --- | --- |
 | Vite's dep optimizer appends a browser hash, so `…/solid.dev.js?v=0412508d` and `…/solid.dev.js` are two module URLs for one file. `vp build`/`vp preview` are fine because there is no optimizer, which is what made it read as a Solid 2 bug. | Outside Vitest the virtual bypass **delegates to `this.resolve`** so the id matches what Vite gives every other importer, hash and all. |
 | `require.resolve`/`path.join` return OS-native paths, and Rollup normalizes module ids to forward slashes. A backslash path for the same physical file is a second, distinct module. | Normalize to forward slashes before returning. |
-| `createRequire(import.meta.url)` resolves from **tLib**, whose `shared/ts/node_modules` holds solid-js 1.9.12. | `createRequire` is rebound to `config.root` in `configResolved`, and `this.resolve` is passed the consumer's root as the importer rather than the shim file. |
+| `createRequire(import.meta.url)` resolves from **NLib**, whose `shared/ts/node_modules` holds solid-js 1.9.12. | `createRequire` is rebound to `config.root` in `configResolved`, and `this.resolve` is passed the consumer's root as the importer rather than the shim file. |
 
 That last one fails in the place hardest to read: the bypass only falls back to
 `require.resolve` under Vitest, so a production build stays green while
@@ -193,7 +193,7 @@ find module '/@fs/…/solid-2-aria-attributes.ts'` — a message about the shim
 file, which exists and loads fine, rather than about the dependency it then
 failed to find. Handing `this.resolve` the shim's own path instead of the root
 fails differently and more helpfully: eight `[MISSING_EXPORT]` errors naming
-`../../../tLib/shared/ts/node_modules/solid-js/dist/solid.js`. **That message
+`../../../NLib/shared/ts/node_modules/solid-js/dist/solid.js`. **That message
 names which `solid-js` it found, which is the one thing that makes it readable —
 do not catch and rethrow it.**
 
@@ -276,7 +276,7 @@ sufficient alone.
 ### No `import type { Plugin } from "vite"`
 
 From a shared location that import resolves against whatever `vite` is reachable
-from *this* directory — tLib's — which is a different package instance from the
+from *this* directory — NLib's — which is a different package instance from the
 `vite-plus` consumers build with. A consumer's `tsc --noEmit` then reports, at
 its own `defineConfig({…})` call and not at this file:
 
@@ -326,7 +326,7 @@ Solid 1's `isSVG` boolean lands in Solid 2's `skipChildren`, and Solid 1's
 `lucide-solid`'s precompiled `Icon.mjs` calls `spread(el, merged, true, true)`,
 so `skip(prop)` throws `skip is not a function` inside a render effect, and
 Solid 2 answers a throw there with `[REACTIVITY_HALTED]` **for the whole
-process**. Measured in tLib's DOM harness: an empty container and nine failures
+process**. Measured in NLib's DOM harness: an empty container and nine failures
 in a cascade that named neither `spread` nor `lucide-solid`.
 
 The shim drops argument three — Solid 2 infers SVG-ness from the node, and there
@@ -521,15 +521,15 @@ solidCompatSurfaceSuite(
 ```
 
 ⛔ **The runner and those two imports are passed in, and both are forced rather
-than stylistic.** This file sits inside tLib, so a bare import here resolves
-against tLib. Measured in `tLib/shared/ts/node_modules`: `solid-js` **is**
+than stylistic.** This file sits inside NLib, so a bare import here resolves
+against NLib. Measured in `NLib/shared/ts/node_modules`: `solid-js` **is**
 installed there on **1.9.12**, and `vitest` is not installed at all. A bare
 `import("solid-js")` would therefore compute every "is this name supplied" answer
 against the Solid 1 surface — and *pass*, because Solid 1 has more names than
 Solid 2 — while a bare `import "vitest"` would fail to resolve and the suite
 could not load. Written at the consumer's call site, both resolve where the real
 Solid 2 and the real runner are. Same trap as the one in the plugin header, where
-`createRequire` resolving the "real" Solid from tLib kept a build green while 40
+`createRequire` resolving the "real" Solid from NLib kept a build green while 40
 of one consumer's test files died at collection.
 
 ### ⚠️ "Unused" is a union question — the suite's first run proved it
@@ -601,7 +601,7 @@ failed.
 
 ## Formatting
 
-`tLib/biome.json` excludes this directory. biome and the consumers' formatter
+`NLib/biome.json` excludes this directory. biome and the consumers' formatter
 (oxfmt, via `vp fmt`) disagree on import order and line breaking here —
 measured, biome wants to rewrite all seven files — and the churn would bury the
 annotations that are the only record of why each shim is the shape it is. Keep
@@ -616,7 +616,7 @@ cannot be pointed here even by hand.
 
 So: match the surrounding style when you edit, and do not read a green
 `vp fmt --check` in a consumer as saying anything about these files. Closing the
-gap properly means either a tLib-side formatter configured to agree with oxfmt,
+gap properly means either a NLib-side formatter configured to agree with oxfmt,
 or a per-consumer check that can address an out-of-tree path.
 
 ## Changing anything here

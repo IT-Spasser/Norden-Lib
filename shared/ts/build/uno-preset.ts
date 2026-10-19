@@ -216,7 +216,7 @@ export function tPreset(options: TPresetOptions): Preset[] {
     : [];
 
   presets.push({
-    name: "@tlib/uno-preset",
+    name: "@nlib/uno-preset",
     // nui only: a web bundle runs in a real browser, which composites these fine.
     ...(target === "nui" && !nuiElevationException
       ? { blocklist: NUI_BLOCKLIST as Preset["blocklist"] }

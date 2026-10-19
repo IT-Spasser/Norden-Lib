@@ -34,9 +34,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 const g = globalThis as unknown as Record<string, unknown>;
 // Every convar returns its default: the key is baked in, not configured,
 // so an unconfigured server is still authenticated. See the comment on
-// `TLIB_PUBLIC_KEY` for why that is deliberate.
+// `NLIB_PUBLIC_KEY` for why that is deliberate.
 g.GetConvar = (_name: string, defaultValue: string) => defaultValue;
-g.GetCurrentResourceName = () => "tLib";
+g.GetCurrentResourceName = () => "NLib";
 
 const { browseItems, previewHtml } = await import("../../server/lib/marketplace/browse");
 
@@ -307,7 +307,7 @@ describe("the UI preview document", () => {
   });
 });
 
-describe("the tLib-panel adapter", () => {
+describe("the NLib-panel adapter", () => {
   // `browseItems` is now only the snake_case adapter over the shared
   // `browseCatalogue`. What is worth pinning here is that the adapter is TOTAL:
   // a field the shared transport carries and this mapping forgets does not

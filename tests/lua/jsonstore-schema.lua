@@ -86,7 +86,7 @@ end
 
 local recordedTimings = {}
 
-tlib = {
+nlib = {
     logger = { DEBUG = 1, INFO = 2, WARN = 3, ERROR = 4 },
     fs = { writeResourceFile = defaultWrite },
     -- A sink for jsonstore's instrumented write path. A RECORDER rather than
@@ -112,7 +112,7 @@ end
 local function reset()
     files, logged, writes = {}, {}, {}
     refuseWrites, droppedWrites, encodeFails = {}, false, false
-    tlib.fs.writeResourceFile = defaultWrite
+    nlib.fs.writeResourceFile = defaultWrite
     JsonStore.reset()
 end
 
@@ -406,7 +406,7 @@ end
 
 -- 6. A migration may not delete, unless it says so
 --
--- "Never delete" enforced rather than intended, matching the tlib_demo
+-- "Never delete" enforced rather than intended, matching the nlib_demo
 -- convention of resetting by dropping writes and never deleting. A removal that
 -- is deliberate is declared, which puts the one destructive act a migration can
 -- perform in the diff where a reviewer sees it.
@@ -421,7 +421,7 @@ store = JsonStore.open({
         version    = 2,
         assume     = 1,
         -- Does NOT declare soundWavMap in allowRemove -- and soundWavMap is not
-        -- even this owner's section, it is tlib.soundstore's, which is exactly
+        -- even this owner's section, it is nlib.soundstore's, which is exactly
         -- how this mistake happens for real.
         migrations = { [1] = function(doc) doc.soundWavMap = nil end },
     },
@@ -518,8 +518,8 @@ end
 
 -- 9. Two owners version one document independently
 --
--- Every one of these documents is co-owned: tELS's `vehicles` belongs to tLib
--- Discovery, tDetector's `soundWavMap` to tlib.soundstore. One scalar version
+-- Every one of these documents is co-owned: tELS's `vehicles` belongs to NLib
+-- Discovery, tDetector's `soundWavMap` to nlib.soundstore. One scalar version
 -- for the whole file would make soundstore bumping its shape lock the consumer
 -- out of its own sections.
 
@@ -596,8 +596,8 @@ if after.props.a ~= 1 then fail('an existing section was replaced by its default
 
 -- 11. Demo mode: a migration that cannot land must not look landed
 --
--- `tlib.fs.writeResourceFile` DROPS the write and reports SUCCESS when
--- `tlib_demo` is set. Without the write-behind mirror the migration reports
+-- `nlib.fs.writeResourceFile` DROPS the write and reports SUCCESS when
+-- `nlib_demo` is set. Without the write-behind mirror the migration reports
 -- success, the file keeps the old shape, and every reader for the rest of the
 -- session is handed the old shape while the code believes it is on the new one.
 

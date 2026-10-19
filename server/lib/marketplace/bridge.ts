@@ -10,9 +10,9 @@
 // A `fExports` name is callable by ANY resource on the customer's server with any
 // arguments, with no ACE check and no `source` to attribute it to. That is the
 // same reason `shared/ts/marketplace/catalogue.ts` forbids handing
-// `TLIB_PUBLIC_KEY` to an export, and it is why installs and uninstalls do not go
+// `NLIB_PUBLIC_KEY` to an export, and it is why installs and uninstalls do not go
 // through this file: they are a net event in `server/sv_marketplace.lua`, gated on
-// `tlib.admin`, and the disk work happens in the owning consumer's own bundle
+// `nlib.admin`, and the disk work happens in the owning consumer's own bundle
 // (`shared/ts/marketplace/agent.ts`).
 //
 // This file used to also export `mpInstallFromFile` and `mpUninstall`, which
@@ -41,7 +41,7 @@ export function registerBridge(): void {
   if (installed) return;
   installed = true;
 
-  //   exports.tLib:mpRegisterType(resourceName, type, installPath)
+  //   exports.NLib:mpRegisterType(resourceName, type, installPath)
   //
   // The one write-shaped export, and it writes only to this process's in-memory
   // registry: it declares where a consumer's items land. The coordinator calls it
@@ -55,7 +55,7 @@ export function registerBridge(): void {
     return true;
   });
 
-  //   exports.tLib:mpBrowse(paramsJson, function(ok, err, resultJson) end)
+  //   exports.NLib:mpBrowse(paramsJson, function(ok, err, resultJson) end)
   //
   // The first of the four async exports here, and the one that states the
   // convention the other three follow — it is `../community-configs/bridge.ts`'s:
@@ -82,7 +82,7 @@ export function registerBridge(): void {
     );
   });
 
-  //   exports.tLib:mpLike(slug, license, next, function(ok, err, stateJson) end)
+  //   exports.NLib:mpLike(slug, license, next, function(ok, err, stateJson) end)
   //
   // Like or un-like one item for one player. Same async convention as `mpBrowse`.
   //
@@ -115,7 +115,7 @@ export function registerBridge(): void {
     );
   });
 
-  //   exports.tLib:mpPreviewHtml(slug, function(ok, err, html) end)
+  //   exports.NLib:mpPreviewHtml(slug, function(ok, err, html) end)
   //
   fExports("mpPreviewHtml", (slug: unknown, cb: unknown) => {
     if (typeof cb !== "function") return;
@@ -130,7 +130,7 @@ export function registerBridge(): void {
     );
   });
 
-  //   exports.tLib:mpThemeJson(slug, function(ok, err, json) end)
+  //   exports.NLib:mpThemeJson(slug, function(ok, err, json) end)
   //
   // A `theme` item's published definition, for the dispatch-panel preview. A
   // READ, same async convention as the three above.
@@ -147,7 +147,7 @@ export function registerBridge(): void {
     );
   });
 
-  //   exports.tLib:mpAssertItemResource(resourceName, slug, function(ok, err) end)
+  //   exports.NLib:mpAssertItemResource(resourceName, slug, function(ok, err) end)
   //
   // "Does this slug belong to this product?" The coordinator installs into the
   // resource's own registered `installPath`, so an item could never land in

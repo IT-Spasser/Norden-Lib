@@ -38,10 +38,10 @@ SetTimeout = function(ms, fn) timers[#timers + 1] = { ms = ms, fn = fn } end
 -- this is here.)
 --
 -- So: the local `assert` below restores the real print before failing, and
--- TLIB_TEST_VERBOSE=1 echoes everything through for debugging.
+-- NLIB_TEST_VERBOSE=1 echoes everything through for debugging.
 local realPrint = print
 local rawassert = assert
-local verbose = os.getenv('TLIB_TEST_VERBOSE') == '1'
+local verbose = os.getenv('NLIB_TEST_VERBOSE') == '1'
 
 print = function(s)
     printed[#printed + 1] = tostring(s)
@@ -62,7 +62,7 @@ end
 -- adapters under test rather than a stubbed copy of them, and that is the point:
 -- these call shapes were transcribed by hand from vendored framework sources.
 LoadResourceFile = function(resource, path)
-    assert(resource == 'tLib', 'adapters must be loaded from tLib, got ' .. tostring(resource))
+    assert(resource == 'NLib', 'adapters must be loaded from NLib, got ' .. tostring(resource))
     return ('return dofile(%q)'):format(path)
 end
 
@@ -104,10 +104,10 @@ local aceGrants = {}
 local demoOn = false
 local recordedTimings = {}
 
-tlib = {
+nlib = {
     permission = { has = function(src, key) return aceGrants[tostring(src) .. '|' .. tostring(key)] == true end },
     demo = { active = function() return demoOn end },
-    -- `tlib.telemetry.record` is called from the instrumented write path. A
+    -- `nlib.telemetry.record` is called from the instrumented write path. A
     -- RECORDER rather than a no-op, so this suite can assert that a slow write
     -- is actually measured -- a stub that discarded the call would let the
     -- instrumentation be deleted with every test still green.
@@ -385,7 +385,7 @@ local pushGate = access.gate({ mode = 'everyone' }, { key = 'r', label = 'x' })
 pushGate:push(7)
 assert(#clientEvents == 1 and clientEvents[1].target == 7 and clientEvents[1].value == true,
     'push sends the answer to that one client')
-assert(clientEvents[1].event == 'tProbe:tlib:access:r',
+assert(clientEvents[1].event == 'tProbe:nlib:access:r',
     'the event is namespaced by resource, since FiveM net event names are global')
 
 -- The client can only REQUEST an answer. Anything it sends is ignored, and the
@@ -393,7 +393,7 @@ assert(clientEvents[1].event == 'tProbe:tlib:access:r',
 reset()
 local netGate = access.gate({ mode = 'custom', custom = function() return false end }, { key = 's', label = 'x' })
 source = 7
-netHandlers['tProbe:tlib:access:s'](true)   -- a client asserting "I am allowed"
+netHandlers['tProbe:nlib:access:s'](true)   -- a client asserting "I am allowed"
 assert(#clientEvents == 1 and clientEvents[1].value == false,
     'the server ignores what the client claims and answers with its own decision')
 
@@ -523,7 +523,7 @@ shut:invalidate()
 assert(shut:allowed(7), 'demo mode grants a gate the player would fail')
 
 -- Ahead of the memo, not behind it: the 250ms answer cache would otherwise hold
--- a denial across a runtime `tlib_demo on` for a quarter second per player.
+-- a denial across a runtime `nlib_demo on` for a quarter second per player.
 -- Invalidate is the documented way to clear it, and this asserts nothing else is
 -- needed once it has been called.
 demoOn = false

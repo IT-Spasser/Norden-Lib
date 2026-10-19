@@ -1,6 +1,6 @@
 -- Where the TIMMYG Studios API lives, defined once for every Lua VM.
 --
--- `tlib_api_base_url` is a SINGLE switch: point it at a local dev worker and
+-- `nlib_api_base_url` is a SINGLE switch: point it at a local dev worker and
 -- every call this codebase makes to the studio -- marketplace browse, preview,
 -- install downloads, community configs, AND the product version check and its
 -- changelog -- follows it. Its reach is the whole `timmygstudios.com` API
@@ -14,7 +14,7 @@
 -- shared/ts/marketplace/catalogue.ts, and tests/unit/marketplace-base-url.test.ts
 -- asserts the two literals are equal because no single source can span both.
 --
--- Free of every tLib global -- no Platform, no Logger, no Config -- so it can be
+-- Free of every NLib global -- no Platform, no Logger, no Config -- so it can be
 -- loaded standalone into a CONSUMER resource's Lua VM through LoadResourceFile,
 -- exactly the way shared/imports/versioncheck/server.lua loads
 -- shared/sh_branding.lua. Keep it dependency-free, and keep it listed in BOTH
@@ -26,7 +26,7 @@
 StudioApi = StudioApi or {}
 
 --- The convar that redirects every studio API call.
-StudioApi.CONVAR = 'tlib_api_base_url'
+StudioApi.CONVAR = 'nlib_api_base_url'
 
 --- Production. Must stay byte-identical to `MARKETPLACE_DEFAULT_BASE_URL` in
 --- shared/ts/marketplace/catalogue.ts.
@@ -55,7 +55,7 @@ function StudioApi.normalize(raw)
             url = url:sub(1, -#suffix - 1)
             if not warned then
                 warned = true
-                print(('^3[tLib] %s ends in "%s"; callers append that themselves, so it was trimmed to "%s".^0')
+                print(('^3[NLib] %s ends in "%s"; callers append that themselves, so it was trimmed to "%s".^0')
                     :format(StudioApi.CONVAR, suffix, url))
             end
             break
@@ -71,7 +71,7 @@ end
 --- Deliberately not memoised. The whole point of the convar is iterating against
 --- a local dev server, and a cached value means a mid-session change silently
 --- does nothing until the resource restarts. tRadio's client bridge already
---- re-read per call; tLib's `resolveConfig()` used to cache and no longer does,
+--- re-read per call; NLib's `resolveConfig()` used to cache and no longer does,
 --- so both sides now agree.
 ---@return string
 function StudioApi.baseUrl()
@@ -92,14 +92,14 @@ end
 -- by tests/unit/marketplace-base-url.test.ts.
 --
 -- READ-ONLY, AND IT DOES NOT MINT. The id is minted by whichever request
--- needs it first, in tLib's Node bundle (server/lib/install-id.ts), which is
--- the one writer of tLib's data.json. A Lua minter would be a second writer of
+-- needs it first, in NLib's Node bundle (server/lib/install-id.ts), which is
+-- the one writer of NLib's data.json. A Lua minter would be a second writer of
 -- the same document and could race the first into two different ids. The cost
 -- is that on a brand-new install the FIRST version check may carry no id; the
 -- next one does. An absent header is a state tWeb handles, two ids for one
 -- install is not.
 --
--- `LoadResourceFile` rather than an export on tLib, deliberately: it is a plain
+-- `LoadResourceFile` rather than an export on NLib, deliberately: it is a plain
 -- cross-resource READ that needs nothing started, and it keeps the id off a
 -- FiveM export where every third-party script on the operator's server could
 -- ask for it.
@@ -108,8 +108,8 @@ end
 --- `INSTALL_ID_HEADER` in shared/ts/install-id.ts.
 StudioApi.INSTALL_ID_HEADER = 'x-install-id'
 
---- Where tLib keeps it. Must equal `INSTALL_ID_DATA_FILE` / `INSTALL_ID_KEY`.
-StudioApi.INSTALL_ID_RESOURCE = 'tLib'
+--- Where NLib keeps it. Must equal `INSTALL_ID_DATA_FILE` / `INSTALL_ID_KEY`.
+StudioApi.INSTALL_ID_RESOURCE = 'NLib'
 StudioApi.INSTALL_ID_FILE = 'data.json'
 StudioApi.INSTALL_ID_KEY = 'installId'
 

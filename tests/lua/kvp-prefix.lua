@@ -1,4 +1,4 @@
--- KVP namespace resolution: tlib_community_id, else sv_projectName, else none.
+-- KVP namespace resolution: nlib_community_id, else sv_projectName, else none.
 --
 -- Pinned because the algorithm is written out three times — here, in
 -- shared/ts/kvp.ts and in tRadio's client bridge — and they had already drifted:
@@ -15,7 +15,7 @@ GetConvar = function(name, default)
 end
 
 local function prefixFor(communityId, projectName)
-    convars = { tlib_community_id = communityId, sv_projectName = projectName }
+    convars = { nlib_community_id = communityId, sv_projectName = projectName }
     -- Re-loaded per case: the module resolves the prefix once at load time.
     local kvp = dofile('shared/imports/kvp/client.lua')
     return kvp.key('tels_hud_layout')

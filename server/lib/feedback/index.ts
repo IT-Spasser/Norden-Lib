@@ -90,7 +90,7 @@ export function classify(status: number): FeedbackResult {
 }
 
 /**
- * NOT `studioHeaders()`, and this is the one place in tLib that is not.
+ * NOT `studioHeaders()`, and this is the one place in NLib that is not.
  * `/api/feedback` takes no `x-resource-secret` and no `x-fivem-server`. What it
  * does share is `x-install-id`, from the same constant and resolver.
  */
@@ -139,7 +139,7 @@ export function installFeedback(): void {
   /**
    * What to send, for `server/sv_feedback.lua` to actually send.
    *
-   *   local prepared = exports['tLib']:fbPrepare(payloadJson)
+   *   local prepared = exports['NLib']:fbPrepare(payloadJson)
    *   -> '{"url":"...","body":"...","headers":{...}}' or '{"error":"invalid"}'
    */
   fExports("fbPrepare", (payloadJson: unknown): string => {

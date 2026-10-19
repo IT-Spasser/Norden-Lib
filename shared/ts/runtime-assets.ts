@@ -149,8 +149,8 @@ export interface RuntimeAssetCache {
  *
  * ONE definition of this path, for the same reason the default host has one per
  * language: four NUI bundles and `cl_bridge.lua` were each about to build it.
- * The base arrives from Lua (`tlib.marketplace.baseUrl()`, which reads the
- * `tlib_api_base_url` convar on every call) rather than being a constant
+ * The base arrives from Lua (`nlib.marketplace.baseUrl()`, which reads the
+ * `nlib_api_base_url` convar on every call) rather than being a constant
  * here, so a server pointed at a dev worker follows.
  */
 export function marketplaceItemUrl(baseUrl: unknown, slug: string): string | null {
@@ -213,7 +213,7 @@ const RELATIVE_ASSET_ATTR =
  * `TypeError` that rejects the download before the request is made: a customer
  * on an older client would lose every runtime asset with no useful error.
  * `AbortController` + `setTimeout` is universally available, so this costs one
- * branch and removes the cliff. Mirrors `createDeadline` in `@tlib/shared/nui`
+ * branch and removes the cliff. Mirrors `createDeadline` in `@nlib/shared/nui`
  * rather than inventing a second pattern.
  */
 function fetchDeadline(ms: number): { signal: AbortSignal; release: () => void } {
@@ -375,7 +375,7 @@ export function createRuntimeAssetCache(options: RuntimeAssetCacheOptions): Runt
     try {
       for (const [name, data] of Object.entries(extracted)) {
         let norm = normalise(name);
-        // tLib's installer rejects these outright, so reaching one here means
+        // NLib's installer rejects these outright, so reaching one here means
         // the bundle did not come through it. Skip rather than trust it.
         if (norm.includes("..")) {
           log.warn(`[${tag}] skipping unsafe bundle entry "${name}"`);

@@ -41,7 +41,7 @@ export async function request(
   // This was `fetch(...).then(onOk, onErr)`, on the theory that the
   // two-argument form suppressed a recurring runtime log line:
   //
-  //   [js] Unhandled promise rejection in resource tLib
+  //   [js] Unhandled promise rejection in resource NLib
   //   [js] Uncaught TypeError: Invalid state: Reader released
   //         node:internal/webstreams/readablestream(159,19): lazyReadableReleasedError
   //

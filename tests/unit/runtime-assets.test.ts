@@ -35,7 +35,7 @@
 import { describe, expect, test } from "bun:test";
 // adm-zip, NOT fflate — the module extracts with fflate, so building the
 // fixtures with the same library would hide a disagreement about zip layout
-// between a writer and a reader. adm-zip is already tLib's test-side zip tool.
+// between a writer and a reader. adm-zip is already NLib's test-side zip tool.
 import AdmZip from "adm-zip";
 import {
   createRuntimeAssetCache,

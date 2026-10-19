@@ -43,7 +43,7 @@ import {
   surfaceClassNames,
 } from "../shared/ts/build/index.ts";
 
-const root = join(tmpdir(), `tlib-css-contract-control-${process.pid}`);
+const root = join(tmpdir(), `nlib-css-contract-control-${process.pid}`);
 const failures: string[] = [];
 
 function check(name: string, ok: boolean, detail = ""): void {
@@ -285,9 +285,9 @@ try {
     /box-shadow:[^;]*[1-9][0-9]*px [1-9]/.test("box-shadow: inset 2px 4px #000") &&
       blurredShadow("inset 2px 4px #000") === undefined
   );
-  // The three shadows tLib actually ships, each required to pass.
+  // The three shadows NLib actually ships, each required to pass.
   setCheck(
-    "tLib's own zero-blur shadows all pass the predicate",
+    "NLib's own zero-blur shadows all pass the predicate",
     [
       "inset 3px 0 currentColor",
       "inset 0 0 0 999px #8882",

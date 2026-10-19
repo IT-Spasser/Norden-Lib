@@ -1,5 +1,5 @@
 --[[
-    tlib.secrets — where a credential actually lives.
+    nlib.secrets — where a credential actually lives.
 
     The tracked `config.lua` holds blanks permanently; the real values live in a
     gitignored `config.local.lua` beside it, and this overlays them onto Config
@@ -62,7 +62,7 @@ end
 --- @param config table
 --- @return table list of dotted paths
 function Secrets.credentialPaths(config)
-    local diag = tlib and tlib.diag
+    local diag = nlib and nlib.diag
     if type(diag) ~= 'table' or type(diag.isSecretName) ~= 'function' then return {} end
 
     local paths, seen = {}, {}
@@ -128,10 +128,10 @@ function Secrets.overlay(config, opts)
 
     if not opts.quiet then
         for _, message in ipairs(errors) do
-            print(('^1[%s] tlib.secrets: %s^0'):format(resource, message))
+            print(('^1[%s] nlib.secrets: %s^0'):format(resource, message))
         end
         if #applied > 0 then
-            print(('^2[%s] tlib.secrets: %d local value(s) applied: %s^0')
+            print(('^2[%s] nlib.secrets: %d local value(s) applied: %s^0')
                 :format(resource, #applied, table.concat(applied, ', ')))
         end
     end

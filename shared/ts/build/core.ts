@@ -104,7 +104,7 @@ export function addDirToZip(zip: ZipLike, dir: string, zipPrefix: string) {
  * layer refuses instead, because there the file IS the developer's.)
  *
  * `expectConfig: false` is for a resource that genuinely ships no config file —
- * tLib and tAFK. Say why at the call site; the default refusal exists because a
+ * NLib and tAFK. Say why at the call site; the default refusal exists because a
  * sanitizer that sanitized nothing prints a tick either way.
  */
 export function createZip(
@@ -147,7 +147,7 @@ export interface ProdConfig {
   expectConfig?: boolean;
   /**
    * Extra directories to find `OFL-<Family>.txt` in, relative to `root`, for a
-   * resource that ships a face of its own. tLib's own font directory is always
+   * resource that ships a face of its own. NLib's own font directory is always
    * searched and does not need listing.
    */
   fontLicenceDirs?: string[];
@@ -202,7 +202,7 @@ export function runProd(config: ProdConfig, AdmZipClass: new () => ZipLike) {
   // watched the build output instead and were green while the zip went out with
   // the fonts and none of their licences. See stageFontLicences.
   //
-  // tLib's own font directory is always searched, since that is where Hanken
+  // NLib's own font directory is always searched, since that is where Hanken
   // Grotesk, Inter and JetBrains Mono now come from for every consumer; a
   // resource adds its own via `fontLicenceDirs` when it ships a face of its own.
   const licences = stageFontLicences(dist, [

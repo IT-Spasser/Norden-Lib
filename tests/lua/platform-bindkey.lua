@@ -1,4 +1,4 @@
--- Run from tLib: bunx --bun --package fengari-node-cli fengari scripts/run-lua-suite.lua tests/lua/platform-bindkey.lua
+-- Run from NLib: bunx --bun --package fengari-node-cli fengari scripts/run-lua-suite.lua tests/lua/platform-bindkey.lua
 --
 -- Oracle for `platform.bindKey` in shared/imports/platform/client.lua.
 --
@@ -67,12 +67,12 @@ local function fixture()
     _ENV.GetConvar = function(_, default) return default end
     _ENV.GetConvarInt = function(_, default) return default end
 
-    -- The module reports each bind to tLib for cross-resource conflict detection.
-    -- It is pcall-guarded on purpose -- consumers bind at FILE SCOPE, so tLib's own
+    -- The module reports each bind to NLib for cross-resource conflict detection.
+    -- It is pcall-guarded on purpose -- consumers bind at FILE SCOPE, so NLib's own
     -- client VM may not have registered its exports yet -- so an absent `exports`
     -- must not break registration. Leaving it nil proves that.
     _ENV.exports = nil
-    _ENV.tlib = { name = 'tLib' }
+    _ENV.nlib = { name = 'NLib' }
 
     local chunk = assert(loadfile('shared/imports/platform/client.lua'))
     local platform = chunk()
@@ -247,7 +247,7 @@ end)
 
 test('registration survives ReportKeybind not answering yet', function()
     -- The cross-resource report is pcall-guarded because a missing export RAISES
-    -- rather than returning nil. tLib's client VM not being up yet must not break
+    -- rather than returning nil. NLib's client VM not being up yet must not break
     -- a consumer's binds -- a diagnostic is never worth a dead keybind.
     local platform, mappings = fixture() -- fixture leaves _ENV.exports nil
     platform.bindKey{ id = 'x', default = 'Q', press = function() end }

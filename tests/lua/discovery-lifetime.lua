@@ -1,10 +1,10 @@
 -- Discovery instances must stop answering when their owner goes away.
 --
 -- Discovery.create is reached across an export boundary, so every handler it
--- registers lives in tLib's resource state rather than the consumer's. Before
+-- registers lives in NLib's resource state rather than the consumer's. Before
 -- disposal existed, a consumer restart added a second set of handlers over a
 -- freshly loaded config table while the first set stayed live over the table it
--- had loaded whenever tLib last started -- both answered config_request, the
+-- had loaded whenever NLib last started -- both answered config_request, the
 -- client kept whichever reply arrived last, and an edit that was correct on
 -- disk and correctly loaded could still never reach a client. Restarting the
 -- consumer again made it worse, not better.
@@ -22,7 +22,7 @@ end
 -- host
 local env = setmetatable({}, { __index = _G })
 env._G = env
-env._TLIB_IS_FIVEM = true
+env._NLIB_IS_FIVEM = true
 env.handlers = {}   -- [event] = { {fn=, live=true}, … }
 env.nextCookie = 0
 
@@ -93,7 +93,7 @@ env.GetResourceByFindIndex = function() return nil end
 env.GetResourceState = function() return 'started' end
 env.GetHashKey = function(s) return #tostring(s) end
 env.GetInvokingResource = function() return 'consumer' end
-env.GetCurrentResourceName = function() return 'tLib' end
+env.GetCurrentResourceName = function() return 'NLib' end
 env.exports = setmetatable({}, { __index = function() return setmetatable({}, {
     __index = function() return function() return false end end,
 }) end })
@@ -124,7 +124,7 @@ run('shared/lib/adapter/events.lua')
 -- discovery/server.lua frees its per-player rate-limit state through
 -- Platform.onPlayerDropped, which lives here rather than in events.lua. Loading
 -- the real adapter instead of stubbing the one function: every branch in it is
--- already guarded on _TLIB_IS_FIVEM, so off-FiveM it registers the callback into
+-- already guarded on _NLIB_IS_FIVEM, so off-FiveM it registers the callback into
 -- a plain table and touches no host native.
 run('shared/lib/adapter/lifecycle.lua')
 run('server/sv_discovery.lua')
@@ -236,7 +236,7 @@ local skipping = createWith({ skipAutoBroadcast = true })
 check(onByDefault:isDisposed(), 'creating the skipping instance disposed the default one')
 env.replies = {}
 emit('demo:config_request')
-check(#env.replies == 0, 'skipAutoBroadcast: config_request is not answered by tLib')
+check(#env.replies == 0, 'skipAutoBroadcast: config_request is not answered by NLib')
 env.replies = {}
 emit('demo:config_save', 'car', { siren = { maxHz = 950 } })
 check(#env.replies == 0, 'skipAutoBroadcast: a save does not broadcast')

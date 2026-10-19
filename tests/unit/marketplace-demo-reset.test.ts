@@ -23,7 +23,7 @@ afterEach(() => {
 const hash = (data: string) => createHash("sha256").update(data).digest("hex");
 
 function fixture(type = "ui") {
-  const root = fs.mkdtempSync(join(tmpdir(), "tlib-demo-reset-"));
+  const root = fs.mkdtempSync(join(tmpdir(), "nlib-demo-reset-"));
   roots.push(root);
   const base = join(root, "layouts");
   fs.mkdirSync(base);

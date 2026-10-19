@@ -3,7 +3,7 @@
    declared here. See the header of that file for why they moved out. */
 @import "../../../shared/css/theme-tokens.css";
 
-/* The one face tLib actually ships, so it is the interface face rather than the
+/* The one face NLib actually ships, so it is the interface face rather than the
    menu's alone: --font-sans used to name Inter, which is not on disk and not
    fetchable, so every dialog and toast on a game client silently fell back to
    Segoe UI while the menu drew Hanken Grotesk. One shipped face, one fallback
@@ -30,7 +30,7 @@
 
 /* Neutral HUD surfaces. The HSL channels are the public dialog/toast theme
    contract and now live in shared/css/theme-tokens.css, imported above; the menu
-   keeps its separate full-color tokens on .tlib-menu. Only the font stays here,
+   keeps its separate full-color tokens on .nlib-menu. Only the font stays here,
    because it names a face this resource ships and no other one has. */
 @layer base {
   :root {

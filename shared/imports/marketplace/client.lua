@@ -1,6 +1,6 @@
--- tLib/shared/imports/marketplace/client.lua
+-- NLib/shared/imports/marketplace/client.lua
 -- Client-side marketplace open helper. Centralizes slug combining + OpenMarketplace call.
--- Loaded into consumer VM via tlib.marketplace.* (not an export).
+-- Loaded into consumer VM via nlib.marketplace.* (not an export).
 
 local marketplace = {}
 
@@ -9,7 +9,7 @@ local marketplace = {}
 -- FiveM builds a client's file manifest when the resource STARTS, so a file
 -- written by a marketplace install 404s over `nui://` until the next restart.
 -- The fill is for the NUI to fetch the item from the marketplace itself and
--- serve it from blob: URLs for the session -- `@tlib/shared/runtime-assets` on
+-- serve it from blob: URLs for the session -- `@nlib/shared/runtime-assets` on
 -- the TypeScript side. All it needs from Lua is this URL, and it is HERE
 -- because four consumers were otherwise going to build the same string.
 --
@@ -23,7 +23,7 @@ local marketplace = {}
 -- the same code path instead of being broken until a restart.
 --
 -- NO copy of the host and NO `GetConvar` call here. This module runs in the
--- CONSUMER's VM, where tLib's `shared_scripts` were never loaded, so `StudioApi`
+-- CONSUMER's VM, where NLib's `shared_scripts` were never loaded, so `StudioApi`
 -- has to be bootstrapped — the same `LoadResourceFile` + `load` pattern
 -- `shared/imports/versioncheck/server.lua` uses, and for the same reason. There
 -- is one definition of the default host per language and
@@ -31,15 +31,15 @@ local marketplace = {}
 -- literal here would have been a sixth copy of a value that must agree.
 if type(StudioApi) ~= 'table' then
     local path = 'shared/sh_api.lua'
-    local source = assert(LoadResourceFile('tLib', path), 'Missing tLib module: ' .. path)
-    assert(load(source, '@@tLib/' .. path))()
+    local source = assert(LoadResourceFile('NLib', path), 'Missing NLib module: ' .. path)
+    assert(load(source, '@@NLib/' .. path))()
 end
 
 --- The marketplace base URL this client should fetch from.
 ---
 --- Read on every call rather than cached, so an operator changing
---- `tlib_api_base_url` does not need a client rejoin. The ITEM PATH is not
---- built here on purpose: `@tlib/shared/runtime-assets`' `marketplaceItemUrl`
+--- `nlib_api_base_url` does not need a client rejoin. The ITEM PATH is not
+--- built here on purpose: `@nlib/shared/runtime-assets`' `marketplaceItemUrl`
 --- owns that shape, and the NUI is the only thing that uses it, so there is no
 --- second place for it to drift in.
 --- @return string  no trailing slash
@@ -106,17 +106,17 @@ end
 -- there is no host UI to put the browser in -- e.g. opened from tDetector's or
 -- tRadar's sounds panel.
 function marketplace.openPanel(resource, layoutSlugs, soundEntries, opts)
-    exports['tLib']:OpenMarketplace(buildOpts(resource, layoutSlugs, soundEntries, opts))
+    exports['NLib']:OpenMarketplace(buildOpts(resource, layoutSlugs, soundEntries, opts))
 end
 
--- Feed the browser embedded in the caller's OWN tLib dialog, for a tab declared
+-- Feed the browser embedded in the caller's OWN NLib dialog, for a tab declared
 -- `view = "marketplace"`. Opens nothing and takes no focus: the dialog is
 -- already open and already has it. Same arguments as openPanel, so a consumer
 -- swapping one for the other changes only where the browser appears -- which
 -- includes previewState, without which previewing a layout before install
 -- silently stops working.
 function marketplace.provide(resource, layoutSlugs, soundEntries, opts)
-    exports['tLib']:ProvideMarketplaceData(buildOpts(resource, layoutSlugs, soundEntries, opts))
+    exports['NLib']:ProvideMarketplaceData(buildOpts(resource, layoutSlugs, soundEntries, opts))
 end
 
 return marketplace

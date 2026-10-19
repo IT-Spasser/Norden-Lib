@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Replays `internal` onto the published branch with the private paths removed.
 //
-// tLib develops on `internal` and publishes `main`. `internal` carries the
+// NLib develops on `internal` and publishes `main`. `internal` carries the
 // private half — the provenance engine under internal/, and the .gitea/
 // workflows that name the private org — and `main` carries neither.
 //
@@ -12,7 +12,7 @@
 //
 // WHY A THROWAWAY WORKTREE. `internal/` is tracked on `internal` and absent
 // from `main`, so `git checkout main` DELETES it from disk — and six sibling
-// resources import `tLib/internal/...` by relative path at build time, so they
+// resources import `NLib/internal/...` by relative path at build time, so they
 // all break at once with `Cannot find module` and no other warning. That
 // happened. The working directory must never leave `internal`, so `main` is
 // only ever touched inside a temporary worktree this script removes again.
@@ -108,7 +108,7 @@ if (dryRun) {
   process.exit(0);
 }
 
-const work = mkdtempSync(join(tmpdir(), "tlib-publish-"));
+const work = mkdtempSync(join(tmpdir(), "nlib-publish-"));
 let published = 0;
 let skipped = 0;
 

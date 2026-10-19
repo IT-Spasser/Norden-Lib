@@ -18,11 +18,11 @@ local function invoke(data)
 end
 invoke({ resource = 'tELS', type = 'ui', slug = 'item', requestId = 'view-1' })
 eq(#sent, 1)
-eq(sent[1][1], 'tlib:marketplace:inspect')
+eq(sent[1][1], 'nlib:marketplace:inspect')
 eq(sent[1][2], 'tELS'); eq(sent[1][3], 'ui'); eq(sent[1][4], 'item'); eq(sent[1][5], 'view-1')
 invoke(nil); invoke(false); invoke({}); invoke({ resource = 'a', type = 'ui', slug = 'item' })
 eq(#sent, 1); eq(replies, 5)
 local result = { ok = false, resource = 'tELS', type = 'ui', slug = 'item', requestId = 'view-1', error = 'not authorized' }
-events['tlib:marketplace:inspectResult'](result)
+events['nlib:marketplace:inspectResult'](result)
 eq(#messages, 1); eq(messages[1].action, 'marketplaceInspectResult'); eq(messages[1].data, result)
 print(('marketplace-inspection-client: %d checks passed'):format(checks))

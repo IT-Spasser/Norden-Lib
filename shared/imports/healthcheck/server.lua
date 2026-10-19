@@ -1,4 +1,4 @@
--- tlib.healthcheck
+-- nlib.healthcheck
 -- see tRadio/server/sv_version.lua for usage
 
 local function httpGet(url, timeoutMs)
@@ -10,7 +10,7 @@ local function httpGet(url, timeoutMs)
             resolved = true
             p:resolve({ status = status or 0, body = body or '' })
         end
-    end, 'GET', '', { ['User-Agent'] = 'tLib-HealthCheck' })
+    end, 'GET', '', { ['User-Agent'] = 'NLib-HealthCheck' })
 
     CreateThread(function()
         Wait(timeoutMs or 8000)

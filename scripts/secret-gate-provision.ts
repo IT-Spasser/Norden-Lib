@@ -5,14 +5,14 @@
  *
  * Why a provisioner and not eleven hand edits
  *
- * The gate itself is one implementation in tLib. The per-resource part is four
+ * The gate itself is one implementation in NLib. The per-resource part is four
  * small things — a `.githooks/pre-commit`, three `package.json` scripts, a
  * `.gitignore` line and a CI workflow — and four small things times eleven
  * repos is forty-four chances for one to be the stale one. A stale copy of a
  * gate is silent, which is the whole failure mode being designed against here.
  *
  * So the wiring is generated, and `--check` asserts every repo's copy is
- * current. That check belongs in tLib's own `verify`: tLib is the only repo
+ * current. That check belongs in NLib's own `verify`: NLib is the only repo
  * from which all the siblings are visible.
  *
  * Usage:
@@ -31,14 +31,14 @@ import * as path from "node:path";
 import { hookIsCurrent, PRE_COMMIT, writeHook } from "../shared/ts/secrets/hook.ts";
 import { isStandaloneClone } from "./siblings.ts";
 
-const tlibRoot = path.resolve(import.meta.dir, "..");
-const scriptsRoot = path.resolve(tlibRoot, "..");
+const nlibRoot = path.resolve(import.meta.dir, "..");
+const scriptsRoot = path.resolve(nlibRoot, "..");
 
 const SIDECAR_IGNORE = [
   "",
   "# The developer's real credentials. Never committed, never packaged.",
-  "# The tracked config.lua holds blanks permanently; tlib.secrets overlays this",
-  "# file onto Config at server start. See tLib/shared/imports/secrets/server.lua.",
+  "# The tracked config.lua holds blanks permanently; nlib.secrets overlays this",
+  "# file onto Config at server start. See NLib/shared/imports/secrets/server.lua.",
   "config.local.lua",
   "config/config.local.lua",
   "",
@@ -49,7 +49,7 @@ const SIDECAR_IGNORE = [
  * this way lives in the header of secret-gate.ts, which is the file they run.
  */
 function scriptsFor(repo: string): Record<string, string> {
-  const gate = repo === "tLib" ? "scripts/secret-gate.ts" : "../tLib/scripts/secret-gate.ts";
+  const gate = repo === "NLib" ? "scripts/secret-gate.ts" : "../NLib/scripts/secret-gate.ts";
   return {
     "secrets:check": `bun run ${gate}`,
     "secrets:install-hooks": `bun run ${gate} --install-hooks`,
@@ -146,14 +146,14 @@ function provision(repo: string, repoRoot: string, check: boolean): Change[] {
 
   // 4. The CI workflow — the layer that cannot be skipped.
   //
-  // tLib is exempt, and only tLib. It is published to GitHub, so its .gitea/
+  // NLib is exempt, and only NLib. It is published to GitHub, so its .gitea/
   // workflows live on a Gitea-only branch and are absent from the branch this
   // runs on — the directory naming the private org must not ship in a public
   // MIT repo. Every other resource here is Gitea-only and keeps the file in
   // its working tree, which is why the exemption is by name rather than by a
   // "does .gitea exist" test: a sibling that simply lost the directory is a
   // real finding and must stay one.
-  if (repo !== "tLib") {
+  if (repo !== "NLib") {
     const workflowPath = path.join(repoRoot, ".gitea", "workflows", "secrets.yml");
     const workflow = workflowFor();
     const existing = fs.existsSync(workflowPath) ? fs.readFileSync(workflowPath, "utf8") : null;
@@ -175,15 +175,15 @@ function main(): void {
   const onlyIndex = argv.indexOf("--only");
   const only = onlyIndex === -1 ? null : argv[onlyIndex + 1];
 
-  // There is nothing to provision in a standalone clone of tLib, and nothing to
+  // There is nothing to provision in a standalone clone of NLib, and nothing to
   // assert either: every resource this writes wiring into is a sibling. Checked
   // before the scan rather than after, because the scan is "any directory with a
   // .git and a package.json" — in a clone sitting beside somebody's unrelated
-  // repos that would otherwise find them and write tLib's hooks into them.
-  if (isStandaloneClone(tlibRoot)) {
+  // repos that would otherwise find them and write NLib's hooks into them.
+  if (isStandaloneClone(nlibRoot)) {
     console.log(
-      `  🔒 secret-gate provisioning skipped — no sibling resource beside tLib in ${scriptsRoot}. ` +
-        "The wiring this writes is per-sibling; tLib's own gate is unaffected."
+      `  🔒 secret-gate provisioning skipped — no sibling resource beside NLib in ${scriptsRoot}. ` +
+        "The wiring this writes is per-sibling; NLib's own gate is unaffected."
     );
     return;
   }
@@ -221,7 +221,7 @@ function main(): void {
       `✗ the secret-gate wiring has drifted in ${new Set(changes.map((c) => c.repo)).size} ` +
         `resource(s):\n` +
         changes.map((c) => `    ${c.repo}: ${c.what}`).join("\n") +
-        "\n\n  Fix:  bun run scripts/secret-gate-provision.ts   (from tLib)"
+        "\n\n  Fix:  bun run scripts/secret-gate-provision.ts   (from NLib)"
     );
     process.exit(1);
   }

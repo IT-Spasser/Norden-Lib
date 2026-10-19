@@ -1,8 +1,8 @@
 ---
 title: "Installation"
-description: "Install tLib, depend on it from your own resource, and optionally open its port for browser access."
+description: "Install NLib, depend on it from your own resource, and optionally open its port for browser access."
 order: 1
-group: "tLib"
+group: "NLib"
 published: true
 ---
 
@@ -17,25 +17,25 @@ see *Building from source* in the repository README.
 
 ### Extract
 
-Put the `tLib` folder in your server's `resources` directory.
+Put the `NLib` folder in your server's `resources` directory.
 
 ### Start the resource
 
-Add this to `server.cfg`, **above** every resource that depends on tLib:
+Add this to `server.cfg`, **above** every resource that depends on NLib:
 
 ```txt title="server.cfg"
-ensure tLib
+ensure NLib
 ```
 
 </Steps>
 
 ## Opening the port, if you want browser access
 
-**Optional, and nothing needs it.** Every tLib resource is fully working at this point:
+**Optional, and nothing needs it.** Every NLib resource is fully working at this point:
 tRadio runs over the connection players already have, tDB serves its database, and all of
 it is reached in game. No port is involved in any of that.
 
-What the port adds is the **hub** — one page linking every tLib resource that has a web
+What the port adds is the **hub** — one page linking every NLib resource that has a web
 surface, so you can reach them from a browser instead of from inside the game. Today that
 is tDB's admin panel and tRadio's dispatch panel, which a desktop app can also connect to.
 Leave the port closed and those surfaces are simply not reachable from a browser; the
@@ -44,34 +44,34 @@ resources behind them are unaffected.
 If you want it: open `7777/tcp` **on the machine** — the host firewall, plus NAT
 port-forwarding if the server is behind a router — then visit `http://<your-server-ip>:7777`.
 
-For a different port, set it above `ensure tLib` and open that one instead:
+For a different port, set it above `ensure NLib` and open that one instead:
 
 ```txt title="server.cfg"
-set tlib_http_port 8080
+set nlib_http_port 8080
 ```
 
-## Depend on tLib
+## Depend on NLib
 
 ```lua title="fxmanifest.lua"
-dependencies { 'tLib' }
+dependencies { 'NLib' }
 
 shared_scripts {
-    '@tLib/imports.lua',   -- only if you use the import modules
+    '@NLib/imports.lua',   -- only if you use the import modules
 }
 ```
 
 Exports need the dependency line alone:
 
 ```lua
-exports['tLib']:ShowToast(nil, 'success', 'tLib is running', 'Installed correctly.')
+exports['NLib']:ShowToast(nil, 'success', 'NLib is running', 'Installed correctly.')
 ```
 
 The menu is declared, not built imperatively — pages on the server, handlers on the client.
-See [Exports](/docs/tLib/exports) and [Menu Consumers](/docs/tLib/menu-consumers).
+See [Exports](/docs/NLib/exports) and [Menu Consumers](/docs/NLib/menu-consumers).
 
-The import modules need `@tLib/imports.lua` and nothing else. Each one loads the first time
+The import modules need `@NLib/imports.lua` and nothing else. Each one loads the first time
 you touch it:
 
 ```lua
-local value = tlib.kvp.getString('my_key', 'default')
+local value = nlib.kvp.getString('my_key', 'default')
 ```

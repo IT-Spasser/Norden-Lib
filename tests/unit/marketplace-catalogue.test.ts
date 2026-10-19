@@ -1,14 +1,14 @@
 /**
  * The shared catalogue transport.
  *
- * This is the module tRadio's admin server and tLib's NUI bridge both compile
+ * This is the module tRadio's admin server and NLib's NUI bridge both compile
  * in, so a defect here is a defect in every resource at once. Three things are
  * pinned:
  *
  * 1. **Field totality.** The headline test round-trips a fully-populated v2
  *    item and asserts deep equality with what the backend actually sends. That
  *    is not a formality: `previewColors` reached tRadio and was dropped on the
- *    way into tLib's item shape, and tRadio's own store carries a comment about
+ *    way into NLib's item shape, and tRadio's own store carries a comment about
  *    theme swatches having already been lost once to this exact class of drift.
  *    A field added to `toV2Item` upstream and not here fails this test rather
  *    than rendering an empty swatch row.
@@ -32,8 +32,8 @@ const g = globalThis as unknown as Record<string, unknown>;
 /**
  * No key stub here, deliberately.
  *
- * The tLib public key is a BAKED-IN constant, not a convar — see
- * `TLIB_PUBLIC_KEY`'s comment for why that is intended and not an
+ * The NLib public key is a BAKED-IN constant, not a convar — see
+ * `NLIB_PUBLIC_KEY`'s comment for why that is intended and not an
  * oversight. So the tests assert against the real exported value: if someone
  * converts it back to operator-supplied configuration, these fail.
  */
@@ -52,7 +52,7 @@ const {
   ITEM_RESOURCE_MISMATCH,
   ITEM_RESOURCE_UNKNOWN,
   MARKETPLACE_HASH_HEADER,
-  TLIB_PUBLIC_KEY,
+  NLIB_PUBLIC_KEY,
   marketplaceApiV2,
   marketplaceHeaders,
   MARKETPLACE_IDENTITY_HEADER,
@@ -180,7 +180,7 @@ describe("the request", () => {
   test("sends the public key and the install label", async () => {
     const calls = captureFetch(emptyPage);
     await browseCatalogue({});
-    expect(calls[0]?.headers["x-resource-secret"]).toBe(TLIB_PUBLIC_KEY);
+    expect(calls[0]?.headers["x-resource-secret"]).toBe(NLIB_PUBLIC_KEY);
     expect(calls[0]?.headers["x-fivem-server"]).toMatch(/^[0-9a-f]{32}$/);
   });
 
@@ -195,7 +195,7 @@ describe("the request", () => {
    * And it must be OMITTED, never blank, when nothing resolves: an empty
    * value fails tWeb's `/^[0-9a-z]{25}$/` and a 400 on a browse reads as "the
    * marketplace is down". `setInstallIdResolver(null)` is the state of a
-   * consumer's bundle, which does not install tLib's reader.
+   * consumer's bundle, which does not install NLib's reader.
    */
   test("carries the install id on every call, and omits it rather than blanking it", async () => {
     const id = "a1b2c3d4e5f6g7h8i9j0k1l2m";
@@ -231,10 +231,10 @@ describe("the request", () => {
   });
 
   test("honours a self-hosted base URL instead of pinning production", async () => {
-    // An operator who points tlib_api_base_url at their own host must not
+    // An operator who points nlib_api_base_url at their own host must not
     // have this silently keep hitting ours.
     g.GetConvar = (name: string, d: string) =>
-      name === "tlib_api_base_url" ? "https://example.test/" : convarStub(name, d);
+      name === "nlib_api_base_url" ? "https://example.test/" : convarStub(name, d);
     expect(marketplaceApiV2()).toBe("https://example.test/api/v2/marketplace");
   });
 
@@ -246,7 +246,7 @@ describe("the request", () => {
   test("lets a caller add headers without losing the credential", () => {
     const h = marketplaceHeaders({ Accept: "text/html" });
     expect(h.Accept).toBe("text/html");
-    expect(h["X-Resource-Secret"]).toBe(TLIB_PUBLIC_KEY);
+    expect(h["X-Resource-Secret"]).toBe(NLIB_PUBLIC_KEY);
   });
 
   test("authenticates with no operator setup at all", async () => {
@@ -261,8 +261,8 @@ describe("the request", () => {
     g.GetConvar = (_name: string, d: string) => d;
     const calls = captureFetch(emptyPage);
     await browseCatalogue({});
-    expect(calls[0]?.headers["x-resource-secret"]).toBe(TLIB_PUBLIC_KEY);
-    expect(TLIB_PUBLIC_KEY).toBeTruthy();
+    expect(calls[0]?.headers["x-resource-secret"]).toBe(NLIB_PUBLIC_KEY);
+    expect(NLIB_PUBLIC_KEY).toBeTruthy();
   });
 });
 
@@ -315,7 +315,7 @@ describe("paging and failure", () => {
 /**
  * Bundle integrity.
  *
- * tLib's own install agent has verified this digest since it was written
+ * NLib's own install agent has verified this digest since it was written
  * (`installer/bundle.ts`'s `prepareBundle`). tRadio's install path verified
  * nothing but two ZIP magic bytes, which a substituted archive also has —
  * `assertBundleHash` is that check factored out so a caller doing its own
@@ -362,11 +362,11 @@ describe("assertBundleHash", () => {
 /**
  * Cross-product install enforcement.
  *
- * The gap this closes: tLib's coordinator keys registrations `resource:type`
+ * The gap this closes: NLib's coordinator keys registrations `resource:type`
  * and writes into that resource's own registered `installPath`, so a tELS item
  * could never land in tRadio's DIRECTORY. The item's own `resource` field was
  * the unenforced half — `install('tRadar', 'ui', '<a-tELS-slug>')` passed every
- * check and tLib fetched and installed it.
+ * check and NLib fetched and installed it.
  *
  * It could not be answered client-side before this, and that is the reason the
  * per-slug fetch is here rather than the install paths each deriving it: v2's
@@ -392,7 +392,7 @@ describe("item ownership", () => {
     const calls = captureFetch(owned);
     await fetchCatalogueItem("midnight");
     expect(calls[0]?.url).toBe(`${marketplaceApiV2()}/items/midnight`);
-    expect(calls[0]?.headers["x-resource-secret"]).toBe(TLIB_PUBLIC_KEY);
+    expect(calls[0]?.headers["x-resource-secret"]).toBe(NLIB_PUBLIC_KEY);
   });
 
   test("escapes the slug rather than pasting it into a path", async () => {
@@ -561,7 +561,7 @@ describe("the identity a browse carries", () => {
     // The secret must still be there. The identity is an ADDITION to the
     // request, not a replacement for the credential — and `marketplaceHeaders`
     // merges caller extras last, so a careless spread could have dropped it.
-    expect(headers["x-resource-secret"]).toBe(TLIB_PUBLIC_KEY);
+    expect(headers["x-resource-secret"]).toBe(NLIB_PUBLIC_KEY);
   });
 
   test("sends no identity header at all when there is no player", async () => {
@@ -604,7 +604,7 @@ describe("setCatalogueLike", () => {
     await setCatalogueLike("midnight", "a1b2c3d4", true);
     const headers = calls[0]?.headers ?? {};
     expect(headers[MARKETPLACE_IDENTITY_HEADER.toLowerCase()]).toBe("a1b2c3d4");
-    expect(headers["x-resource-secret"]).toBe(TLIB_PUBLIC_KEY);
+    expect(headers["x-resource-secret"]).toBe(NLIB_PUBLIC_KEY);
   });
 
   /**

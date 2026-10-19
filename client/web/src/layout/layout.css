@@ -1,8 +1,8 @@
-.tlib-layout {
-  --tlib-layout-panel: var(--hud-editor-panel, var(--nui-surface));
-  --tlib-layout-border: var(--nui-border);
-  --tlib-layout-text: var(--nui-text);
-  --tlib-layout-muted: var(--nui-muted);
+.nlib-layout {
+  --nlib-layout-panel: var(--hud-editor-panel, var(--nui-surface));
+  --nlib-layout-border: var(--nui-border);
+  --nlib-layout-text: var(--nui-text);
+  --nlib-layout-muted: var(--nui-muted);
   position: fixed;
   inset: 0;
   z-index: 100000;
@@ -14,18 +14,18 @@
   outline: none;
   color-scheme: dark;
 }
-.tlib-layout *,
-.tlib-layout *::before,
-.tlib-layout *::after {
+.nlib-layout *,
+.nlib-layout *::before,
+.nlib-layout *::after {
   box-sizing: border-box;
 }
-.tlib-layout svg {
+.nlib-layout svg {
   width: 16px;
   height: 16px;
   stroke-width: 1.7;
   flex-shrink: 0;
 }
-.tlib-layout__panel {
+.nlib-layout__panel {
   position: absolute;
   z-index: 5;
   top: 50%;
@@ -38,17 +38,17 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: var(--radius-surface, 0.875rem);
-  border: 1px solid var(--tlib-layout-border);
-  background: var(--tlib-layout-panel);
+  border: 1px solid var(--nlib-layout-border);
+  background: var(--nlib-layout-panel);
 }
-.tlib-layout__header {
+.nlib-layout__header {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 14px 14px 10px;
   flex-shrink: 0;
 }
-.tlib-layout .tlib-layout__drag {
+.nlib-layout .nlib-layout__drag {
   flex: 1;
   min-width: 0;
   gap: 10px;
@@ -60,57 +60,57 @@
   cursor: grab;
   touch-action: none;
 }
-.tlib-layout__panel--dragging .tlib-layout__drag {
+.nlib-layout__panel--dragging .nlib-layout__drag {
   cursor: grabbing;
 }
-.tlib-layout__header-icon {
+.nlib-layout__header-icon {
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
-  border: 1px solid var(--tlib-layout-border);
+  border: 1px solid var(--nlib-layout-border);
   border-radius: var(--nui-radius);
   background: var(--nui-inset);
 }
-.tlib-layout__title {
+.nlib-layout__title {
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.3px;
   line-height: 1.2;
 }
-.tlib-layout__grip {
+.nlib-layout__grip {
   margin-left: auto;
-  color: var(--tlib-layout-muted);
+  color: var(--nlib-layout-muted);
 }
-.tlib-layout__body {
+.nlib-layout__body {
   padding: 0 14px;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
   min-height: 0;
   scrollbar-width: thin;
-  scrollbar-color: var(--tlib-layout-border) transparent;
+  scrollbar-color: var(--nlib-layout-border) transparent;
 }
-.tlib-layout__panel p {
+.nlib-layout__panel p {
   margin: 0;
 }
-.tlib-layout__list {
+.nlib-layout__list {
   list-style: none;
   display: grid;
   gap: 2px;
   margin: 0;
   padding: 0;
 }
-.tlib-layout__row {
+.nlib-layout__row {
   display: flex;
   align-items: center;
   gap: 4px;
   border-radius: var(--nui-radius);
 }
-.tlib-layout__row--selected {
+.nlib-layout__row--selected {
   background: var(--nui-inset);
 }
-.tlib-layout .tlib-layout__row-select {
+.nlib-layout .nlib-layout__row-select {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -126,25 +126,25 @@
   text-align: left;
   cursor: pointer;
 }
-.tlib-layout .tlib-layout__row-select:hover {
+.nlib-layout .nlib-layout__row-select:hover {
   background: var(--nui-inset);
 }
-.tlib-layout__row--selected .tlib-layout__row-select {
+.nlib-layout__row--selected .nlib-layout__row-select {
   font-weight: 600;
 }
-.tlib-layout__row-name {
+.nlib-layout__row-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.tlib-layout__row-owner {
+.nlib-layout__row-owner {
   margin-left: auto;
   flex-shrink: 0;
-  color: var(--tlib-layout-muted);
+  color: var(--nlib-layout-muted);
   font-size: 11px;
   font-weight: 400;
 }
-.tlib-layout .tlib-layout__row-visible {
+.nlib-layout .nlib-layout__row-visible {
   width: 32px;
   min-height: 32px;
   padding: 6px;
@@ -152,89 +152,89 @@
   border-color: transparent;
   background: transparent;
 }
-.tlib-layout__panel .tlib-layout__pinned,
-.tlib-layout__panel .tlib-layout__help {
-  color: var(--tlib-layout-muted);
+.nlib-layout__panel .nlib-layout__pinned,
+.nlib-layout__panel .nlib-layout__help {
+  color: var(--nlib-layout-muted);
   font-size: 11px;
 }
-.tlib-layout__panel .tlib-layout__pinned {
+.nlib-layout__panel .nlib-layout__pinned {
   padding: 8px 10px 0;
 }
-.tlib-layout__panel .tlib-layout__help {
+.nlib-layout__panel .nlib-layout__help {
   margin: 10px 0 12px;
   text-align: center;
 }
 /* Three controls now, so the row wraps rather than squeezing the labels out. */
-.tlib-layout__actions {
+.nlib-layout__actions {
   flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding: 10px 0 14px;
-  border-top: 1px solid var(--tlib-layout-border);
+  border-top: 1px solid var(--nlib-layout-border);
 }
-.tlib-layout__history {
+.nlib-layout__history {
   display: flex;
   gap: 4px;
 }
-.tlib-layout__history button {
+.nlib-layout__history button {
   width: 34px;
   padding: 7px;
 }
-.tlib-layout .tlib-layout__reset {
+.nlib-layout .nlib-layout__reset {
   padding-inline: 8px;
   border-color: transparent;
   background: transparent;
   font-size: 13px;
 }
-.tlib-layout__panel .tlib-layout__notice {
+.nlib-layout__panel .nlib-layout__notice {
   padding: 0 14px 12px;
   color: var(--nui-danger);
   font-size: 12px;
 }
-.tlib-layout__panel .tlib-layout__empty {
+.nlib-layout__panel .nlib-layout__empty {
   padding: 8px 0 4px;
-  color: var(--tlib-layout-muted);
+  color: var(--nlib-layout-muted);
   font-size: 14px;
 }
-.tlib-layout__panel footer {
+.nlib-layout__panel footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   padding: 12px 14px;
-  border-top: 1px solid var(--tlib-layout-border);
+  border-top: 1px solid var(--nlib-layout-border);
   flex-shrink: 0;
 }
-.tlib-layout__panel footer button {
+.nlib-layout__panel footer button {
   padding-inline: 8px;
   white-space: nowrap;
 }
-.tlib-layout .tlib-layout__discard {
+.nlib-layout .nlib-layout__discard {
   background: transparent;
 }
-.tlib-layout__safezone {
+.nlib-layout__safezone {
   position: absolute;
   border: 1px dashed #ffffff30;
   pointer-events: none;
 }
-.tlib-layout__guide {
+.nlib-layout__guide {
   position: absolute;
   pointer-events: none;
 }
-.tlib-layout__guide--x {
+.nlib-layout__guide--x {
   top: 0;
   bottom: 0;
   border-left: 1px dashed var(--nui-accent);
 }
-.tlib-layout__guide--y {
+.nlib-layout__guide--y {
   left: 0;
   right: 0;
   border-top: 1px dashed var(--nui-accent);
 }
 /* Placement rides on `transform`, so the box itself never leaves the origin and
    a drag composites instead of relayouting the overlay. */
-.tlib-layout__proxy {
+.nlib-layout__proxy {
   position: absolute;
   left: 0;
   top: 0;
@@ -246,12 +246,12 @@
   min-height: 1px;
   will-change: transform;
 }
-.tlib-layout__proxy--selected {
+.nlib-layout__proxy--selected {
   z-index: 2;
   border-color: var(--nui-accent);
   background: #ffffff03;
 }
-.tlib-layout__proxy--hidden {
+.nlib-layout__proxy--hidden {
   border-style: dashed;
   background: repeating-linear-gradient(
     135deg,
@@ -261,7 +261,7 @@
     transparent 10px
   );
 }
-.tlib-layout__tag {
+.nlib-layout__tag {
   position: absolute;
   top: 4px;
   left: 4px;
@@ -270,21 +270,21 @@
   align-items: center;
   gap: 6px;
   padding: 3px 6px;
-  border: 1px solid var(--tlib-layout-border);
+  border: 1px solid var(--nlib-layout-border);
   border-radius: 4px;
-  background: var(--tlib-layout-panel);
-  color: var(--tlib-layout-text);
+  background: var(--nlib-layout-panel);
+  color: var(--nlib-layout-text);
   font-size: 12px;
   white-space: nowrap;
 }
-.tlib-layout__proxy--selected .tlib-layout__tag {
+.nlib-layout__proxy--selected .nlib-layout__tag {
   border-color: var(--nui-accent);
 }
-.tlib-layout__tag > span {
+.nlib-layout__tag > span {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.tlib-layout__tag button {
+.nlib-layout__tag button {
   border-color: transparent;
   border-radius: 3px;
   min-height: 24px;
@@ -292,12 +292,12 @@
   flex-shrink: 0;
   background: transparent;
 }
-.tlib-layout__tag svg {
+.nlib-layout__tag svg {
   width: 14px;
   height: 14px;
 }
 /* Only rendered mid-gesture, so it can sit over the widget without competing. */
-.tlib-layout__scale-badge {
+.nlib-layout__scale-badge {
   position: absolute;
   right: 4px;
   bottom: 4px;
@@ -312,13 +312,13 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.tlib-layout__handle {
+.nlib-layout__handle {
   position: absolute;
   z-index: 3;
   width: 14px;
   height: 14px;
 }
-.tlib-layout__handle::after {
+.nlib-layout__handle::after {
   content: "";
   position: absolute;
   inset: 4px;
@@ -326,27 +326,27 @@
   border: 1px solid var(--nui-accent-text);
   border-radius: 1px;
 }
-.tlib-layout__handle--nw {
+.nlib-layout__handle--nw {
   top: -7px;
   left: -7px;
   cursor: nwse-resize;
 }
-.tlib-layout__handle--ne {
+.nlib-layout__handle--ne {
   top: -7px;
   right: -7px;
   cursor: nesw-resize;
 }
-.tlib-layout__handle--sw {
+.nlib-layout__handle--sw {
   bottom: -7px;
   left: -7px;
   cursor: nesw-resize;
 }
-.tlib-layout__handle--se {
+.nlib-layout__handle--se {
   bottom: -7px;
   right: -7px;
   cursor: nwse-resize;
 }
-.tlib-layout__demo {
+.nlib-layout__demo {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -361,26 +361,26 @@
   color: #efefea;
   pointer-events: none;
 }
-.tlib-layout__demo strong {
+.nlib-layout__demo strong {
   font-size: 10px;
   letter-spacing: 3px;
   color: #b7b7b1;
 }
-.tlib-layout__demo > div {
+.nlib-layout__demo > div {
   font-size: clamp(20px, 4vh, 55px);
   font-weight: 700;
 }
-.tlib-layout__demo small {
+.nlib-layout__demo small {
   font-size: 10px;
   color: #a8a8a1;
 }
-.tlib-layout__demo > span {
+.nlib-layout__demo > span {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 9px;
 }
-.tlib-layout__demo i {
+.nlib-layout__demo i {
   display: block;
   width: 45px;
   height: 4px;
@@ -388,9 +388,9 @@
   border-radius: 4px;
 }
 @media (prefers-reduced-motion: reduce) {
-  .tlib-layout *,
-  .tlib-layout *::before,
-  .tlib-layout *::after {
+  .nlib-layout *,
+  .nlib-layout *::before,
+  .nlib-layout *::after {
     animation: none !important;
     transition: none !important;
   }

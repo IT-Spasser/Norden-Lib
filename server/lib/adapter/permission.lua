@@ -1,10 +1,10 @@
--- platform permission adapter — arbitrary permission keys, not just tlib.admin.
+-- platform permission adapter — arbitrary permission keys, not just nlib.admin.
 -- Server-only. Consumers (tRadio zones/NACs, tELS admin gating, etc.) get a
 -- single API that resolves to ACE or a registered framework resolver.
 
-if _TLIB_SIDE ~= 'server' then return end
+if _NLIB_SIDE ~= 'server' then return end
 
-local log = Logger.create('tLib/adapter/permission')
+local log = Logger.create('NLib/adapter/permission')
 
 -- server-admin-supplied override. Signature: fn(source:int, key:string) -> bool.
 -- When set, takes priority over the ACE check even on FiveM — servers that
@@ -45,7 +45,7 @@ local function decidePermission(source, key, demoActive, resolver)
         end
         return allowed == true
     end
-    if _TLIB_IS_FIVEM then
+    if _NLIB_IS_FIVEM then
         -- Compared against both BOOL representations on purpose. The native is
         -- declared BOOL and normally arrives as a Lua boolean, but a numeric 1 is
         -- a legal marshalling of it -- and `== true` alone would read that as a
@@ -105,7 +105,7 @@ function Platform.hasPermissionBatch(source, keys)
     return out
 end
 
-Platform.export('tLib', 'HasPermission', function(source, key)
+Platform.export('NLib', 'HasPermission', function(source, key)
     return Platform.hasPermission(source, key)
 end)
 
@@ -113,12 +113,12 @@ end)
 -- tRadar and the rest call; a consumer that does not know about the batch export
 -- is not affected by it. There is NO fallback for a consumer that does: this
 -- export and shared/imports/permission/server.lua's `hasBatch` ship in the same
--- tLib, so they cannot disagree about whether it exists. `hasBatch` fails CLOSED
+-- NLib, so they cannot disagree about whether it exists. `hasBatch` fails CLOSED
 -- if this export does not answer.
-Platform.export('tLib', 'HasPermissionBatch', function(source, keys)
+Platform.export('NLib', 'HasPermissionBatch', function(source, keys)
     return Platform.hasPermissionBatch(source, keys)
 end)
 
-Platform.export('tLib', 'RegisterPermissionResolver', function(fn)
+Platform.export('NLib', 'RegisterPermissionResolver', function(fn)
     Platform.registerPermissionResolver(fn)
 end)

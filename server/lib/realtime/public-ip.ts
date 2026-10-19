@@ -1,6 +1,6 @@
 // public-ip.ts — one-shot discovery of the server's public IP.
 //
-// Fired at tLib boot. Consumers reading the wsUrl via rtConnectionInfo or
+// Fired at NLib boot. Consumers reading the wsUrl via rtConnectionInfo or
 // rtIssueToken before the lookup completes get `ws://localhost:PORT` as a
 // fallback — fine for dev, insufficient for remote players. Production logs
 // a warning when the resolved IP lands so the operator sees the real URL.

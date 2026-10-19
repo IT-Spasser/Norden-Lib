@@ -1,7 +1,7 @@
 #!/bin/sh
 # Refuses to publish private paths to a public remote.
 #
-# tLib is published to GitHub and developed on Gitea. The private half —
+# NLib is published to GitHub and developed on Gitea. The private half —
 # internal/, and the .gitea/ workflows that name the private org — lives on a
 # Gitea-only branch. Nothing enforces that but this hook and branch discipline.
 #

@@ -12,21 +12,21 @@
  * Lua the runtime redactor uses — rather than listed again here. A hand-listed
  * array of names is how `Advanced.S3.AccessKey` went uncovered.
  *
- * THIS FILE LIVES IN tLib AND IS RUN BY ALL OF THEM. The per-resource part
+ * THIS FILE LIVES IN NLib AND IS RUN BY ALL OF THEM. The per-resource part
  * is a `.githooks/pre-commit` shim, the `secrets:*` `package.json` scripts and
  * a CI workflow — nothing that can drift. The precedent is tUnit's `scan:solid2`,
- * which already runs `../tLib/scripts/solid2-scan.ts` for exactly this reason:
+ * which already runs `../NLib/scripts/solid2-scan.ts` for exactly this reason:
  * "a rule that has drifted reports zero, and zero reads exactly like a finished
  * migration".
  *
  * Usage
  *
- *   bun run ../tLib/scripts/secret-gate.ts                 # HEAD  (CI backstop)
- *   bun run ../tLib/scripts/secret-gate.ts --staged        # index (pre-commit)
- *   bun run ../tLib/scripts/secret-gate.ts --worktree      # local, informational
- *   bun run ../tLib/scripts/secret-gate.ts --install-hooks # core.hooksPath=.githooks
- *   bun run ../tLib/scripts/secret-gate.ts --check-hooks   # is the hook installed?
- *   bun run ../tLib/scripts/secret-gate.ts --repo ../tRadio
+ *   bun run ../NLib/scripts/secret-gate.ts                 # HEAD  (CI backstop)
+ *   bun run ../NLib/scripts/secret-gate.ts --staged        # index (pre-commit)
+ *   bun run ../NLib/scripts/secret-gate.ts --worktree      # local, informational
+ *   bun run ../NLib/scripts/secret-gate.ts --install-hooks # core.hooksPath=.githooks
+ *   bun run ../NLib/scripts/secret-gate.ts --check-hooks   # is the hook installed?
+ *   bun run ../NLib/scripts/secret-gate.ts --repo ../tRadio
  *
  * Exit codes: 0 clean, 1 a credential has a value, 2 the gate could not run
  * (no repo, no config files found, a malformed policy). A 2 is NOT a pass.
@@ -35,7 +35,7 @@
  *
  * Not in the tracked file. The tracked `config.lua` holds blanks permanently
  * and the real values live in a gitignored sidecar next to it
- * (`config.local.lua`), which `tlib.secrets` overlays onto `Config` at server
+ * (`config.local.lua`), which `nlib.secrets` overlays onto `Config` at server
  * start. That is the answer to the question every other mechanism gets wrong:
  * a clean/smudge filter or a strip-on-commit leaves the committed blob blank
  * and the working tree holding a value, so the next `git checkout` or `pull`
@@ -235,8 +235,8 @@ function main(): void {
     if (!hookIsCurrent(repo)) {
       die(
         `secret-gate --install-hooks: ${HOOKS_PATH}/pre-commit in ${repo} is missing or is ` +
-          "not the canonical bytes from tLib's shared/ts/secrets/hook.ts.\n" +
-          "  Refresh it:  bun run ../tLib/scripts/secret-gate.ts --write-hooks\n" +
+          "not the canonical bytes from NLib's shared/ts/secrets/hook.ts.\n" +
+          "  Refresh it:  bun run ../NLib/scripts/secret-gate.ts --write-hooks\n" +
           "  A stale hook is the one failure mode a hook cannot report about itself."
       );
     }
@@ -251,7 +251,7 @@ function main(): void {
     if (installed && !hookIsCurrent(repo)) {
       console.error(
         `✗ ${path.basename(repo)} has core.hooksPath = ${HOOKS_PATH}, but the hook there is ` +
-          "not tLib's current bytes.\n    Fix:  bun run secrets:write-hooks"
+          "not NLib's current bytes.\n    Fix:  bun run secrets:write-hooks"
       );
       process.exit(1);
     }

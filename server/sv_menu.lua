@@ -5,9 +5,9 @@
 -- Everything goes through Platform rather than raw natives. registry.lua is pure
 -- so that host differences can only ever appear here.
 
-if _TLIB_SIDE ~= 'server' then return end
+if _NLIB_SIDE ~= 'server' then return end
 
-local log = Logger.create('tLib/menu')
+local log = Logger.create('NLib/menu')
 local S = MenuSchema
 
 MenuEngine = {}
@@ -205,7 +205,7 @@ Platform.AddNetEventHandler(S.events.request, function(requestId, body)
         return
     end
 
-    -- The shared "Send feedback" dialog, which tLib's own menu injects into
+    -- The shared "Send feedback" dialog, which NLib's own menu injects into
     -- every owner's root page. It is here rather than behind a net event of its
     -- own because this channel already carries the correlation id, the rate
     -- limiter, the timeout and the drop sweep -- and because the dialog is only
@@ -368,23 +368,23 @@ Platform.onPlayerDropped(function(src)
 end)
 
 -- Console only: these report and re-push whatever the ACEs now say.
-Platform.registerCommand('tlib_menu_refresh', function()
+Platform.registerCommand('nlib_menu_refresh', function()
     local count = 0
     for _ in registry:eachPlayer() do count = count + 1 end
     E.refresh()
-    print(('[tLib] Re-sent permission-filtered menus to %d connected player(s).'):format(count))
+    print(('[NLib] Re-sent permission-filtered menus to %d connected player(s).'):format(count))
 end, true)
 
-Platform.registerCommand('tlib_menu_permissions', function(_, args)
+Platform.registerCommand('nlib_menu_permissions', function(_, args)
     local target = tonumber(args[1])
     if not target or target % 1 ~= 0 or target <= 0 then
-        print('[tLib] Usage: tlib_menu_permissions <connected player server ID>')
+        print('[NLib] Usage: nlib_menu_permissions <connected player server ID>')
         return
     end
     local snapshot = registry:snapshot(target)
-    print(('[tLib] player=%d grants=%d descriptors=%d'):format(target, #snapshot.grants, #snapshot.menus))
+    print(('[NLib] player=%d grants=%d descriptors=%d'):format(target, #snapshot.grants, #snapshot.menus))
     for owner, ns in pairs(registry.namespaces) do
-        print(('[tLib]   namespace %s root=%s allowed=%s'):format(
+        print(('[NLib]   namespace %s root=%s allowed=%s'):format(
             owner, ns.ace, tostring(Platform.hasPermission(target, ns.ace))))
     end
 end, true)
@@ -404,7 +404,7 @@ local function ownerOf(declared)
 end
 
 local function api(name, fn)
-    Platform.export('tLib', name, fn)
+    Platform.export('NLib', name, fn)
 end
 
 --- Declare a resource's corner of the menu.
@@ -456,7 +456,7 @@ api('SetMenuTheme', function(menuId, theme, declaredOwner)
 end)
 
 -- Shared by both patch entry points. Going through the export instead would mean
--- tLib calling its own export, which reports no invoking resource.
+-- NLib calling its own export, which reports no invoking resource.
 local function patch(owner, menuId, itemId, changes)
     local ok, message, targets, clean = registry:patchItem(owner, menuId, itemId, changes)
     if not ok then return false, message end
