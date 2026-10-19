@@ -1,37 +1,8 @@
-import {
-  createHash,
-  createPublicKey,
-  randomBytes,
-  scryptSync,
-  timingSafeEqual,
-  verify,
-} from "node:crypto";
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
 declare function exports(name: string, fn: (...args: never[]) => unknown): void;
 
 const SCRYPT = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
-
-/** Claims of a valid EdDSA token as a JSON string, or "" when the signature or expiry fails. */
-export function verifyToken(
-  token: string,
-  publicKeyPem: string,
-  allowExpiredSeconds = 0,
-  nowMs = Date.now()
-): string {
-  const [head, body, sig] = String(token).split(".");
-  if (!head || !body || !sig) return "";
-  try {
-    const key = createPublicKey(publicKeyPem);
-    if (!verify(null, Buffer.from(`${head}.${body}`), key, Buffer.from(sig, "base64url")))
-      return "";
-    const claims = JSON.parse(Buffer.from(body, "base64url").toString());
-    if (typeof claims.exp !== "number") return "";
-    if (claims.exp * 1000 + allowExpiredSeconds * 1000 < nowMs) return "";
-    return JSON.stringify(claims);
-  } catch {
-    return "";
-  }
-}
 
 /** `scrypt$<salt>$<hash>`. Argon2id is not in Node 22, so scrypt is the memory-hard KDF used. */
 export function hashPassword(password: string): string {
@@ -57,7 +28,6 @@ export function sha256(input: string): string {
 
 export function installCrypto(): void {
   exports("Sha256", sha256 as never);
-  exports("VerifyToken", verifyToken as never);
   exports("HashPassword", hashPassword as never);
   exports("VerifyPassword", verifyPassword as never);
   exports("RandomToken", randomToken as never);
