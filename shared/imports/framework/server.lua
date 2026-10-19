@@ -1,6 +1,10 @@
 --[[
     Framework bridge (server): one interface over ESX, QBCore, QBox and standalone.
     deps: db.query(sql, params) -> rows, resourceState(name), esx(), qb(), qbox(), json, identifier(src), playerName(src), hasAce(src, ace)
+          characterName(src) -> 'Fornavn Efternavn' | nil   optional override for any framework
+    A player's name is always the ROLEPLAY name (the character), never the FiveM/Steam name. ESX reads firstName/lastName from the
+    player and falls back to the users table; QBCore and QBox read charinfo. Only when no character name can be found at all, and
+    only for standalone, the platform name is used (and logged once), because that is all there is.
 ]]
 
 local M = {}
@@ -23,14 +27,35 @@ local function decode(deps, v)
     return ok and type(t) == 'table' and t or {}
 end
 
+local warned = {}
+local function warnOnce(deps, key, msg)
+    if warned[key] or not deps.log then return end
+    warned[key] = true
+    deps.log(msg)
+end
+
 local function esx(deps)
     local B = { name = 'esx' }
+    local cache = {}
+
+    --- The character's name: the player object first, then the users table (cached per identifier).
+    local function rpName(p)
+        local first = p.get and p.get('firstName')
+        local last = p.get and p.get('lastName')
+        if type(first) == 'string' and first ~= '' then return trim(first .. ' ' .. (type(last) == 'string' and last or '')) end
+        if cache[p.identifier] then return cache[p.identifier] end
+        local rows = deps.db.query('SELECT firstname, lastname FROM users WHERE identifier = ? LIMIT 1', { p.identifier })
+        local r = rows and rows[1]
+        local name = r and trim((r.firstname or '') .. ' ' .. (r.lastname or '')) or ''
+        if name ~= '' then cache[p.identifier] = name end
+        return name ~= '' and name or nil
+    end
 
     function B.getPlayer(src)
         local p = deps.esx().GetPlayerFromId(src)
         if not p then return nil end
         return {
-            source = src, identifier = p.identifier, name = p.getName and p.getName() or deps.playerName(src),
+            source = src, identifier = p.identifier, name = rpName(p),
             job = { name = p.job and p.job.name, grade = p.job and p.job.grade or 0 },
             hasAce = function(ace) return deps.hasAce(src, ace) end,
         }
@@ -151,6 +176,8 @@ local function standalone(deps)
     function B.getPlayer(src)
         local id = deps.identifier(src)
         if not id then return nil end
+        -- Without a framework there is no character; the platform name is all there is unless characterName is supplied.
+        warnOnce(deps, 'standalone-name', 'standalone: no character names exist, using the FiveM name. Set Config.CharacterName to supply roleplay names.')
         return { source = src, identifier = id, name = deps.playerName(src), job = { name = nil, grade = 0 }, hasAce = function(ace) return deps.hasAce(src, ace) end }
     end
     function B.searchPeople() return {} end
@@ -164,9 +191,23 @@ end
 --- framework: 'auto' | 'esx' | 'qb' | 'qbox' | 'standalone'
 function M.create(deps, framework)
     if not framework or framework == 'auto' then framework = M.detect(deps.resourceState) end
-    if framework == 'esx' then return esx(deps) end
-    if framework == 'qb' or framework == 'qbox' then return qb(deps, framework) end
-    return standalone(deps)
+    local B
+    if framework == 'esx' then B = esx(deps)
+    elseif framework == 'qb' or framework == 'qbox' then B = qb(deps, framework)
+    else B = standalone(deps) end
+
+    -- A configured resolver wins over everything: it is how a server with its own character system says who is who.
+    if deps.characterName then
+        local inner = B.getPlayer
+        function B.getPlayer(src)
+            local p = inner(src)
+            if not p then return nil end
+            local ok, name = pcall(deps.characterName, src)
+            if ok and type(name) == 'string' and name ~= '' then p.name = trim(name) end
+            return p
+        end
+    end
+    return B
 end
 
 return M
