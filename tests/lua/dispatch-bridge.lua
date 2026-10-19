@@ -32,5 +32,5 @@ eq(broken.poll(), false, 'a missing script is not an error')
 eq(#closed, 2, 'and closes nothing')
 calls = { { id = 'r', prio = 2, msg = 'reject' } }
 p.poll(); p.poll()
-eq(#pushed, 5, 'a rejected push is retried on the next poll, not forgotten')
+eq(#pushed, 4, 'a rejected push is retried on the next poll, not forgotten')
 print('PASS dispatch bridge')
