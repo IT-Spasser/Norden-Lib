@@ -167,13 +167,13 @@ export function createMarketplaceAgent(config: AgentConfig): MarketplaceAgent {
     }
   }
 
-  g.on(`nlib:marketplace:doInspect:${resourceName}`, (raw) => {
+  g.on(`norden_lib:marketplace:doInspect:${resourceName}`, (raw) => {
     if (stopped || !raw || typeof raw !== "object") return;
     const p = raw as Payload;
     if (typeof p.token !== "string" || !p.token || p.token.length > 128) return;
     const result = inspect(p.type, p.slug);
     if (!stopped)
-      g.emit("nlib:marketplace:agentResult", { token: p.token, slug: p.slug, ...result });
+      g.emit("norden_lib:marketplace:agentResult", { token: p.token, slug: p.slug, ...result });
   });
 
   function receive(raw: unknown, action: "install" | "uninstall") {
@@ -182,7 +182,7 @@ export function createMarketplaceAgent(config: AgentConfig): MarketplaceAgent {
     if (typeof p.token !== "string" || !p.token || p.token.length > 128) return;
     const reply = (result: { ok: boolean; error?: string }) => {
       if (!stopped)
-        g.emit("nlib:marketplace:agentResult", { token: p.token, slug: p.slug, ...result });
+        g.emit("norden_lib:marketplace:agentResult", { token: p.token, slug: p.slug, ...result });
     };
     if (
       typeof p.slug !== "string" ||
@@ -225,8 +225,8 @@ export function createMarketplaceAgent(config: AgentConfig): MarketplaceAgent {
       )
       .finally(() => locks.delete(key));
   }
-  g.on(`nlib:marketplace:doInstall:${resourceName}`, (raw) => receive(raw, "install"));
-  g.on(`nlib:marketplace:doUninstall:${resourceName}`, (raw) => receive(raw, "uninstall"));
+  g.on(`norden_lib:marketplace:doInstall:${resourceName}`, (raw) => receive(raw, "install"));
+  g.on(`norden_lib:marketplace:doUninstall:${resourceName}`, (raw) => receive(raw, "uninstall"));
   function resetToShipped() {
     const removed: string[] = [];
     const failed: { slug: string; error: string }[] = [];
@@ -258,11 +258,11 @@ export function createMarketplaceAgent(config: AgentConfig): MarketplaceAgent {
     return { removed, failed };
   }
 
-  // NLib fires this once per resource at start, and only when nlib_demo is on.
+  // Norden Lib fires this once per resource at start, and only when norden_lib_demo is on.
   // It takes no payload it trusts: there is nothing to parameterise, so there is
   // nothing an attacker could steer. The operation is idempotent and, on a
   // server that is not in demo mode, never dispatched at all.
-  g.on(`nlib:marketplace:doDemoReset:${resourceName}`, () => {
+  g.on(`norden_lib:marketplace:doDemoReset:${resourceName}`, () => {
     if (stopped) return;
     const { removed, failed } = resetToShipped();
     if (removed.length)

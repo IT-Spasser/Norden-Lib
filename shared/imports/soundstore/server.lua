@@ -3,7 +3,7 @@
 -- reconciliation that keeps both honest against the disk.
 --
 --
--- Server-only: it writes a resource file and asks nlib.assets to list a
+-- Server-only: it writes a resource file and asks norden_lib.assets to list a
 -- directory, and neither works from a client VM.
 --
 -- THE RECONCILIATION MUST RUN BEFORE THE PHANTOM-MAPPING PASS. An empty folder
@@ -20,7 +20,7 @@ local soundstore = {}
 local Store = {}
 Store.__index = Store
 
---- Persist the tone map and the installed-sound list through nlib.jsonstore,
+--- Persist the tone map and the installed-sound list through norden_lib.jsonstore,
 --- which is THE writer of this document. `jsonstore.open` memoises per
 --- resource-and-file, so this store and the consumer's are the SAME object: one
 --- re-entrancy flag, one queue, and no two-writer invariant to restate.
@@ -56,7 +56,7 @@ end
 
 --- Drop an installed sound by filename and clear every tone that used it: a
 --- mapping left pointing at a deleted file 404s in the NUI rather than falling
---- back. Through `nlib.marketplace.forgetSoundFile`, which is the one sweep --
+--- back. Through `norden_lib.marketplace.forgetSoundFile`, which is the one sweep --
 --- it was extracted because the same eight lines existed in five other places.
 --- @return boolean
 function Store:removeSound(filename)
@@ -67,7 +67,7 @@ function Store:removeSound(filename)
             break
         end
     end
-    nlib.marketplace.forgetSoundFile(filename, self.toneWavMap)
+    norden_lib.marketplace.forgetSoundFile(filename, self.toneWavMap)
     self:save()
     return true
 end
@@ -75,7 +75,7 @@ end
 --- Record a marketplace-installed sound.
 --- @return string|nil the slug already claiming this filename, if any
 function Store:install(slug)
-    local conflict = nlib.marketplace.upsertSound(self.installedSounds, slug)
+    local conflict = norden_lib.marketplace.upsertSound(self.installedSounds, slug)
     self:save()
     return conflict
 end
@@ -83,7 +83,7 @@ end
 --- Forget a marketplace-uninstalled sound.
 --- @return string|nil the filename that was removed, if it was tracked
 function Store:uninstall(slug)
-    local removedFilename = nlib.marketplace.removeSound(self.installedSounds, self.toneWavMap, slug)
+    local removedFilename = norden_lib.marketplace.removeSound(self.installedSounds, self.toneWavMap, slug)
     if removedFilename then
         self._log("cleared toneWavMap entries for '" .. removedFilename .. "' (sound deleted)", self._levels.INFO)
     end
@@ -96,7 +96,7 @@ end
 ---
 --- `opts.keys`    the tone keys this device knows; their lowercased names plus
 ---                `.wav` are the shipped defaults the self-heal restores.
---- `opts.log`     a nlib.logger.create handle. Required: every branch below is
+--- `opts.log`     a norden_lib.logger.create handle. Required: every branch below is
 ---                destructive or corrective, and one that happens silently is
 ---                the failure this module exists to end.
 --- `opts.phantom` `(key, filename) -> boolean`, "this mapping was auto-seeded
@@ -112,7 +112,7 @@ function soundstore.open(opts)
     local keys     = opts.keys or {}
     local log      = opts.log
     if type(log) ~= "function" then
-        error("nlib.soundstore.open: opts.log is required (pass nlib.logger.create('<resource>'))", 2)
+        error("norden_lib.soundstore.open: opts.log is required (pass norden_lib.logger.create('<resource>'))", 2)
     end
 
     local keySet = {}
@@ -123,10 +123,10 @@ function soundstore.open(opts)
         return keySet[key] == true and filename == key:lower() .. ".wav"
     end
 
-    local levels = nlib.logger
+    local levels = norden_lib.logger
     local file  = opts.file or "data.json"
 
-    local store = nlib.jsonstore.open({ resource = resource, file = file, log = log })
+    local store = norden_lib.jsonstore.open({ resource = resource, file = file, log = log })
     local data = store:read()
 
     local self = setmetatable({
@@ -143,9 +143,9 @@ function soundstore.open(opts)
 
     local dirty = false
 
-    local diskFiles, scanFailure = nlib.assets.scan(dir, {
+    local diskFiles, scanFailure = norden_lib.assets.scan(dir, {
         resource   = resource,
-        extensions = nlib.assets.AUDIO,
+        extensions = norden_lib.assets.AUDIO,
     })
 
     -- An empty result is treated as a failed scan, NOT as an empty folder.
@@ -175,7 +175,7 @@ function soundstore.open(opts)
         -- 1. Reconcile installedSounds against disk. `changed` is membership,
         --    not length: swapping one sound for another leaves the count alone
         --    and used to discard the whole reconciliation.
-        local cleaned, changed = nlib.assets.reconcile(self.installedSounds, diskFiles)
+        local cleaned, changed = norden_lib.assets.reconcile(self.installedSounds, diskFiles)
         if changed then
             self.installedSounds = cleaned
             dirty = true

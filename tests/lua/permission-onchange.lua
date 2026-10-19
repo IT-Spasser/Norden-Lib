@@ -13,7 +13,7 @@
 local registered, serverAsks
 
 local seedLevel   -- what GetPermissionLevel returns; non-number models "no answer"
-local seedThrows  -- a NLib that is not reachable from load scope at all
+local seedThrows  -- a Norden Lib that is not reachable from load scope at all
 
 GetCurrentResourceName = function() return 'tRadar' end
 RegisterNetEvent   = function(name, fn) registered[name] = fn end
@@ -21,15 +21,15 @@ TriggerServerEvent = function(name) serverAsks[#serverAsks + 1] = name end
 
 exports = setmetatable({}, {
     __index = function(_, name)
-        assert(name == 'NLib', 'looked up the wrong resource: ' .. tostring(name))
+        assert(name == 'norden_lib', 'looked up the wrong resource: ' .. tostring(name))
         -- Indexing a missing export RAISES in FiveM, so model the raise and not
         -- a nil return: that is the shape the module's pcall is written against.
-        if seedThrows then error('No such export GetPermissionLevel in resource NLib') end
+        if seedThrows then error('No such export GetPermissionLevel in resource norden_lib') end
         return { GetPermissionLevel = function() return seedLevel end }
     end,
 })
 
-nlib = { name = 'NLib' }
+norden_lib = { name = 'norden_lib' }
 
 local function load()
     registered, serverAsks = {}, {}
@@ -37,8 +37,8 @@ local function load()
     return dofile('shared/imports/permission/client.lua')
 end
 
-local RECEIVE = 'NLib:receiveAdminPermission'
-local REQUEST = 'NLib:requestAdminPermission'
+local RECEIVE = 'norden_lib:receiveAdminPermission'
+local REQUEST = 'norden_lib:requestAdminPermission'
 
 --- Deliver a server-triggered answer.
 local function fromServer(result)
@@ -48,14 +48,14 @@ local function fromServer(result)
 end
 
 -- The seed ------------------------------------------------------------------
--- NLib's server only answers a request, and NLib's own client asks once at ITS
+-- Norden Lib's server only answers a request, and Norden Lib's own client asks once at ITS
 -- resource start. A module that loads lazily on a consumer's first onChange has
 -- already missed that reply, so a handler with no seed would report 0 until
 -- something happened to re-ask.
 
 seedThrows, seedLevel = false, 2
 local p = load()
-assert(p.level() == 2 and p.isAdmin(), 'the level is seeded from NLib own client cache')
+assert(p.level() == 2 and p.isAdmin(), 'the level is seeded from Norden Lib own client cache')
 assert(#serverAsks == 0, 'and a readable seed costs no extra round trip')
 
 seedLevel = 0
@@ -63,7 +63,7 @@ p = load()
 assert(p.level() == 0 and not p.isAdmin(), 'a seeded 0 is not an admin')
 assert(#serverAsks == 0, 'a seeded 0 is still an answer, so it is not re-asked either')
 
--- A NLib that cannot be reached at load scope must not produce a confident 0.
+-- A Norden Lib that cannot be reached at load scope must not produce a confident 0.
 seedThrows = true
 p = load()
 assert(p.level() == 0, 'an unreadable seed reads as level 0')
@@ -109,8 +109,8 @@ assert(p.isAdmin() and p.level() == 2, 'and the server, with 65535, is believed'
 
 -- A number, and only a number -----------------------------------------------
 -- The three copies all accepted a boolean too, labelled "old servers sent a
--- boolean", and so did NLib's own cl_permission.lua until 2026-10-12. All of
--- them are gone: NLib's client and server ship in one resource and cannot
+-- boolean", and so did Norden Lib's own cl_permission.lua until 2026-10-12. All of
+-- them are gone: Norden Lib's client and server ship in one resource and cannot
 -- disagree about the shape, and every tagged release v0.1..v0.6 sends a number.
 -- Anything that is not a number is 0, which is also the right answer for a
 -- spoofed payload.
@@ -183,7 +183,7 @@ assert(#serverAsks == before + 1 and serverAsks[#serverAsks] == REQUEST,
     'refresh asks the server')
 
 -- The wire names are an implementation detail -------------------------------
--- This is what unblocks renaming NLib:receiveAdminPermission. The module's
+-- This is what unblocks renaming norden_lib:receiveAdminPermission. The module's
 -- surface must name neither wire event, or a consumer can reach for one.
 for _, name in ipairs({ 'level', 'isAdmin', 'onChange', 'refresh' }) do
     assert(type(p[name]) == 'function', name .. ' is part of the interface')

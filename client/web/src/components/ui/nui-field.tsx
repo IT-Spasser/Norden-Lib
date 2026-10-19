@@ -18,7 +18,7 @@ import {
 // NuiButton moved into the shared package so tELS, tDetector and tRadar can
 // mount the marketplace components that use it; nothing in this app is
 // reachable from a sibling resource. Re-exported here so the existing import
-// sites in NLib keep working. nui.css comes along with it.
+// sites in Norden Lib keep working. nui.css comes along with it.
 import { NuiButton } from "../../../../../shared/ts/nui-kit/NuiButton";
 import type { DialogField, DialogValue } from "../dialog-model";
 import { NUI_CHECKBOX_CLASS, NuiCheckGlyph } from "./nui-controls";
@@ -26,7 +26,7 @@ import { applyNuiTheme, nuiThemeDeps } from "./nui-theme";
 
 export { NuiButton };
 
-const inputClass = "nlib-nui-control nlib-nui-input";
+const inputClass = "norden-nui-control norden-nui-input";
 
 /** Schema-neutral control binding. State and the NUI wire live in the dialog adapter. */
 export function NuiField(props: {
@@ -91,7 +91,7 @@ export function NuiField(props: {
   );
   return (
     <Field.Root
-      class="nlib-nui-field"
+      class="norden-nui-field"
       data-field-id={props.field.id}
       invalid={!!props.error}
       disabled={props.field.disabled}
@@ -103,10 +103,10 @@ export function NuiField(props: {
           props.field.type !== "display"
         }
       >
-        <Field.Label id={label} class="nlib-nui-label">
+        <Field.Label id={label} class="norden-nui-label">
           {props.field.label}
           <Show when={props.field.required}>
-            <span aria-hidden="true" class="nlib-nui-required">
+            <span aria-hidden="true" class="norden-nui-required">
               *
             </span>
           </Show>
@@ -129,21 +129,21 @@ export function NuiField(props: {
             disabled={props.field.disabled}
             invalid={!!props.error}
             onCheckedChange={(d) => props.onChange(d.checked === true)}
-            class="nlib-nui-checkbox"
+            class="norden-nui-checkbox"
             onFocusOut={props.onBlur}
           >
             {/* The box and the glyph come from nui-controls, which is also what a
               menu row renders — one implementation, two call sites. Ark still
               owns the interaction here; the menu keeps its own. */}
             <Checkbox.Control class={NUI_CHECKBOX_CLASS}>
-              <Checkbox.Indicator class="nlib-nui-checkbox-indicator">
+              <Checkbox.Indicator class="norden-nui-checkbox-indicator">
                 <NuiCheckGlyph />
               </Checkbox.Indicator>
             </Checkbox.Control>
-            <Checkbox.Label id={label} class="nlib-nui-label">
+            <Checkbox.Label id={label} class="norden-nui-label">
               {props.field.label}
               <Show when={props.field.required}>
-                <span aria-hidden="true" class="nlib-nui-required">
+                <span aria-hidden="true" class="norden-nui-required">
                   *
                 </span>
               </Show>
@@ -158,11 +158,11 @@ export function NuiField(props: {
             disabled={props.field.disabled}
             onValueChange={(d) => d.value !== null && props.onChange(d.value)}
             onFocusOut={props.onBlur}
-            class="nlib-nui-segments"
+            class="norden-nui-segments"
           >
             <For each={props.field.options ?? []}>
               {(option) => (
-                <RadioGroup.Item value={option.value} class="nlib-nui-control nlib-nui-segment">
+                <RadioGroup.Item value={option.value} class="norden-nui-control norden-nui-segment">
                   <RadioGroup.ItemText>{option.label}</RadioGroup.ItemText>
                   <RadioGroup.ItemHiddenInput
                     aria-required={props.field.required ? "true" : "false"}
@@ -174,7 +174,7 @@ export function NuiField(props: {
         </Match>
         <Match when={props.field.type === "dropdown"}>
           <Select.Root
-            class="nlib-nui-select"
+            class="norden-nui-select"
             collection={collection()}
             value={props.value === "" || props.value === undefined ? [] : [String(props.value)]}
             open={props.active !== false && selectOpen()}
@@ -188,10 +188,10 @@ export function NuiField(props: {
               <Select.Trigger
                 {...a11y()}
                 aria-required={props.field.required ? "true" : "false"}
-                class={`${inputClass} nlib-nui-select-trigger`}
+                class={`${inputClass} norden-nui-select-trigger`}
               >
                 <Select.ValueText placeholder={props.field.placeholder ?? "Select…"} />
-                <Select.Indicator class="nlib-nui-select-indicator">
+                <Select.Indicator class="norden-nui-select-indicator">
                   <ChevronDown size={14} />
                 </Select.Indicator>
               </Select.Trigger>
@@ -203,7 +203,7 @@ export function NuiField(props: {
             <Show when={props.active !== false && selectOpen()}>
               <Portal>
                 <Select.Positioner
-                  class="nlib-nui-surface nlib-nui-select-positioner"
+                  class="norden-nui-surface norden-nui-select-positioner"
                   ref={(el) =>
                     createEffect(
                       // See nuiThemeDeps: its revision reads must be in compute.
@@ -215,10 +215,10 @@ export function NuiField(props: {
                     )
                   }
                 >
-                  <Select.Content class="nlib-nui-select-content">
+                  <Select.Content class="norden-nui-select-content">
                     <For each={collection().items}>
                       {(item) => (
-                        <Select.Item item={item} class="nlib-nui-select-item">
+                        <Select.Item item={item} class="norden-nui-select-item">
                           <Select.ItemText>{item.label}</Select.ItemText>
                           <Select.ItemIndicator>
                             <Check size={14} />
@@ -244,7 +244,7 @@ export function NuiField(props: {
                drag, so committing from here was one `dialogChange` per step —
                and `tRadar/client/cl_settings.lua` answers each one with an
                `UpdateDialogField` push back, making a single drag a full
-               NUI→Lua→NUI round trip per pixel in every resource using a NLib
+               NUI→Lua→NUI round trip per pixel in every resource using a Norden Lib
                dialog. This is the only field type with that property; everything
                else here fires once per discrete interaction. */
             onValueChange={(d) => previewSlider(d.value[0])}
@@ -266,16 +266,20 @@ export function NuiField(props: {
             onValueChangeEnd={(d) => commitSlider(d.value[0])}
             onFocusOut={props.onBlur}
           >
-            <div class="nlib-nui-slider">
-              <Slider.Control class="nlib-nui-slider-control">
-                <Slider.Track class="nlib-nui-slider-track">
-                  <Slider.Range class="nlib-nui-slider-range" />
+            <div class="norden-nui-slider">
+              <Slider.Control class="norden-nui-slider-control">
+                <Slider.Track class="norden-nui-slider-track">
+                  <Slider.Range class="norden-nui-slider-range" />
                 </Slider.Track>
-                <Slider.Thumb index={0} {...a11y()} class="nlib-nui-control nlib-nui-slider-thumb">
+                <Slider.Thumb
+                  index={0}
+                  {...a11y()}
+                  class="norden-nui-control norden-nui-slider-thumb"
+                >
                   <Slider.HiddenInput />
                 </Slider.Thumb>
               </Slider.Control>
-              <Slider.ValueText class="nlib-nui-slider-value" />
+              <Slider.ValueText class="norden-nui-slider-value" />
             </div>
           </Slider.Root>
         </Match>
@@ -285,12 +289,12 @@ export function NuiField(props: {
           suppressed for this type; `description` is the second line.
         */}
         <Match when={props.field.type === "display"}>
-          <p class="nlib-nui-display">{props.field.label}</p>
+          <p class="norden-nui-display">{props.field.label}</p>
         </Match>
         <Match when={props.field.type === "textarea"}>
           <Field.Textarea
             value={String(props.value ?? "")}
-            class={`${inputClass} nlib-nui-textarea`}
+            class={`${inputClass} norden-nui-textarea`}
             rows={props.field.rows ?? 3}
             maxlength={props.field.maxLength}
             required={props.field.required}
@@ -318,12 +322,12 @@ export function NuiField(props: {
         </Match>
       </MatchType>
       <Show when={props.field.description}>
-        <Field.HelperText id={helper} class="nlib-nui-helper">
+        <Field.HelperText id={helper} class="norden-nui-helper">
           {props.field.description}
         </Field.HelperText>
       </Show>
       <Show when={props.error}>
-        <Field.ErrorText id={error} role="alert" class="nlib-nui-error">
+        <Field.ErrorText id={error} role="alert" class="norden-nui-error">
           {props.error}
         </Field.ErrorText>
       </Show>

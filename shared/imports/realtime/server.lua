@@ -1,22 +1,22 @@
--- Server-side facade over NLib's WebSocket realtime layer.
+-- Server-side facade over Norden Lib's WebSocket realtime layer.
 --
---   shared_scripts { '@NLib/imports.lua' }
---   nlib_module { 'realtime' }
+--   shared_scripts { '@norden_lib/imports.lua' }
+--   norden_lib_module { 'realtime' }
 --
---   local info = nlib.realtime:issueToken(playerId, { meta = { hello = 'world' } })
---   nlib.realtime:setRooms(playerId, { 'radio:freq:154.125' })
---   nlib.realtime:onEvent('ptt', function(playerId, sessionId, payload) end)
---   nlib.realtime:broadcastEvent('radio:freq:154.125', 'talker', { id = 42, on = true })
+--   local info = norden_lib.realtime:issueToken(playerId, { meta = { hello = 'world' } })
+--   norden_lib.realtime:setRooms(playerId, { 'radio:freq:154.125' })
+--   norden_lib.realtime:onEvent('ptt', function(playerId, sessionId, payload) end)
+--   norden_lib.realtime:broadcastEvent('radio:freq:154.125', 'talker', { id = 42, on = true })
 --
 -- The binary voice path does not go through Lua — it lives entirely in the
--- iframe <-> shell <-> ws <-> NLib-node path. Lua handles room decisions, typed
+-- iframe <-> shell <-> ws <-> Norden Lib-node path. Lua handles room decisions, typed
 -- events and lifecycle only.
 
-local RT_EVT_CONNECT      = '__nlib:rt:connect'
-local RT_EVT_DISCONNECT   = '__nlib:rt:disconnect'
-local RT_EVT_EVENT        = '__nlib:rt:event'
-local RT_EVT_CTRL_RECV    = '__nlib:rt:control:recv'
-local RT_EVT_CTRL_STATE   = '__nlib:rt:control:state'
+local RT_EVT_CONNECT      = '__norden_lib:rt:connect'
+local RT_EVT_DISCONNECT   = '__norden_lib:rt:disconnect'
+local RT_EVT_EVENT        = '__norden_lib:rt:event'
+local RT_EVT_CTRL_RECV    = '__norden_lib:rt:control:recv'
+local RT_EVT_CTRL_STATE   = '__norden_lib:rt:control:state'
 
 local realtime          = {}
 
@@ -39,14 +39,14 @@ local function registerListenersOnce()
         end
         for i = 1, #connectHandlers do
             local ok, err = pcall(connectHandlers[i], playerId, sessionId, meta)
-            if not ok then print(('[nlib.realtime] onConnect handler error: %s'):format(err)) end
+            if not ok then print(('[norden_lib.realtime] onConnect handler error: %s'):format(err)) end
         end
     end)
 
     AddEventHandler(RT_EVT_DISCONNECT, function(playerId, sessionId, code, reason)
         for i = 1, #disconnectHandlers do
             local ok, err = pcall(disconnectHandlers[i], playerId, sessionId, code, reason)
-            if not ok then print(('[nlib.realtime] onDisconnect handler error: %s'):format(err)) end
+            if not ok then print(('[norden_lib.realtime] onDisconnect handler error: %s'):format(err)) end
         end
     end)
 
@@ -55,12 +55,12 @@ local function registerListenersOnce()
         if list then
             for i = 1, #list do
                 local ok, err = pcall(list[i], playerId, sessionId, payload)
-                if not ok then print(('[nlib.realtime] onEvent(%s) handler error: %s'):format(eventType, err)) end
+                if not ok then print(('[norden_lib.realtime] onEvent(%s) handler error: %s'):format(eventType, err)) end
             end
         end
         for i = 1, #eventWildcard do
             local ok, err = pcall(eventWildcard[i], playerId, sessionId, eventType, payload)
-            if not ok then print(('[nlib.realtime] onEvent(*) handler error: %s'):format(err)) end
+            if not ok then print(('[norden_lib.realtime] onEvent(*) handler error: %s'):format(err)) end
         end
     end)
 end
@@ -74,46 +74,46 @@ function realtime:issueToken(playerId, opts)
         local ok, encoded = pcall(json.encode, meta)
         if ok then metaJson = encoded end
     end
-    return exports['NLib']:rtIssueToken(playerId, metaJson)
+    return exports['norden_lib']:rtIssueToken(playerId, metaJson)
 end
 
 --- { wsUrl, port, host } — useful for logging / health checks.
 function realtime:connectionInfo()
-    return exports['NLib']:rtConnectionInfo()
+    return exports['norden_lib']:rtConnectionInfo()
 end
 
 --- Close all of a player's sessions. Returns the number closed.
 function realtime:kick(playerId, reason)
-    return exports['NLib']:rtKick(playerId, reason or 'kicked')
+    return exports['norden_lib']:rtKick(playerId, reason or 'kicked')
 end
 
 --- Replace a player's room membership. Pass an empty table to remove all.
 function realtime:setRooms(playerId, roomIds)
     if type(roomIds) ~= 'table' then roomIds = {} end
-    exports['NLib']:rtSetRooms(playerId, roomIds)
+    exports['norden_lib']:rtSetRooms(playerId, roomIds)
 end
 
 function realtime:getRooms(playerId)
-    return exports['NLib']:rtGetRooms(playerId) or {}
+    return exports['norden_lib']:rtGetRooms(playerId) or {}
 end
 
 --- Deliver a typed event to all of a player's authed sessions. Returns the
 --- number of sessions reached.
 function realtime:sendEvent(playerId, eventType, payload)
-    return exports['NLib']:rtSendEvent(playerId, eventType, payload)
+    return exports['norden_lib']:rtSendEvent(playerId, eventType, payload)
 end
 
 --- Broadcast to every session subscribed to a room. `opts.exceptPlayerId` skips
 --- one player. Returns the number of sessions reached.
 function realtime:broadcastEvent(roomId, eventType, payload, opts)
     local excl = opts and opts.exceptPlayerId or nil
-    return exports['NLib']:rtBroadcastEvent(roomId, eventType, payload, excl)
+    return exports['norden_lib']:rtBroadcastEvent(roomId, eventType, payload, excl)
 end
 
 --- Publish raw bytes to a room from the server side — rare, since voice goes
 --- iframe <-> ws direct. The fanout frame carries senderId 0, meaning "server".
 function realtime:publish(roomId, bytes)
-    return exports['NLib']:rtPublishServer(roomId, bytes)
+    return exports['norden_lib']:rtPublishServer(roomId, bytes)
 end
 
 function realtime:onConnect(fn)
@@ -148,11 +148,11 @@ function realtime:onEvent(eventType, fn)
 end
 
 function realtime:stats()
-    return exports['NLib']:rtStats()
+    return exports['norden_lib']:rtStats()
 end
 
 -- The control client is a persistent outbound WebSocket to a remote brain (e.g.
--- radio.yourapp.com). The consumer supplies a license and a token endpoint; NLib
+-- radio.yourapp.com). The consumer supplies a license and a token endpoint; Norden Lib
 -- handles the token fetch, reconnects and heartbeat.
 
 local controlRecvHandlers = {}
@@ -171,7 +171,7 @@ local function registerControlListenersOnce()
         end
         for i = 1, #controlRecvHandlers do
             local ok, err = pcall(controlRecvHandlers[i], envType, data, n)
-            if not ok then print(('[nlib.realtime] control recv handler error: %s'):format(err)) end
+            if not ok then print(('[norden_lib.realtime] control recv handler error: %s'):format(err)) end
         end
     end)
 
@@ -187,18 +187,18 @@ end
 function realtime:startControl(cfg)
     assert(type(cfg) == 'table', 'startControl: cfg table required')
     registerControlListenersOnce()
-    return exports['NLib']:rtStartControl(cfg.license, cfg.tokenEndpoint)
+    return exports['norden_lib']:rtStartControl(cfg.license, cfg.tokenEndpoint)
 end
 
 function realtime:stopControl()
-    return exports['NLib']:rtStopControl()
+    return exports['norden_lib']:rtStopControl()
 end
 
 --- Send an envelope upstream, e.g. typ = "state:talker". `correlation` is an
 --- optional reply id for request/response flows.
 function realtime:sendControl(typ, data, correlation)
     local dataJson = data ~= nil and json.encode(data) or nil
-    return exports['NLib']:rtSendControl(typ, dataJson, correlation)
+    return exports['norden_lib']:rtSendControl(typ, dataJson, correlation)
 end
 
 --- Register a handler for incoming upstream envelopes:
@@ -217,7 +217,7 @@ function realtime:onControlState(fn)
 end
 
 function realtime:controlState()
-    return (exports['NLib']:rtControlState() or {}).state
+    return (exports['norden_lib']:rtControlState() or {}).state
 end
 
 return realtime

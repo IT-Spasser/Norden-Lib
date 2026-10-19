@@ -1,13 +1,13 @@
--- Server-side facade over NLib's engine registry.
+-- Server-side facade over Norden Lib's engine registry.
 --
---   shared_scripts { '@NLib/imports.lua' }
---   nlib_module { 'inference' }
+--   shared_scripts { '@norden_lib/imports.lua' }
+--   norden_lib_module { 'inference' }
 --
---   local shared = nlib.inference:lookup('text', 'qwen3-1.7b-q4_k_m')
+--   local shared = norden_lib.inference:lookup('text', 'qwen3-1.7b-q4_k_m')
 --   if shared then
 --       -- someone else already has these weights loaded; talk to shared.url
 --   else
---       local handle = nlib.inference:advertise({
+--       local handle = norden_lib.inference:advertise({
 --           capability = 'text',
 --           workload   = 'qwen3-1.7b-q4_k_m',
 --           url        = 'http://127.0.0.1:18291/v1',
@@ -19,7 +19,7 @@
 -- `request.url` and rejects an advertisement with no URL by returning '', so a
 -- descriptor spelled `baseUrl` advertises nothing and reports it as nil.
 --
--- No inference goes through NLib. An advertisement is a note about where an
+-- No inference goes through Norden Lib. An advertisement is a note about where an
 -- engine is; the bytes go straight between the two resources over loopback.
 -- Advertised URLs must be on 127.0.0.1 — the registry rejects anything else.
 
@@ -29,7 +29,7 @@ local inference = {}
 --- the advertisement was rejected (missing fields, or a non-loopback URL).
 function inference:advertise(descriptor)
     assert(type(descriptor) == 'table', 'advertise: descriptor table required')
-    local handle = exports['NLib']:InferenceAdvertise(json.encode(descriptor))
+    local handle = exports['norden_lib']:InferenceAdvertise(json.encode(descriptor))
     if type(handle) ~= 'string' or handle == '' then return nil end
     return handle
 end
@@ -37,7 +37,7 @@ end
 --- An engine another resource is already running for this exact workload, or
 --- nil. Never returns this resource's own advertisement.
 function inference:lookup(capability, workload)
-    local encoded = exports['NLib']:InferenceLookup(capability, workload)
+    local encoded = exports['norden_lib']:InferenceLookup(capability, workload)
     if type(encoded) ~= 'string' or encoded == '' then return nil end
     local ok, parsed = pcall(json.decode, encoded)
     if not ok then return nil end
@@ -68,12 +68,12 @@ end
 --- Drop an advertisement early. Stopping the resource does this anyway.
 function inference:withdraw(handle)
     if type(handle) ~= 'string' or handle == '' then return false end
-    return nativeTruth(exports['NLib']:InferenceWithdraw(handle))
+    return nativeTruth(exports['norden_lib']:InferenceWithdraw(handle))
 end
 
 --- Every live advertisement, for diagnostics.
 function inference:list()
-    local encoded = exports['NLib']:InferenceList()
+    local encoded = exports['norden_lib']:InferenceList()
     if type(encoded) ~= 'string' or encoded == '' then return {} end
     local ok, parsed = pcall(json.decode, encoded)
     if not ok then return {} end

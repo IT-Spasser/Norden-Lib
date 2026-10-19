@@ -222,8 +222,8 @@ const BUNDLES: readonly Bundle[] = [
          * RETARGETED. This case used to name
          * `tAFK/client/web/src/components/ui/input.tsx` and a six-utility focus
          * string. That file is GONE -- tAFK's Input converged into
-         * `@nlib/internal/ui/input`, whose affordance is one hand-written class,
-         * `.prop-input` in `@nlib/shared/css/surface.css`, not a utility string.
+         * `@norden_lib/internal/ui/input`, whose affordance is one hand-written class,
+         * `.prop-input` in `@norden_lib/shared/css/surface.css`, not a utility string.
          * So the old case could not pass: the probe reads `source` off disk and
          * threw ENOENT before tCAD, tUnit and tRadio's bundles were reached at
          * all.
@@ -236,7 +236,7 @@ const BUNDLES: readonly Bundle[] = [
          * utility string spelt.
          */
         name: "input, real Tab",
-        source: "NLib/shared/css/surface.css",
+        source: "norden_lib/shared/css/surface.css",
         classes: "prop-input",
         trigger: "tab",
         tag: "input",
@@ -387,7 +387,7 @@ const BUNDLES: readonly Bundle[] = [
 // A PNG reader, because the verdict is pixels
 //
 // Deliberately NOT `sharp`: that is a native binary, it is pinned in tRadio for
-// a documented reason, and NLib must stay installable without it. Chromium's
+// a documented reason, and Norden Lib must stay installable without it. Chromium's
 // own screenshots are 8-bit, non-interlaced, colour type 2 or 6, which is all
 // this needs to read. Anything else throws rather than being guessed at.
 interface Bitmap {

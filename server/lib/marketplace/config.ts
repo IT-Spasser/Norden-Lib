@@ -1,6 +1,6 @@
 // Marketplace configuration — resolved from convars on every call.
 //
-// One convar (`nlib_api_base_url`) names the TIMMYG Studios API host.
+// One convar (`norden_lib_api_base_url`) names the TIMMYG Studios API host.
 // Default points at production; override to `http://localhost:3000/marketplace`
 // against a local `wrangler dev` worker for integration testing. That one convar
 // also redirects community configs and the product version check — see
@@ -36,7 +36,7 @@ export interface MarketplaceConfig {
  * Marketplace config, recomputed on every call.
  *
  * NOT memoised, deliberately. It used to cache into a module-scope `cached` at
- * first use, which meant changing `nlib_api_base_url` mid-session silently
+ * first use, which meant changing `norden_lib_api_base_url` mid-session silently
  * did nothing here while tRadio's client bridge — which always re-read per call
  * — followed it immediately. Someone iterating against a local dev server got
  * half the traffic on each host with no indication why. The work is two template

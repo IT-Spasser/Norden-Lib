@@ -10,7 +10,7 @@ export function isNUI(): boolean {
   return typeof window.GetParentResourceName === "function";
 }
 
-export function getResourceName(fallback = "NLib"): string {
+export function getResourceName(fallback = "norden_lib"): string {
   return window.GetParentResourceName?.() ?? fallback;
 }
 
@@ -163,7 +163,7 @@ export async function fetchNui<T = unknown>(
     return await requestNui<T>(event, data, normaliseOptions(options));
   } catch (err) {
     // A timeout is a real bug in the Lua handler; say so rather than swallow it.
-    console.warn(`[NLib/nui] ${err instanceof Error ? err.message : String(err)}`);
+    console.warn(`[norden_lib/nui] ${err instanceof Error ? err.message : String(err)}`);
     return null;
   }
 }

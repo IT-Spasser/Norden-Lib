@@ -50,7 +50,7 @@ export interface BrowseResult {
 /**
  * List items for the in-game panel. The request itself belongs to
  * `shared/ts/marketplace/catalogue.ts`, which tRadio's admin server compiles in as
- * well; this is the NLib-panel adapter on top of it and nothing more.
+ * well; this is the Norden Lib-panel adapter on top of it and nothing more.
  */
 export async function browseItems(params: BrowseParams): Promise<BrowseResult> {
   const page = await browseCatalogue(params, BROWSE_TIMEOUT_MS);

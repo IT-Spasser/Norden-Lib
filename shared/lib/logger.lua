@@ -6,7 +6,7 @@ local _labels   = { [1] = 'DEBUG', [2] = 'INFO', [3] = 'WARN', [4] = 'ERROR' }
 local _minLevel = 2
 
 function Logger.setLevel(level)
-    assert(type(level) == 'number', '[NLib/logger] setLevel: level must be a number')
+    assert(type(level) == 'number', '[norden_lib/logger] setLevel: level must be a number')
     _minLevel = level
 end
 
@@ -38,7 +38,7 @@ local function _format(source, lvl, args, n)
     if text == '' then return nil end
 
     -- `source` when the caller pinned one, `_side` otherwise. It was taken and
-    -- then dropped: every `Logger.create('NLib/menu')` line printed `[server]`,
+    -- then dropped: every `Logger.create('norden_lib/menu')` line printed `[server]`,
     -- so thirty-odd modules were indistinguishable in the console and the
     -- docstring on `create` described behaviour that did not happen.
     -- `Logger.log` passes nil and still reads `[server]` / `[client]`.
@@ -66,12 +66,12 @@ function Logger.log(...)
 end
 
 --- Returns a log function pinned to a source name:
----   local log = Logger.create('NLib/menu')
+---   local log = Logger.create('norden_lib/menu')
 ---   log('Bad value', val, 3)  -- WARN
 function Logger.create(source)
     assert(
         type(source) == 'string' and source ~= '',
-        '[NLib/logger] create: source must be a non-empty string'
+        '[norden_lib/logger] create: source must be a non-empty string'
     )
     return function(...)
         _emit(source, ...)
@@ -83,23 +83,23 @@ end
 function Logger.init(ui)
     local levelMap = { debug = 1, info = 2, warn = 3, error = 4 }
 
-    Platform.onUIEvent(ui, 'NLibLog', function(data)
+    Platform.onUIEvent(ui, 'nordenLibLog', function(data)
         local rawLevel = type(data) == 'table' and data.level or 'info'
         local source   = type(data) == 'table' and data.source or 'ui'
         local msg      = type(data) == 'table' and data.msg or ''
 
         local level    = levelMap[tostring(rawLevel):lower()] or 2
 
-        _emit('NLib/' .. tostring(source), tostring(msg), level)
+        _emit('norden_lib/' .. tostring(source), tostring(msg), level)
     end)
 end
 
 --- Log exports for consuming resources. Registered from client.lua only, not
 --- server.lua.
 ---
----   local log = exports['NLib']:CreateLogger('tMenu', print)
+---   local log = exports['norden_lib']:CreateLogger('tMenu', print)
 ---   log('Bad value', val, 3)                      -- WARN
----   local line = exports['NLib']:Log('tMenu', { 'msg', 2 })
+---   local line = exports['norden_lib']:Log('tMenu', { 'msg', 2 })
 ---
 --- `Log` returns a formatted line and leaves the print call to the caller.
 --- CreateLogger's optional `opts.minLevel` overrides the global level for that
@@ -118,9 +118,9 @@ function Logger.registerExports()
         return _format(loggerId, lvl, args, n)
     end
 
-    Platform.export('NLib', 'CreateLogger', function(loggerId, printFn, opts)
+    Platform.export('norden_lib', 'CreateLogger', function(loggerId, printFn, opts)
         if type(loggerId) ~= 'string' or loggerId == '' then
-            print('[NLib/logger/ERROR] CreateLogger: loggerId must be a non-empty string')
+            print('[norden_lib/logger/ERROR] CreateLogger: loggerId must be a non-empty string')
             return nil
         end
 
@@ -133,7 +133,7 @@ function Logger.registerExports()
             or
             (printFnType == 'userdata' and type(getmetatable(printFn)) == 'table' and type(getmetatable(printFn).__call) == 'function')
         if not printFnCallable then
-            print('[NLib/logger/ERROR] CreateLogger: printFn must be a function (got '
+            print('[norden_lib/logger/ERROR] CreateLogger: printFn must be a function (got '
                 .. printFnType .. ' from logger "' .. loggerId .. '")')
             return nil
         end
@@ -156,11 +156,11 @@ function Logger.registerExports()
         return Platform.storeCallback(closure)
     end)
 
-    Platform.export('NLib', 'Log', function(loggerId, args)
+    Platform.export('norden_lib', 'Log', function(loggerId, args)
         if type(args) ~= 'table' then
             print(string.format(
-                '[NLib/logger/ERROR] Log: args must be a table (got %s from logger "%s") — '
-                .. 'use colon-bracket notation: exports["NLib"]:Log(...)',
+                '[norden_lib/logger/ERROR] Log: args must be a table (got %s from logger "%s") — '
+                .. 'use colon-bracket notation: exports["norden_lib"]:Log(...)',
                 type(args), tostring(loggerId)
             ))
             return
@@ -169,7 +169,7 @@ function Logger.registerExports()
         return _formatForConsumer(loggerId, args)
     end)
 
-    Platform.export('NLib', 'SetLogLevel', function(level)
+    Platform.export('norden_lib', 'SetLogLevel', function(level)
         Logger.setLevel(level)
     end)
 end

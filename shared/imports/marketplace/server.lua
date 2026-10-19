@@ -92,7 +92,7 @@ end
 --[[
     The standard two item types, and the warning that was dead in four copies.
 
-        nlib.marketplace.standardTypes(GetCurrentResourceName(), {
+        norden_lib.marketplace.standardTypes(GetCurrentResourceName(), {
             note = ..., warn = ...,
             layouts = { installed = fn, uninstalled = fn },
             sounds  = { warnEvent = 'tdet:soundOverwriteWarning',
@@ -102,13 +102,13 @@ end
     Four resources declared the same two types at the same two paths inside the
     same pcall wrapper, and three of them broadcast a `soundOverwriteWarning` to
     EVERY PLAYER about an admin action -- for which nothing anywhere registered a
-    handler. tELS found it and deleted its copy. NLib now carries the installing
+    handler. tELS found it and deleted its copy. Norden Lib now carries the installing
     player's id as `meta.src`, so the message reaches the one person who can act
     on it. The server log is unconditional and the client send is not: `meta.src`
     is nil when the admin disconnected mid-install.
 
     Registration is pcall'd because a server may run without
-    `nlib_module { 'marketplace' }`; the bridge then answers false rather than
+    `norden_lib_module { 'marketplace' }`; the bridge then answers false rather than
     raising, and the resource still has to come up -- with a warning naming the
     fxmanifest line to add, which is the one thing the operator can act on.
 ]]
@@ -122,7 +122,7 @@ local DEFAULT_SOUND_PATH = 'layouts/sounds'
 --- level: the two level scales in this tree run in OPPOSITE directions, so a
 --- shared module passing a number would log tRadio's routine installs at ERROR.
 ---
---- Returns true when NLib accepted it. The Node bridge answers `false` rather
+--- Returns true when Norden Lib accepted it. The Node bridge answers `false` rather
 --- than raising when the `marketplace` module is not loaded, so a false and a
 --- throw are the same operator-visible condition and get the same message.
 ---
@@ -132,11 +132,11 @@ local DEFAULT_SOUND_PATH = 'layouts/sounds'
 --- @return boolean
 function marketplace.registerType(kind, installPath, warn)
     local ok, registered = pcall(function()
-        return exports['NLib']:RegisterMarketplaceType(kind, { installPath = installPath })
+        return exports['norden_lib']:RegisterMarketplaceType(kind, { installPath = installPath })
     end)
     if ok and registered ~= false then return true end
     if type(warn) == 'function' then
-        warn(("marketplace type '%s' was not registered — add `nlib_module { 'marketplace' }` to this resource's fxmanifest to enable it")
+        warn(("marketplace type '%s' was not registered — add `norden_lib_module { 'marketplace' }` to this resource's fxmanifest to enable it")
             :format(tostring(kind)))
     end
     return false
@@ -167,7 +167,7 @@ end
 
 --- Register the standard `ui` and `sound` types and wire their lifecycle.
 ---
---- @param resourceName string  the lifecycle event prefix; NLib fires
+--- @param resourceName string  the lifecycle event prefix; Norden Lib fires
 ---                             `<resourceName>:marketplace:installed`.
 --- @param opts table
 ---   note     function|nil  function(message), for the routine install lines

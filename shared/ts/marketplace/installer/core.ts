@@ -201,7 +201,7 @@ export function owned(c: Context): Receipt | null {
     // ("installed content changed; refusing overwrite/delete"), and this one
     // reached the admin panel verbatim as `Unexpected token } in JSON at
     // position 42` — which names neither the file nor the fact that the file is
-    // NLib's own bookkeeping rather than anything they installed.
+    // Norden Lib's own bookkeeping rather than anything they installed.
     try {
       receipt = JSON.parse(fs.readFileSync(c.receipt, "utf8"));
     } catch {

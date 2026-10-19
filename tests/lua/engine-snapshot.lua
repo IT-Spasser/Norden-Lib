@@ -29,8 +29,8 @@
 
 -- The host
 
-_NLIB_SIDE = 'client'
-_NLIB_IS_FIVEM = false -- no RegisterCommand/RegisterKeyMapping in this state
+_NORDEN_LIB_SIDE = 'client'
+_NORDEN_LIB_IS_FIVEM = false -- no RegisterCommand/RegisterKeyMapping in this state
 
 local now, timers, threads = 0, {}, {}
 local netEvents, uiCallbacks, uiMessages, serverEvents = {}, {}, {}, {}
@@ -60,7 +60,7 @@ Platform = {
 }
 
 assert(loadfile('shared/lib/menu/schema.lua', 't', _G),
-    'shared/lib/menu/schema.lua not found -- run this suite from the NLib resource root')()
+    'shared/lib/menu/schema.lua not found -- run this suite from the Norden Lib resource root')()
 assert(loadfile('shared/lib/menu/catalog.lua', 't', _G))()
 assert(loadfile('client/lib/menu/actions.lua', 't', _G))()
 for _, path in ipairs({ 'client/lib/menu/input.lua', 'client/lib/menu/context.lua',

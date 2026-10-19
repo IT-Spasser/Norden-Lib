@@ -1,4 +1,4 @@
--- Run from NLib: bunx --package fengari-node-cli fengari tests/lua/versioncheck.lua
+-- Run from norden_lib: bunx --package fengari-node-cli fengari tests/lua/versioncheck.lua
 -- Executes the actual Lua module with mocked FiveM metadata, HTTP and timers.
 local report = print
 local passed = 0
@@ -44,7 +44,7 @@ local function fixture(authors, name)
     function PerformHttpRequest(url, cb, method, body, headers)
         requests[#requests + 1] = { url = url, cb = cb, headers = headers }
     end
-    -- The module takes the studio-author rule from NLib's real
+    -- The module takes the studio-author rule from Norden Lib's real
     -- shared/sh_branding.lua rather than carrying its own copy. Load that exact
     -- file here, per fixture, so these tests are an oracle for the shared rule
     -- itself -- a mocked stand-in would pass while the banner drifted away from
@@ -54,8 +54,8 @@ local function fixture(authors, name)
     -- reaches it, and the module's guard is written to accept either.
     StudioBranding = nil
     assert(loadfile('shared/sh_branding.lua'))()
-    -- Same story for the studio API host: the module takes it from NLib's real
-    -- shared/sh_api.lua so `nlib_api_base_url` is ONE switch -- pointing it
+    -- Same story for the studio API host: the module takes it from Norden Lib's real
+    -- shared/sh_api.lua so `norden_lib_api_base_url` is ONE switch -- pointing it
     -- at a dev worker has to move the version check and its changelog too, not
     -- just marketplace installs. Pre-loaded here for the same reason branding is;
     -- the module's guard accepts either. GetConvar is left undefined by default
@@ -100,8 +100,8 @@ local function excludes(text, part) assert(not text:find(part, 1, true), 'Unexpe
 local function current(cb) cb({ version = '1.0.0' }) end
 
 -- Five of the tests below load a SIBLING resource (`../tDB`, `../tRadio`, ...)
--- to prove NLib's shared versioncheck is what those resources actually call.
--- A standalone clone of NLib from GitHub has no siblings, and `scripts/test-lua.ts`
+-- to prove Norden Lib's shared versioncheck is what those resources actually call.
+-- A standalone clone of Norden Lib from GitHub has no siblings, and `scripts/test-lua.ts`
 -- globs this directory with no allowlist, so without this the whole suite dies on
 -- the first `assert(loadfile(...))` of a file that is not there.
 --
@@ -132,7 +132,7 @@ test('manifest author enables art even after resource rename', function()
 end)
 
 test('display options cannot grant branding to an unrelated resource', function()
-    local f = fixture({ 'Another author' }, 'NLib')
+    local f = fixture({ 'Another author' }, 'norden_lib')
     assert(#f.vc.lean('tDB') == 1)
     f.vc({ name = 'tDB', current = '1.0.0', author = 'TIMMYG Studios', banner = 'CUSTOM ASCII', fetch = current })
     f.run(1100)
@@ -165,7 +165,7 @@ end)
 
 test('GitHub checks the configured repository and renders its release', function()
     local f = fixture({ 'TIMMYG Studios' })
-    f.vc({ name = 'NLib', current = '1.0.0', fetch = f.vc.github('tommy141x/tLib') })
+    f.vc({ name = 'norden_lib', current = '1.0.0', fetch = f.vc.github('tommy141x/tLib') })
     assert(f.requests[1].url == 'https://api.github.com/repos/tommy141x/tLib/releases/latest')
     f.requests[1].cb(200, { tag_name = 'v1.1.0', body = 'Fixed things', html_url = 'https://github.com/tommy141x/tLib/releases/tag/v1.1.0' })
     f.run(1100)
@@ -189,16 +189,16 @@ test('Studios provider queries each product and resolves once', function()
     end
 end)
 
--- The whole point of nlib_api_base_url is pointing every studio call at one
+-- The whole point of norden_lib_api_base_url is pointing every studio call at one
 -- local dev server. Before this, the provider below hard-coded the host, so an
 -- operator testing marketplace installs against localhost still had their
 -- version check and changelog hitting production -- exactly the split the convar
 -- exists to remove. github() is asserted UNCHANGED in the same test: that one
 -- really does point at GitHub and must never follow this convar.
-test('Studios provider follows nlib_api_base_url; GitHub does not', function()
+test('Studios provider follows norden_lib_api_base_url; GitHub does not', function()
     local f = fixture({ 'TIMMYG Studios' })
     GetConvar = function(name, default)
-        if name == 'nlib_api_base_url' then return 'http://localhost:8787/' end
+        if name == 'norden_lib_api_base_url' then return 'http://localhost:8787/' end
         return default
     end
     f.vc({ name = 'tELS', current = '1.0.0', fetch = f.vc.studios('tELS', '1.0.0') })
@@ -207,10 +207,10 @@ test('Studios provider follows nlib_api_base_url; GitHub does not', function()
 
     local g = fixture({ 'TIMMYG Studios' })
     GetConvar = function(name, default)
-        if name == 'nlib_api_base_url' then return 'http://localhost:8787' end
+        if name == 'norden_lib_api_base_url' then return 'http://localhost:8787' end
         return default
     end
-    g.vc({ name = 'NLib', current = '1.0.0', fetch = g.vc.github('tommy141x/tLib') })
+    g.vc({ name = 'norden_lib', current = '1.0.0', fetch = g.vc.github('tommy141x/tLib') })
     assert(g.requests[1].url == 'https://api.github.com/repos/tommy141x/tLib/releases/latest',
         'github provider must not follow the marketplace convar')
     GetConvar = nil
@@ -222,7 +222,7 @@ end)
 test('Studios provider trims a trailing /api path off the convar', function()
     local f = fixture({ 'TIMMYG Studios' })
     GetConvar = function(name, default)
-        if name == 'nlib_api_base_url' then return '  http://localhost:8787/api/v1/  ' end
+        if name == 'norden_lib_api_base_url' then return '  http://localhost:8787/api/v1/  ' end
         return default
     end
     f.vc({ name = 'tELS', current = '1.0.0', fetch = f.vc.studios('tELS', '1.0.0') })
@@ -241,11 +241,11 @@ test('Studios timeout prints failure without accepting a late result', function(
     assert(#f.output == count)
 end)
 
-testWithSiblings('tDB forwards initial and subsequent database status through NLib', {
+testWithSiblings('tDB forwards initial and subsequent database status through norden_lib', {
     '../tDB/server/utils/version.lua',
 }, function()
     local f = fixture({ 'TIMMYG Studios' })
-    nlib = { versioncheck = f.vc }
+    norden_lib = { versioncheck = f.vc }
     assert(loadfile('../tDB/server/utils/version.lua'))()
     TriggerEvent('tdb:startupStatus', 'Database ready')
     -- tDB queries its own repository, not PocketBase's. This asserts the real URL
@@ -263,10 +263,10 @@ testWithSiblings('tDB forwards initial and subsequent database status through NL
 end)
 
 testWithSiblings('all five shipped manifests explicitly credit TIMMYG Studios', {
-    '../NLib/fxmanifest.lua', '../tRadio/fxmanifest.lua', '../tELS/fxmanifest.lua',
+    '../norden_lib/fxmanifest.lua', '../tRadio/fxmanifest.lua', '../tELS/fxmanifest.lua',
     '../tAFK/fxmanifest.lua', '../tDB/fxmanifest.lua',
 }, function()
-    for _, resource in ipairs({ 'NLib', 'tRadio', 'tELS', 'tAFK', 'tDB' }) do
+    for _, resource in ipairs({ 'norden_lib', 'tRadio', 'tELS', 'tAFK', 'tDB' }) do
         local authors = {}
         local function author(value)
             if type(value) == 'table' then
@@ -312,7 +312,7 @@ testWithSiblings('tAFK and tELS startup scripts use the shared provider and info
 }, function()
     for _, resource in ipairs({ 'tAFK', 'tELS' }) do
         local f = fixture({ 'TIMMYG Studios' }, resource)
-        nlib = { versioncheck = f.vc }
+        norden_lib = { versioncheck = f.vc }
         assert(loadfile('../' .. resource .. '/server/sv_version.lua'))()
         contains(f.requests[1].url, '/api/products/' .. resource .. '/changelog')
         f.requests[1].cb(200, { product = { currentVersion = '1.0.0' } })
@@ -385,7 +385,7 @@ test('throwing provider and malformed fields still print', function()
     contains(f.text(), 'v2.0.0')
 end)
 
-test('missing NLib completion and continuous startup noise are bounded', function()
+test('missing Norden Lib completion and continuous startup noise are bounded', function()
     local f = fixture({})
     -- Reload after overriding the mocked resource state.
     function GetResourceState() return 'starting' end
@@ -411,10 +411,10 @@ test('info event subscriptions are removed only after output is actually drawn',
     excludes(f.text(), 'After draw')
 end)
 
-test('throwing beforePrint does not suppress the NLib completion event', function()
-    local f = fixture({}, 'NLib')
+test('throwing beforePrint does not suppress the Norden Lib completion event', function()
+    local f = fixture({}, 'norden_lib')
     local done = false
-    AddEventHandler('nlib:versioncheckDone', function() done = true end)
+    AddEventHandler('norden_lib:versioncheckDone', function() done = true end)
     f.vc({ current = '1.0.0', fetch = current, beforePrint = function() error('broken hook') end })
     f.run(1100)
     assert(done)
@@ -426,7 +426,7 @@ testWithSiblings('tDetector uses shared unpublished-version handling', {
     '../tDetector/server/sv_version.lua',
 }, function()
     local f = fixture({ 'TIMMYG Studios' }, 'tDetector')
-    nlib = { versioncheck = f.vc }
+    norden_lib = { versioncheck = f.vc }
     assert(loadfile('../tDetector/server/sv_version.lua'))()
     contains(f.requests[1].url, '/api/products/tDetector/changelog')
     f.requests[1].cb(200, { product = { currentVersion = '' }, updates = {} })
@@ -452,7 +452,7 @@ testWithSiblings('radio Lua bridge renders structured update failure without cla
     local f = fixture({ 'TIMMYG Studios' }, 'tRadio')
     local env = setmetatable({
         Config = { exposeWeb = false, isSatelliteServer = false },
-        nlib = { versioncheck = f.vc },
+        norden_lib = { versioncheck = f.vc },
         LoadResourceFile = function() return nil end,
         SV_FUNCTIONS_VERSION = 2,
     }, { __index = _G })
@@ -472,7 +472,7 @@ report(('Passed %d versioncheck tests'):format(passed))
 if #skipped > 0 then
     report(('Skipped %d test(s) that load a sibling resource, none of which is present: %s')
         :format(#skipped, table.concat(skipped, '; ')))
-    report('This is a standalone NLib checkout. The cross-resource half of versioncheck is UNPROVEN here.')
+    report('This is a standalone Norden Lib checkout. The cross-resource half of versioncheck is UNPROVEN here.')
 end
 -- A suite that skipped everything must not read as a pass.
 if passed == 0 then

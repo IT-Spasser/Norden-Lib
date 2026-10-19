@@ -45,7 +45,7 @@ end
 -- fnv1a: the cross-language pins
 
 local pins = {
-    ['nlib'] = 'a3620e9a',
+    ['norden_lib'] = '22ee93f7',
     ['TypeError|at x (nui/assets/index.js:1)'] = '9e6c6ac2',
     ['warning:layout-missing'] = 'd581e878',
     ['crash:heap-near-limit'] = 'f28ad9db',
@@ -171,11 +171,11 @@ end
 
 -- The event names are tWeb's
 local names = {
-    [T.EVENT_ERROR] = 'nlib.error_reported',
-    [T.EVENT_WARNING] = 'nlib.warning_reported',
-    [T.EVENT_CRASH] = 'nlib.crash_reported',
-    [T.EVENT_SLOW] = 'nlib.slow_operation',
-    [T.EVENT_ENVIRONMENT] = 'nlib.environment_reported',
+    [T.EVENT_ERROR] = 'norden_lib.error_reported',
+    [T.EVENT_WARNING] = 'norden_lib.warning_reported',
+    [T.EVENT_CRASH] = 'norden_lib.crash_reported',
+    [T.EVENT_SLOW] = 'norden_lib.slow_operation',
+    [T.EVENT_ENVIRONMENT] = 'norden_lib.environment_reported',
 }
 for got, expected in pairs(names) do
     if got ~= expected then

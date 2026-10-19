@@ -7,12 +7,12 @@
 -- callback signatures, because tELS calls them.
 --
 -- The publish endpoint requires `X-Resource-Secret`, carrying the baked-in
--- NLIB_PUBLIC_KEY from shared/ts/marketplace/catalogue.ts. The header name must
+-- NORDEN_LIB_PUBLIC_KEY from shared/ts/marketplace/catalogue.ts. The header name must
 -- not change -- every shipped copy sends it. It is NOT a convar, and it is not
 -- handed to this VM through an export: either would let any third-party script
 -- on a customer's server read it without console or file access.
 
-local log = Logger.create('NLib/community-configs')
+local log = Logger.create('norden_lib/community-configs')
 
 --- Is this value callable?
 ---
@@ -50,7 +50,7 @@ local function registerExports()
     --- `publisher` = { name, identifiers } is ATTRIBUTION, not authentication.
     --- It is what this server claims about the publishing player: a display
     --- name for the listing and a handle to ban. The API treats it that way.
-    Platform.export('NLib', 'CommunityConfigsUpload', function(opts, callback)
+    Platform.export('norden_lib', 'CommunityConfigsUpload', function(opts, callback)
         if type(opts) ~= 'table' then
             if isCallable(callback) then callback(false, 'invalid opts') end
             return
@@ -99,7 +99,7 @@ local function registerExports()
         -- IT IS A CREDENTIAL. Whoever holds it can overwrite or withdraw
         -- that listing. It is never logged here, and a consumer must keep it
         -- server-side; see the note in tELS's `sv_configs.lua`.
-        exports['NLib']:ccPublish(json.encode(payload), function(ok, err, id, editToken)
+        exports['norden_lib']:ccPublish(json.encode(payload), function(ok, err, id, editToken)
             if not ok or type(id) ~= 'string' or id == '' then
                 local errMsg = tostring(err or 'unexpected response')
                 log(('upload failed for %s/%s/%s: %s'):format(script, configType, key, errMsg), 3)
@@ -117,7 +117,7 @@ local function registerExports()
     --- `CommunityConfigsUpload`. The Worker re-derives the fingerprint columns
     --- and the LED-name index from `configJson` in the same write, so a
     --- listing cannot end up matched by data describing its previous contents.
-    Platform.export('NLib', 'CommunityConfigsUpdate', function(opts, callback)
+    Platform.export('norden_lib', 'CommunityConfigsUpdate', function(opts, callback)
         if type(opts) ~= 'table' then
             if isCallable(callback) then callback(false, 'invalid opts') end
             return
@@ -140,7 +140,7 @@ local function registerExports()
         if type(opts.keyLabel)    == 'string' then payload.keyLabel    = opts.keyLabel    end
         if type(opts.fp)          == 'table'  then payload.fp          = opts.fp          end
 
-        exports['NLib']:ccUpdate(id, editToken, json.encode(payload), function(ok, err)
+        exports['norden_lib']:ccUpdate(id, editToken, json.encode(payload), function(ok, err)
             if not ok then
                 local errMsg = tostring(err or 'unexpected response')
                 log(('update failed for %s: %s'):format(id, errMsg), 3)
@@ -157,7 +157,7 @@ local function registerExports()
     --- Not a delete: the Worker sets `status = 'unlisted'`, which every public
     --- read already filters on. Imports that already happened keep pointing at
     --- it. There is no un-withdraw — publishing again mints a new id.
-    Platform.export('NLib', 'CommunityConfigsWithdraw', function(opts, callback)
+    Platform.export('norden_lib', 'CommunityConfigsWithdraw', function(opts, callback)
         if type(opts) ~= 'table' then
             if isCallable(callback) then callback(false, 'invalid opts') end
             return
@@ -172,7 +172,7 @@ local function registerExports()
             return
         end
 
-        exports['NLib']:ccWithdraw(id, editToken, function(ok, err, status)
+        exports['norden_lib']:ccWithdraw(id, editToken, function(ok, err, status)
             if not ok then
                 local errMsg = tostring(err or 'unexpected response')
                 log(('withdraw failed for %s: %s'):format(id, errMsg), 3)
@@ -190,7 +190,7 @@ local function registerExports()
     --- Note the argument ORDER here is (ok, configJson, err), not the
     --- (ok, err, value) the bridge uses. It is the shipped signature tELS
     --- already calls and is not reordered to match.
-    Platform.export('NLib', 'CommunityConfigsImport', function(id, callback)
+    Platform.export('norden_lib', 'CommunityConfigsImport', function(id, callback)
         if type(id) ~= 'string' or id == '' then
             if isCallable(callback) then callback(false, nil, 'invalid id') end
             return
@@ -198,7 +198,7 @@ local function registerExports()
         callback = guardCallback(callback, 'CommunityConfigsImport')
         if not callback then return end
 
-        exports['NLib']:ccImport(id, function(ok, err, configJson)
+        exports['norden_lib']:ccImport(id, function(ok, err, configJson)
             if not ok or type(configJson) ~= 'string' then
                 local errMsg = tostring(err or 'unexpected response')
                 log(('import failed for id=%s: %s'):format(id, errMsg), 3)
@@ -223,7 +223,7 @@ local function registerExports()
     ---
     --- Same argument ORDER note as above: (ok, configJson, err) out here,
     --- (ok, err, value) from the bridge.
-    Platform.export('NLib', 'CommunityConfigsPeek', function(id, callback)
+    Platform.export('norden_lib', 'CommunityConfigsPeek', function(id, callback)
         if type(id) ~= 'string' or id == '' then
             if isCallable(callback) then callback(false, nil, 'invalid id') end
             return
@@ -231,7 +231,7 @@ local function registerExports()
         callback = guardCallback(callback, 'CommunityConfigsPeek')
         if not callback then return end
 
-        exports['NLib']:ccPeek(id, function(ok, err, configJson)
+        exports['norden_lib']:ccPeek(id, function(ok, err, configJson)
             if not ok or type(configJson) ~= 'string' then
                 local errMsg = tostring(err or 'unexpected response')
                 log(('peek failed for id=%s: %s'):format(id, errMsg), 3)
@@ -253,7 +253,7 @@ local function registerExports()
     --- browser after the request itself succeeds. That is precisely why this
     --- export exists: the panel asks the game server, and the server does the
     --- HTTP.
-    Platform.export('NLib', 'CommunityConfigsList', function(opts, callback)
+    Platform.export('norden_lib', 'CommunityConfigsList', function(opts, callback)
         if type(opts) ~= 'table' then
             if isCallable(callback) then callback(false, nil, 'invalid opts') end
             return
@@ -268,7 +268,7 @@ local function registerExports()
             return
         end
 
-        exports['NLib']:ccList(
+        exports['norden_lib']:ccList(
             script,
             configType,
             type(opts.key) == 'string' and opts.key or '',
@@ -290,7 +290,7 @@ local function registerExports()
     --- fingerprint in `fp`; the caller decides with TELS_FP_Compare. The
     --- similarity algorithm deliberately lives in the consuming resource so it
     --- can be tuned by shipping a resource update rather than a web deploy.
-    Platform.export('NLib', 'CommunityConfigsMatch', function(opts, callback)
+    Platform.export('norden_lib', 'CommunityConfigsMatch', function(opts, callback)
         if type(opts) ~= 'table' then
             if isCallable(callback) then callback(false, nil, 'invalid opts') end
             return
@@ -303,7 +303,7 @@ local function registerExports()
             return
         end
 
-        exports['NLib']:ccMatch(
+        exports['norden_lib']:ccMatch(
             type(opts.script) == 'string' and opts.script or '',
             type(opts.configType) == 'string' and opts.configType or 'led_layout',
             json.encode(opts.fp),

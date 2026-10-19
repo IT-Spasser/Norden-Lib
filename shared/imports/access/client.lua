@@ -1,9 +1,9 @@
 --[[
-    NLib/shared/imports/access — the CLIENT MIRROR.
+    norden_lib/shared/imports/access — the CLIENT MIRROR.
 
     Usage in a consumer (client scripts):
 
-        local radio = nlib.access.gate({ key = 'radio' })
+        local radio = norden_lib.access.gate({ key = 'radio' })
 
         if radio:allowed() then showRadioButton() end
         radio:onChange(function(allowed) toggleRadioButton(allowed) end)
@@ -86,7 +86,7 @@ function access.gate(opts)
         value     = false,
         answered  = false,
         listeners = {},
-        event     = ('%s:nlib:access:%s'):format(RESOURCE, key),
+        event     = ('%s:norden_lib:access:%s'):format(RESOURCE, key),
     }, Gate)
 
     RegisterNetEvent(self.event, function(value) deliver(self, value) end)

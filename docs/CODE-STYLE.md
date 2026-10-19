@@ -58,7 +58,7 @@ measures whole-line comments only — a trailing `// why` on a line of code does
 not count against it.
 
 30% is not a target. It is the point past which a file is prose with code in it.
-When the gate was written NLib averaged 24.8%, and the worst single file was 77%
+When the gate was written Norden Lib averaged 24.8%, and the worst single file was 77%
 comment. A file that needs more explanation than that needs a README beside it.
 
 ### The ratchet

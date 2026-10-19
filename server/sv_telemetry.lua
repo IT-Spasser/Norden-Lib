@@ -1,16 +1,16 @@
--- NLib's side of the diagnostics transport: the net events, and the consent
--- broadcast. Lua rather than the Node bundle because every net event in NLib is
+-- Norden Lib's side of the diagnostics transport: the net events, and the consent
+-- broadcast. Lua rather than the Node bundle because every net event in Norden Lib is
 -- registered from Lua; the event names are duplicated from
 -- shared/imports/telemetry/shared.lua because no VM loads both files, and
 -- tests/unit/telemetry-wiring.test.ts pins them equal.
 -- Design notes: docs/internal/telemetry-consent.md.
 --
 
-local log = Logger.create('NLib/telemetry')
+local log = Logger.create('norden_lib/telemetry')
 
-local INGEST_EVENT = 'nlib:diag:ingest'
-local CONSENT_EVENT = 'nlib:diag:consent'
-local CONSENT_REQUEST_EVENT = 'nlib:diag:consentPlease'
+local INGEST_EVENT = 'norden_lib:diag:ingest'
+local CONSENT_EVENT = 'norden_lib:diag:consent'
+local CONSENT_REQUEST_EVENT = 'norden_lib:diag:consentPlease'
 
 --- Minimum milliseconds between one player's batches. The NUI and the consumer
 --- client thread each flush every 15 s, so a 5 s floor accommodates both. A
@@ -28,7 +28,7 @@ end)
 --- convar's value, the queue depth and the breaker state are operator-facing
 --- and stay server-side.
 local function clientConsent()
-    local ok, raw = pcall(function() return exports['NLib']:DiagConsent() end)
+    local ok, raw = pcall(function() return exports['norden_lib']:DiagConsent() end)
     if not ok or type(raw) ~= 'string' or raw == '' then
         return { enabled = false, source = 'default', locked = false }
     end
@@ -69,7 +69,7 @@ RegisterNetEvent(INGEST_EVENT, function(payload)
 
     -- The bundle re-checks consent, re-limits per client and validates every
     -- dimension. Nothing here trusts the client beyond "a bounded string".
-    pcall(function() exports['NLib']:DiagIngest(src, payload) end)
+    pcall(function() exports['norden_lib']:DiagIngest(src, payload) end)
 end)
 
 RegisterNetEvent(CONSENT_REQUEST_EVENT, function()
@@ -93,39 +93,39 @@ end)
 
 CreateThread(function()
     -- `StudioApi.baseUrl()` is the single definition of the studio host and its
-    -- normalisation, and it is Lua in NLib's shared VM. Pushing the resolved
+    -- normalisation, and it is Lua in Norden Lib's shared VM. Pushing the resolved
     -- value in keeps the bundle from carrying a second copy. Re-pushed on a slow
     -- loop because the convar is a dev switch meant to change mid-session.
     while true do
-        pcall(function() exports['NLib']:DiagSetBaseUrl(StudioApi.baseUrl()) end)
+        pcall(function() exports['norden_lib']:DiagSetBaseUrl(StudioApi.baseUrl()) end)
         Wait(60000)
     end
 end)
 
 -- The consent API. `SetTelemetryConsent` is the one a consumer must call, not
 -- the bundle's `DiagSetConsent`: this wrapper is what tells already-connected
--- clients. Nothing in NLib calls either, and no NLib surface may -- the hub's
+-- clients. Nothing in Norden Lib calls either, and no Norden Lib surface may -- the hub's
 -- index is public and unauthenticated. Not permission-gated here either; a
 -- consumer must gate it at its own call site.
 -- See docs/internal/telemetry-consent.md.
---   local c = json.decode(exports['NLib']:GetTelemetryConsent())
+--   local c = json.decode(exports['norden_lib']:GetTelemetryConsent())
 --   -- { enabled, source, locked, convar, convarValue, queued, transport }
---   local r = json.decode(exports['NLib']:SetTelemetryConsent(true))
+--   local r = json.decode(exports['norden_lib']:SetTelemetryConsent(true))
 --   -- { ok = true, consent = {...} }  or
 --   -- { ok = false, reason = 'locked'|'write-failed', detail = '...' }
 --
 
-Platform.export('NLib', 'GetTelemetryConsent', function()
-    local ok, raw = pcall(function() return exports['NLib']:DiagConsent() end)
+Platform.export('norden_lib', 'GetTelemetryConsent', function()
+    local ok, raw = pcall(function() return exports['norden_lib']:DiagConsent() end)
     if ok and type(raw) == 'string' and raw ~= '' then return raw end
     return json.encode({
         enabled = false, source = 'default', locked = false,
-        convar = 'nlib_telemetry', convarValue = '',
+        convar = 'norden_lib_telemetry', convarValue = '',
     })
 end)
 
-Platform.export('NLib', 'SetTelemetryConsent', function(enabled)
-    local ok, raw = pcall(function() return exports['NLib']:DiagSetConsent(enabled == true) end)
+Platform.export('norden_lib', 'SetTelemetryConsent', function(enabled)
+    local ok, raw = pcall(function() return exports['norden_lib']:DiagSetConsent(enabled == true) end)
     if not ok or type(raw) ~= 'string' then
         return json.encode({ ok = false, reason = 'threw', detail = tostring(raw) })
     end
@@ -142,8 +142,8 @@ end)
 -- The operator-facing view. Deliberately a console command, not a chat one:
 -- every question it answers is an operator's, and the server console is the
 -- copy that survives the caller disconnecting.
-RegisterCommand('nlib_telemetry_status', function(src)
-    local ok, raw = pcall(function() return exports['NLib']:DiagConsent() end)
+RegisterCommand('norden_lib_telemetry_status', function(src)
+    local ok, raw = pcall(function() return exports['norden_lib']:DiagConsent() end)
     if not ok or type(raw) ~= 'string' then
         log('telemetry status unavailable: the bundle did not answer', 4)
         return
@@ -170,7 +170,7 @@ RegisterCommand('nlib_telemetry_status', function(src)
         end
     end
     for _, line in ipairs(lines) do
-        print('[NLib/telemetry] ' .. line)
-        if src and src > 0 then TriggerClientEvent('chat:addMessage', src, { args = { 'NLib', line } }) end
+        print('[norden_lib/telemetry] ' .. line)
+        if src and src > 0 then TriggerClientEvent('chat:addMessage', src, { args = { 'norden_lib', line } }) end
     end
 end, true)

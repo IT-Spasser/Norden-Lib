@@ -1,13 +1,13 @@
 /**
  * Launches the Chromium every NUI tool in this stack drives, and attaches CDP to a page.
  *
- * ## Why this is in NLib rather than in tRadio's harness
+ * ## Why this is in Norden Lib rather than in tRadio's harness
  *
  * It was `tRadio/scripts/nui-harness/browser.ts` for as long as tRadio was the only
  * resource driving a real NUI bundle in a browser. The shared prop editor changed that:
  * `prop-editor-gallery.ts` beside this file photographs the SAME component out of
  * tRadio's, tRadar's and tDetector's bundles, and a launcher living inside one of the
- * three would have made NLib depend on a consumer. There is still exactly one copy —
+ * three would have made Norden Lib depend on a consumer. There is still exactly one copy —
  * tRadio's harness imports this one.
  *
  * ## Why a downloaded Chromium 103 and not the system browser

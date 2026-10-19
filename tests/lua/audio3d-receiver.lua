@@ -20,7 +20,7 @@ RegisterNetEvent = function() end
 CreateThread = function() end
 Wait = function() end
 
-nlib = {
+norden_lib = {
     platform = {
         now = function() return now end,
         getCameraState = function() return camera end,

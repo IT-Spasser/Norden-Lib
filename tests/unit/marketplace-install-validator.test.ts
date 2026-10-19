@@ -46,7 +46,7 @@ function bundle(files: Record<string, string>): Buffer {
 }
 
 beforeEach(() => {
-  root = fs.mkdtempSync(path.join(os.tmpdir(), "nlib-validator-test-"));
+  root = fs.mkdtempSync(path.join(os.tmpdir(), "norden-validator-test-"));
 });
 afterEach(() => {
   fs.rmSync(root, { recursive: true, force: true });
@@ -172,7 +172,7 @@ describe("install content validators", () => {
     // Asserted with the byte limit rather than with a zip-slip entry, because AdmZip
     // normalises `..` away when an entry is ADDED — `addFile("../escape.html")` stores
     // "escape.html", so the obvious fixture quietly tests nothing and passes. (Found the
-    // honest way: this test failed on its first run with a successful install.) NLib covers
+    // honest way: this test failed on its first run with a successful install.) Norden Lib covers
     // traversal refusal directly in server/lib/marketplace/installer.test.ts, where the
     // fixture patches the central directory. The limit check is the first thing prepareBundle
     // does, so it proves the ordering just as well without a hand-built archive.

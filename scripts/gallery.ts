@@ -1,5 +1,5 @@
 /**
- * `bun run gallery` — every surface NLib draws, photographed, into one flat folder.
+ * `bun run gallery` — every surface Norden Lib draws, photographed, into one flat folder.
  *
  *   assets/gallery/menu--<id>.png         a menu page per row kind, per skin, per accent
  *   assets/gallery/dialog--<id>.png       each dialog size and every field type
@@ -10,17 +10,17 @@
  *
  * ## The prop editor is the odd one out, and deliberately so
  *
- * Every other surface here is drawn by NLib's OWN bundle, so one bundle photographs all
- * of them. `@nlib/internal/prop-editor` is not in NLib's NUI at all — NLib ships the
+ * Every other surface here is drawn by Norden Lib's OWN bundle, so one bundle photographs all
+ * of them. `@norden_lib/internal/prop-editor` is not in Norden Lib's NUI at all — Norden Lib ships the
  * component, tRadio, tRadar and tDetector mount it — and its whole appearance comes from
  * token NAMES whose VALUES are per-resource (tRadio scopes its own set to
- * `.radio-settings-root`; the other two inherit NLib's `theme-tokens.css` from `:root`).
+ * `.radio-settings-root`; the other two inherit Norden Lib's `theme-tokens.css` from `:root`).
  * So the honest picture of it is three pictures, each out of a consumer's real shipped
  * bundle. This surface drives each consumer's own `bun run gallery -- --only propeditor`,
  * which is the same command and the same driver
  * (`shared/ts/build/prop-editor-gallery.ts`) they use on their own.
  *
- * Shooting a synthetic NLib-only page instead was the alternative and is worse: it would
+ * Shooting a synthetic Norden Lib-only page instead was the alternative and is worse: it would
  * photograph a page nothing ships, and the per-resource token values — the one thing
  * worth looking at three times — would be exactly what it could not show.
  *
@@ -35,7 +35,7 @@
  * `assets/` is git-ignored and is not shipped, so this is safe to regenerate at will.
  *
  * This drives the REAL built bundle with a mocked NUI transport, exactly as
- * `tests/browser/*.ts` do — same `GetParentResourceName` stub, same `https://nlib/**` route,
+ * `tests/browser/*.ts` do — same `GetParentResourceName` stub, same `https://norden_lib/**` route,
  * same `{name, args:[payload]}` envelope. The fixtures are the difference: `gallery-fixtures.ts`
  * is representative content, those harnesses use content chosen to break things.
  *
@@ -63,10 +63,10 @@ const SURFACES = ["menu", "dialog", "toast", "marketplace", "layout", "propedito
 type Surface = (typeof SURFACES)[number];
 
 /**
- * The resources that mount `@nlib/internal/prop-editor`, and where each puts the shots.
+ * The resources that mount `@norden_lib/internal/prop-editor`, and where each puts the shots.
  *
- * Sibling directories of NLib, which is how every resource in `[tScripts]` already
- * reaches the others (`tRadar/scripts/gallery.ts` imports `../../NLib/...`). A host that
+ * Sibling directories of Norden Lib, which is how every resource in `[tScripts]` already
+ * reaches the others (`tRadar/scripts/gallery.ts` imports `../../norden_lib/...`). A host that
  * is not checked out is skipped with a flag rather than failing the run — this folder is
  * frequently a partial checkout.
  */
@@ -104,17 +104,17 @@ const written: string[] = [];
 
 // The prop editor: one run per host, out of that host's own bundle
 // First, and in its own block, because it is the one surface that does not come out of
-// NLib's bundle — everything below this point is about NLib's own NUI, and a
+// Norden Lib's bundle — everything below this point is about Norden Lib's own NUI, and a
 // `--only propeditor` run has no reason to build it or open a browser on it.
 // A missing host is already a flag rather than a failure, but a tree with NO
-// host at all is a standalone clone of NLib rather than a partial checkout, and
+// host at all is a standalone clone of Norden Lib rather than a partial checkout, and
 // three flags saying so plus a `--only propeditor` run that exits 1 is a broken
 // gallery, not a report.
 const standalone = isStandaloneClone(ROOT);
 if (want("propeditor") && standalone) {
   console.log(
-    "[NLib gallery] prop editor: skipped — no consumer resource is checked out beside NLib. " +
-      "This surface is shot out of each consumer's own bundle, never out of NLib's."
+    "[norden_lib gallery] prop editor: skipped — no consumer resource is checked out beside Norden Lib. " +
+      "This surface is shot out of each consumer's own bundle, never out of Norden Lib's."
   );
 } else if (want("propeditor")) {
   const base = join(outDir, "propeditor");
@@ -124,11 +124,11 @@ if (want("propeditor") && standalone) {
   for (const host of PROP_EDITOR_HOSTS) {
     const cwd = resolve(ROOT, "..", host);
     if (!(await Bun.file(join(cwd, "package.json")).exists())) {
-      flags.push(`propeditor/${host}: not checked out beside NLib, skipped`);
+      flags.push(`propeditor/${host}: not checked out beside Norden Lib, skipped`);
       continue;
     }
     const out = join(base, host);
-    console.log(`\n[NLib gallery] prop editor — ${host}, themed as ${host}`);
+    console.log(`\n[norden_lib gallery] prop editor — ${host}, themed as ${host}`);
     const res = Bun.spawnSync(
       ["bun", "run", "gallery", "--", "--only", "propeditor", "--out", out],
       { cwd, stdout: "inherit", stderr: "inherit" }
@@ -141,16 +141,16 @@ if (want("propeditor") && standalone) {
   }
 }
 
-// Nothing below draws anything a `--only propeditor` run wants, and building NLib's
+// Nothing below draws anything a `--only propeditor` run wants, and building Norden Lib's
 // bundle to photograph none of it would only slow the run down.
 if (!only.some((s) => s !== "propeditor")) {
-  console.log(`\n[NLib gallery] ${written.length} shots → ${join(outDir, "propeditor")}`);
+  console.log(`\n[norden_lib gallery] ${written.length} shots → ${join(outDir, "propeditor")}`);
   for (const flag of flags) console.log(`  flag: ${flag}`);
   process.exit(standalone || (written.length && !flags.length) ? 0 : 1);
 }
 
 if (process.argv.includes("--rebuild") || !(await Bun.file(join(dist, "index.html")).exists())) {
-  console.log("[NLib gallery] building client/ui");
+  console.log("[norden_lib gallery] building client/ui");
   const res = Bun.spawnSync(["bun", "run", "build"], {
     cwd: ROOT,
     stdout: "inherit",
@@ -186,9 +186,9 @@ let menuSnapshot: unknown = MENU_CLOSED;
 
 await page.addInitScript(() => {
   (window as unknown as { GetParentResourceName: () => string }).GetParentResourceName = () =>
-    "NLib";
+    "norden_lib";
 });
-await page.route("https://nlib/**", async (route) => {
+await page.route("https://norden_lib/**", async (route) => {
   const event = new URL(route.request().url()).pathname;
   const reply: Record<string, unknown> = { ok: true };
   if (event === "/menu_ready" || event === "/menu_resync") reply.snapshot = menuSnapshot;
@@ -332,7 +332,7 @@ if (want("menu")) {
     await send("menu:branding", entry.branding);
     await send("menu:snapshot", entry.snapshot);
     await page.waitForTimeout(350);
-    // `.nlib-menu` is the always-mounted host and would pass while nothing rendered inside it;
+    // `.norden-menu` is the always-mounted host and would pass while nothing rendered inside it;
     // `.menu-panel` only exists once a snapshot was accepted and is visible.
     await shoot(`menu--${entry.id}`, ".menu-panel");
     await send("menu:visible", false);
@@ -395,12 +395,12 @@ if (want("toast")) {
     // duration 0 on a non-loading toast would take its type default and expire mid-run.
     await send("showToast", { ...toast, duration: 600_000 });
     await page.waitForTimeout(400);
-    await shoot(`toast--${toast.type}`, ".nlib-nui-toast");
+    await shoot(`toast--${toast.type}`, ".norden-nui-toast");
   }
   await send("dismissAllToasts");
   for (const toast of TOASTS) await send("showToast", { ...toast, duration: 600_000 });
   await page.waitForTimeout(500);
-  await shoot("toast--stack", ".nlib-nui-toast");
+  await shoot("toast--stack", ".norden-nui-toast");
   await send("dismissAllToasts");
   await page.waitForTimeout(200);
 }
@@ -429,7 +429,7 @@ if (want("marketplace")) {
 if (want("layout")) {
   await send("layoutOpen", LAYOUT_OPEN);
   await page.waitForTimeout(600);
-  await shoot("layout--editor", ".nlib-layout__panel");
+  await shoot("layout--editor", ".norden-layout__panel");
   await send("layoutClose", { session: LAYOUT_OPEN.session });
   await page.waitForTimeout(200);
 }
@@ -437,10 +437,11 @@ if (want("layout")) {
 await browser.close();
 await server.stop(true);
 
-// NLib's own surfaces are all at this viewport; the prop-editor shots are at each
+// Norden Lib's own surfaces are all at this viewport; the prop-editor shots are at each
 // consumer's, which is why that count is called out separately rather than folded in.
 console.log(
-  `[NLib gallery] ${written.length} shots → ${outDir}` + ` (NLib's own surfaces at ${vpW}x${vpH})`
+  `[norden_lib gallery] ${written.length} shots → ${outDir}` +
+    ` (Norden Lib's own surfaces at ${vpW}x${vpH})`
 );
 for (const flag of flags) console.log(`  flag: ${flag}`);
 if (!written.length) process.exit(1);

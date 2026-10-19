@@ -1,6 +1,6 @@
 -- Player input: key binds, input blocking, input mode.
 
-_NLIB_NUI_FOCUSED = false
+_NORDEN_LIB_NUI_FOCUSED = false
 
 -- cb is either a function, fired on eventType ('Pressed' unless 'Released' is
 -- asked for), or a { press, release } pair sharing one key mapping.
@@ -15,7 +15,7 @@ local function _normalizePair(cb, eventType)
     return cb, nil
 end
 
-if _NLIB_IS_FIVEM then
+if _NORDEN_LIB_IS_FIVEM then
     -- Friendly names to the FiveM key strings RegisterKeyMapping expects. Players
     -- rebind these in Settings > Controls > FiveM.
     local _keyDefaults = {
@@ -85,7 +85,7 @@ else
     Platform.bindKey = Platform._stub('bindKey')
 end
 
-if _NLIB_IS_FIVEM then
+if _NORDEN_LIB_IS_FIVEM then
     -- There is no single "block movement" native, so each control has to be
     -- disabled every frame for as long as blocking is on.
     Platform._blockMove = false
@@ -131,11 +131,11 @@ else
     Platform.setIgnoreLookInput = Platform._stub('setIgnoreLookInput')
 end
 
--- 1 while something owns the cursor -- NLib's own NUI focus or the pause menu.
+-- 1 while something owns the cursor -- Norden Lib's own NUI focus or the pause menu.
 -- Key handlers suppress input on this, so a dialog does not also drive the menu.
-if _NLIB_IS_FIVEM then
+if _NORDEN_LIB_IS_FIVEM then
     function Platform.getInputMode()
-        if _NLIB_NUI_FOCUSED then return 1 end
+        if _NORDEN_LIB_NUI_FOCUSED then return 1 end
         if IsPauseMenuActive and IsPauseMenuActive() then return 1 end
         return 0
     end

@@ -476,7 +476,7 @@ describe("websocket upgrade", () => {
       mount: "/rt",
       title: "Realtime",
       listed: false,
-      resourceName: "NLib",
+      resourceName: "norden_lib",
       onUpgrade: (req, socket, head) =>
         wss.handleUpgrade(req as never, socket as never, head as never, (ws) =>
           wss.emit("connection", ws, req)

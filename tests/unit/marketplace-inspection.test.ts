@@ -11,7 +11,7 @@ afterEach(() => {
 });
 const hash = (data: string) => createHash("sha256").update(data).digest("hex");
 function fixture() {
-  const root = fs.mkdtempSync(join(tmpdir(), "nlib-inspect-"));
+  const root = fs.mkdtempSync(join(tmpdir(), "norden-inspect-"));
   roots.push(root);
   const base = join(root, "layouts");
   fs.mkdirSync(base);

@@ -1,7 +1,7 @@
 -- Resource file writes that survive FiveM for GTAV Enhanced.
 --
---   local ok, err = nlib.fs.writeResourceFile('data.json', encoded)
---   if not ok then log('could not write data.json — ' .. err, nlib.logger.ERROR) end
+--   local ok, err = norden_lib.fs.writeResourceFile('data.json', encoded)
+--   if not ok then log('could not write data.json — ' .. err, norden_lib.logger.ERROR) end
 --
 -- Server-only: it writes a resource file, which does not work from a client VM.
 --
@@ -10,20 +10,20 @@
 -- On Enhanced, `SaveResourceFile` returns false for some resources while Node's
 -- `fs` writes the identical path successfully. The cause is still unknown; the
 -- workaround is proven. tRadio hit it first, then tELS, then tDetector — and
--- each one shipped its own Node bridge for it, which is why this is a NLib
+-- each one shipped its own Node bridge for it, which is why this is a Norden Lib
 -- module rather than a fourth copy.
 --
 -- The bridge is the CALLING resource's own export
 --
 -- The Node half is `WriteResourceFile`, registered by
--- `registerWriteResourceFile()` from NLib/shared/ts/fs/server.ts. The
+-- `registerWriteResourceFile()` from norden_lib/shared/ts/fs/server.ts. The
 -- implementation is shared at BUILD time and every resource registers it in its
 -- own server bundle, so this looks it up on the LOCAL resource:
 -- `exports[GetCurrentResourceName()]`.
 --
--- It used to call `exports.NLib:WriteResourceFile(...)` — one central bridge.
+-- It used to call `exports.norden_lib:WriteResourceFile(...)` — one central bridge.
 -- That cannot work: FiveM's Node runtime sandboxes each resource to its own
--- directory, so NLib writing into tDetector's folder was refused outright with
+-- directory, so Norden Lib writing into tDetector's folder was refused outright with
 -- "Access to this API has been restricted. Use --allow-fs-write". That flag is a
 -- server STARTUP ARGUMENT, not a manifest key, so the only fix available to a
 -- shipped product is for the write to originate inside the resource it lands in.
@@ -65,7 +65,7 @@ local nativeWriteUsable = {}
 --- @param relPath  string   path relative to the target resource's root
 --- @param contents string   the bytes to write
 --- @param resource string|nil  target resource; defaults to the calling one
---- @param log      function|nil  a nlib.logger.create handle, for the one-time
+--- @param log      function|nil  a norden_lib.logger.create handle, for the one-time
 ---                 notice that this environment needs the bridge. Optional
 ---                 because the caller always gets `err` back either way.
 --- @return boolean ok, string|nil err  -- err is a real errno message when available
@@ -82,7 +82,7 @@ function fs.writeResourceFile(relPath, contents, resource, log)
     -- is. On a demo server the save did precisely what was asked of it, so
     -- failing it would put a red toast behind every settings change and make a
     -- working demo look broken. The console says once per target what happened.
-    if nlib.demo.dropWrite(('%s/%s'):format(resource, relPath)) then return true end
+    if norden_lib.demo.dropWrite(('%s/%s'):format(resource, relPath)) then return true end
 
     if nativeWriteUsable[resource] ~= false then
         local ok, native = pcall(SaveResourceFile, resource, relPath, contents, -1)
@@ -100,14 +100,14 @@ function fs.writeResourceFile(relPath, contents, resource, log)
         if nativeWriteUsable[resource] == nil and type(log) == "function" then
             log(("SaveResourceFile cannot write to '%s' in this environment "
                 .. "(expected on FiveM Enhanced) — using this resource's Node fs bridge for it from now on")
-                :format(resource), nlib.logger.WARN)
+                :format(resource), norden_lib.logger.WARN)
         end
         nativeWriteUsable[resource] = false
     end
 
     -- Contract: true on success, or a NON-EMPTY error string. Never false, never
     -- "" — an empty string is truthy in Lua and would read as success.
-    -- The LOCAL resource's export, never NLib's: see the header. Resolved on
+    -- The LOCAL resource's export, never Norden Lib's: see the header. Resolved on
     -- every call rather than cached, because the handle is cheap and a cached
     -- one would pin this module to whichever VM first used it — it is dofile'd
     -- into each consumer, so there is no single owner to cache for.
@@ -122,7 +122,7 @@ function fs.writeResourceFile(relPath, contents, resource, log)
         -- server owner auditing directory modes for a missing-file problem.
         return false, ("'%s' has no Node fs bridge — its Node fs bridge is unavailable (%s) and "
             .. "SaveResourceFile also failed. Its server bundle must call "
-            .. "registerWriteResourceFile() from NLib/shared/ts/fs/server.ts, and "
+            .. "registerWriteResourceFile() from norden_lib/shared/ts/fs/server.ts, and "
             .. "server/dist/bundle.js must be rebuilt and loaded")
             :format(self, tostring(res))
     end

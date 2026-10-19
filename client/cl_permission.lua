@@ -6,7 +6,7 @@ local isAdmin   = false  -- kept for backward compat: true when permLevel >= 1
 
 -- Only the server may set this. A client-side TriggerEvent of the same name
 -- arrives with a different source; a server-triggered net event is always 65535.
-Platform.AddNetEventHandler("NLib:receiveAdminPermission", function(result)
+Platform.AddNetEventHandler("norden_lib:receiveAdminPermission", function(result)
     if source ~= 65535 then return end
     -- A number, and only a number. An "old servers sent a boolean" branch was
     -- removed 2026-10-12: every tagged release v0.1..v0.6 sends
@@ -21,18 +21,18 @@ end)
 -- A restart re-runs this file but not the server handshake, so ask again.
 AddEventHandler("onClientResourceStart", function(resourceName)
     if resourceName == Platform.getPackageName() then
-        Platform.TriggerServerEvent("NLib:requestAdminPermission")
+        Platform.TriggerServerEvent("norden_lib:requestAdminPermission")
     end
 end)
 
 function Permission_registerClientExports()
-    Platform.export('NLib', 'IsAdmin', function()
+    Platform.export('norden_lib', 'IsAdmin', function()
         return isAdmin
     end)
-    Platform.export('NLib', 'GetPermissionLevel', function()
+    Platform.export('norden_lib', 'GetPermissionLevel', function()
         return permLevel
     end)
-    Platform.export('NLib', 'RefreshAdminPermission', function()
-        Platform.TriggerServerEvent("NLib:requestAdminPermission")
+    Platform.export('norden_lib', 'RefreshAdminPermission', function()
+        Platform.TriggerServerEvent("norden_lib:requestAdminPermission")
     end)
 end

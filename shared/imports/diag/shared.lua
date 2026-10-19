@@ -1,8 +1,8 @@
 --[[
-    NLib/shared/imports/diag — startup diagnostics that an operator can act on.
+    norden_lib/shared/imports/diag — startup diagnostics that an operator can act on.
 
     Usage in a consumer:
-        nlib.diag.fatal('Config does not exist. tRadio cannot start.', {
+        norden_lib.diag.fatal('Config does not exist. tRadio cannot start.', {
             cause = 'config/config.lua failed to load. Almost always a Lua syntax error in your edited copy.',
             fix   = { 'Scroll UP: FiveM printed the exact file and line just before this.' },
             once  = 'no-config',
@@ -63,7 +63,7 @@ function Diag.render(level, title, opts)
     local spec  = LEVELS[level] or LEVELS.error
     local scope = opts.scope
         or (GetCurrentResourceName and GetCurrentResourceName())
-        or 'NLib'
+        or 'norden_lib'
 
     local body = {}
     local function add(text) body[#body + 1] = text end
@@ -337,7 +337,7 @@ end
 --- third pass lists keys the spec does NOT declare, which are the ones the
 --- validator warned were doing nothing. `order` is presentation only, never the
 --- list of what gets printed. A `spec` may be a table or a function.
---- @param spec table|function|nil  a nlib.config spec; `spec.keys` is read
+--- @param spec table|function|nil  a norden_lib.config spec; `spec.keys` is read
 --- @param order table|nil
 --- @param config table|nil
 --- @return table
@@ -386,7 +386,7 @@ end
 --- @param body function  called with (source, args, raw)
 --- @param scope string|nil  defaults to the current resource
 function Diag.guard(name, body, scope)
-    scope = scope or (GetCurrentResourceName and GetCurrentResourceName()) or 'NLib'
+    scope = scope or (GetCurrentResourceName and GetCurrentResourceName()) or 'norden_lib'
     RegisterCommand(name, function(source, args, raw)
         local ok, err = pcall(body, source, args, raw)
         if not ok then
@@ -409,7 +409,7 @@ end
 ---                        harvests nothing; a FUNCTION is called per invocation,
 ---                        for a resource whose state is loaded rather than a
 ---                        global (tAFK's data.json, tELS's serverDefaults).
----   spec     table|nil   a nlib.config spec, enabling `ctx.configKeys()`.
+---   spec     table|nil   a norden_lib.config spec, enabling `ctx.configKeys()`.
 ---   order    table|nil   presentation order for `ctx.configKeys()`.
 ---   secrets  table|nil   extra credential key names beyond SECRET_PATTERNS.
 --- redact boolean|nil defaults to TRUE. `false` exists for the suite's
@@ -430,15 +430,15 @@ end
 ---   ctx.kv(k,v,w)    'k   <described v>', redacted by key name.
 ---   ctx.message(m)   a validation message: indented, newline-continued, and
 ---                    WITHHELD when it names one of the harvested credentials.
----   ctx.messages(r)  every warning then every error in a nlib.config report, or
+---   ctx.messages(r)  every warning then every error in a norden_lib.config report, or
 ---                    'no problems' when there are none.
 ---   ctx.presence / describe / meta / convarSet / resourceState / count / yesNo
 ---   ctx.configKeys() the spec-derived key list.
 function Diag.command(opts)
-    assert(type(opts) == 'table', 'nlib.diag.command: an opts table is required')
-    local name = assert(opts.name, 'nlib.diag.command: name is required')
-    local build = assert(opts.report, 'nlib.diag.command: a report function is required')
-    local scope = opts.scope or (GetCurrentResourceName and GetCurrentResourceName()) or 'NLib'
+    assert(type(opts) == 'table', 'norden_lib.diag.command: an opts table is required')
+    local name = assert(opts.name, 'norden_lib.diag.command: name is required')
+    local build = assert(opts.report, 'norden_lib.diag.command: a report function is required')
+    local scope = opts.scope or (GetCurrentResourceName and GetCurrentResourceName()) or 'norden_lib'
     local route = opts.route or 'both'
     local prefix = opts.prefix or ''
     local redact = opts.redact ~= false

@@ -1,4 +1,4 @@
-import { createEscapeLayer } from "@nlib/shared/escape-layer";
+import { createEscapeLayer } from "@norden_lib/shared/escape-layer";
 import {
   createEffect,
   createMemo,
@@ -207,7 +207,7 @@ export default function Menu() {
   // This effect is the last place in the program that still holds the theme's
   // value BEFORE it is resolved, so it is the only place a themed partner can be
   // written at all. Skipping it left a themed menu with correct opaque surfaces
-  // and every tint beside them still keyed to stock NLib grey.
+  // and every tint beside them still keyed to stock Norden Lib grey.
   //
   // --accent and --muted are absent on purpose: neither has a `-raw` partner in
   // tokens.css because nothing ever asks for a share of them, and inventing one
@@ -370,14 +370,14 @@ export default function Menu() {
     path.map((part) => plainText(t(part))).join(" › ");
   // Protocol-prefixed so it cannot collide with a catalog item id, which keeps the
   // canonicalId test below unambiguous.
-  const SEARCH_ROW = "nlib:menu:searchHit";
+  const SEARCH_ROW = "norden_lib:menu:searchHit";
   const hits = createMemo(() =>
     query().trim() ? searchCatalog(prepared(), query(), menuId(), state.menus) : []
   );
   /*
    * The shared "Send feedback" row
    *
-   * INJECTED BY NLib'S MENU, NOT MOUNTED BY EIGHT RESOURCES. tELS, tRadar,
+   * INJECTED BY norden_lib'S MENU, NOT MOUNTED BY EIGHT RESOURCES. tELS, tRadar,
    * tDetector, tUnit, tAFK, tCAD, tChirp and tRadio all render through THIS
    * bundle, so one row here is one row in every one of their menus and none of
    * them has to wire anything. That is the whole point: the alternative is
@@ -394,10 +394,10 @@ export default function Menu() {
    *
    * ONLY ON AN OWNER'S ENTRY PAGE. A resource has up to 240 pages; a row on
    * all of them is noise, and the entry page is the one every player passes
-   * through. A page with no `owner:` prefix — NLib's own `main` hub — gets no
+   * through. A page with no `owner:` prefix — Norden Lib's own `main` hub — gets no
    * row, because there is no resource for the copy to name.
    */
-  const FEEDBACK_ROW = "nlib:menu:feedback";
+  const FEEDBACK_ROW = "norden_lib:menu:feedback";
   const feedbackResource = createMemo(() => {
     const page = menu();
     // A placeholder is navigation metadata with no rows yet: the player is not
@@ -550,7 +550,7 @@ export default function Menu() {
    *
    * Why this is NOT a toast, having been asked
    *
-   * NLib shipped two notification lifetimes with two sets of numbers: this one
+   * Norden Lib shipped two notification lifetimes with two sets of numbers: this one
    * (error 7000, everything else 2500) and `lib/toast-lifetime.ts`'s
    * `TOAST_DURATIONS` (error 6000, warning 5000, success/info 4000). Two tables
    * is one table too many and the duplicate is gone -- the deadline below is read
@@ -1493,7 +1493,7 @@ export default function Menu() {
   return (
     // Always a concrete skin, resolved per page through the same branding layers as
     // the accent. This attribute is all the markup knows about skins.
-    <div ref={root} class="nlib-menu" data-skin={skinFor(state.branding, menuId())}>
+    <div ref={root} class="norden-menu" data-skin={skinFor(state.branding, menuId())}>
       <Show when={preview}>
         <div class="preview-world" aria-hidden="true">
           <div class="preview-grid" />

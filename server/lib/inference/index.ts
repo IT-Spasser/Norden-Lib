@@ -51,6 +51,7 @@ export function installInference(): void {
   fOn("onResourceStop", (resource: unknown) => {
     if (typeof resource !== "string") return;
     const removed = registry.withdrawAll(resource);
-    if (removed > 0) console.log(`[NLib] inference: dropped ${removed} engine(s) from ${resource}`);
+    if (removed > 0)
+      console.log(`[norden_lib] inference: dropped ${removed} engine(s) from ${resource}`);
   });
 }

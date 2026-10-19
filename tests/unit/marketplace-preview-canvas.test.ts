@@ -2,7 +2,7 @@
  * The canvas tiers, held to their ORDER.
  *
  * This logic is now shared by two surfaces that scale a marketplace layout into a
- * box — NLib's in-game preview overlay and tRadio's admin marketplace cards — which
+ * box — Norden Lib's in-game preview overlay and tRadio's admin marketplace cards — which
  * is the whole reason it left `PreviewOverlay.tsx`. Its failure mode is silent: a
  * wrong answer is not an error, only a preview at the wrong scale, so nothing but a
  * test notices when a tier stops winning.

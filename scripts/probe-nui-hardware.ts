@@ -78,7 +78,7 @@ const READER = `(() => {
   probe("screen.width", () => screen.width);
   probe("screen.height", () => screen.height);
   probe("devicePixelRatio", () => devicePixelRatio);
-  probe("localStorage", () => { localStorage.setItem("__nlibprobe", "1"); const v = localStorage.getItem("__nlibprobe"); localStorage.removeItem("__nlibprobe"); return v; });
+  probe("localStorage", () => { localStorage.setItem("__nordenprobe", "1"); const v = localStorage.getItem("__nordenprobe"); localStorage.removeItem("__nordenprobe"); return v; });
 
   // WebGL. Both contexts, because CEF can have one and not the other, and the
   // debug extension is the only thing that names the real adapter.

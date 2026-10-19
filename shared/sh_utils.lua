@@ -21,12 +21,12 @@ function Utils.generateId()
     return table.concat(t)
 end
 
-Platform.export('NLib', 'GenerateId', function()
+Platform.export('norden_lib', 'GenerateId', function()
     return Utils.generateId()
 end)
 
 local _warnedOnce = {}
-local _warnLog = Logger.create('NLib/utils')
+local _warnLog = Logger.create('norden_lib/utils')
 
 function Utils.warnOnce(key, msg)
     if not _warnedOnce[key] then

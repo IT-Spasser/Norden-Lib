@@ -8,7 +8,7 @@
 //
 //   election   both clients report themselves the controller. This is planted in the
 //              REAL CODE PATH: publishTick computes `mine` from
-//              nlib.occupancy.isController(), so the module genuinely admits two
+//              norden_lib.occupancy.isController(), so the module genuinely admits two
 //              writers on one statebag key. It is the pre-election bug, replayed.
 //   clock      the world's clock stops advancing — the module's only notion of time,
 //              and the one way a relay reasoned entirely about elapsed milliseconds

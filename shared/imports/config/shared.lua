@@ -1,6 +1,6 @@
 -- Startup validation for an owner-edited config.lua.
 --
---   local ok = nlib.config.check(Config, {
+--   local ok = norden_lib.config.check(Config, {
 --       file = 'shared/config.lua',
 --       keys = {
 --           detectionRangeMeters = { type = 'number', default = 500.0, min = 1, max = 2000 },
@@ -326,7 +326,7 @@ end
 --
 -- So validation snapshots what it saw, at the one moment it is guaranteed
 -- pristine: startup, before the resource does real work. `<resource>_diag`
--- should print `nlib.config.configured()`, not the live table.
+-- should print `norden_lib.config.configured()`, not the live table.
 local snapshots = {}
 
 --- Shallow copy. Deliberately NOT deep: the values a diagnostic prints are

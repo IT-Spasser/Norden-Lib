@@ -1,6 +1,6 @@
 /*
  * THE EDITOR SURFACE AND TYPE LAYER
- *     @import "@nlib/shared/css/surface.css";
+ *     @import "@norden_lib/shared/css/surface.css";
  * after theme-tokens.css and fonts.css, both of which it reads.
  *
  * The type scale. Eleven pixels is the FLOOR, and this is not taste: "the fonts
@@ -8,7 +8,7 @@
  * loading, and both times the cause was a panel whose whole vocabulary was 8-10px
  * at a fractional `--muted-foreground`. CEF 103 renders that with almost no stem
  * left, and the eye reads it as a bad FACE rather than as small dim text.
- * So, two rules, and they are the whole reason this file is in NLib rather than
+ * So, two rules, and they are the whole reason this file is in Norden Lib rather than
  * copied a fourth time:
  *
  *   1. Nothing below 11px. Not in a utility, not in a variant table.
@@ -17,8 +17,8 @@
  *      quieter by being a different family and size, never by opacity.
  * `.panel` is opaque at `--card` and separated from what is behind it by a
  * `--border` edge — NOT by being lighter, and NOT by a drop shadow. Not lighter,
- * because raising `--card` past `--input` inverts NLib's elevation ladder and
- * turns every `border-input` into a black outline; `.nlib-overlay` in
+ * because raising `--card` past `--input` inverts Norden Lib's elevation ladder and
+ * turns every `border-input` into a black outline; `.norden-overlay` in
  * theme-tokens.css moves the WHOLE ladder and is the supported way to do it.
  * Not a shadow, because FiveM's CEF does not composite blur or drop shadows
  * usefully: a 24px blur over a moving 3D scene costs a compositor pass every frame

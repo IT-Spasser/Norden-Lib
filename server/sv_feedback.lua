@@ -15,11 +15,11 @@
 --
 -- That is still true now that the menu is no longer the only surface: the
 -- `SubmitFeedback` export (client/cl_menu.lua) exists for resources whose
--- settings live in a NLib dialog, and it sends down this same channel.
+-- settings live in a Norden Lib dialog, and it sends down this same channel.
 
-if _NLIB_SIDE ~= 'server' then return end
+if _NORDEN_LIB_SIDE ~= 'server' then return end
 
-local log = Logger.create('NLib/feedback')
+local log = Logger.create('norden_lib/feedback')
 
 MenuFeedback = {}
 local F = MenuFeedback
@@ -63,13 +63,13 @@ end)
 --- a resource owns, so its name is in the menu registry. A DIALOG form has no
 --- page and no namespace — tRadio is the first — so the second test is the
 --- manifest key every consumer already declares, read off the named resource's
---- own manifest. A forged name can therefore still only name another NLib
+--- own manifest. A forged name can therefore still only name another Norden Lib
 --- consumer, which is the exposure the paragraph above already accepts.
 local function attributedResource(claimed)
     if type(claimed) ~= 'string' or claimed == '' then return nil end
     local registry = MenuEngine and MenuEngine.registry
     if registry and registry.namespaces[claimed] then return claimed end
-    local ok, pinned = pcall(GetResourceMetadata, claimed, 'nlib_min_version', 0)
+    local ok, pinned = pcall(GetResourceMetadata, claimed, 'norden_lib_min_version', 0)
     if ok and type(pinned) == 'string' and pinned ~= '' then return claimed end
     return nil
 end
@@ -136,7 +136,7 @@ function F.submit(src, body, finish)
     end
     -- `PerformHttpRequest` HAS NO TIMEOUT, so without this the player's dialog
     -- waits on nothing. It also has to stay UNDER the menu channel's own
-    -- timeout (`nlib_menu_request_timeout_ms`, 10s default), or the channel
+    -- timeout (`norden_lib_menu_request_timeout_ms`, 10s default), or the channel
     -- says "timed out" about a message that may well have been delivered.
     Platform.setTimeout(function() answer({ ok = false, error = 'unreachable' }) end, 9000)
 
@@ -150,13 +150,13 @@ function F.submit(src, body, finish)
     -- native returns 201. The bundle still owns what to send and what the
     -- answer meant; it no longer owns the sending.
     local ok, err = pcall(function()
-        local prepared = json.decode(exports['NLib']:fbPrepare(payload))
+        local prepared = json.decode(exports['norden_lib']:fbPrepare(payload))
         if type(prepared) ~= 'table' or type(prepared.url) ~= 'string' then
             answer({ ok = false, error = type(prepared) == 'table' and prepared.error or 'invalid' })
             return
         end
         PerformHttpRequest(prepared.url, function(status)
-            local reason = exports['NLib']:fbClassify(status)
+            local reason = exports['norden_lib']:fbClassify(status)
             if reason == nil then answer({ ok = true }); return end
             answer({ ok = false, error = reason })
         end, 'POST', prepared.body, prepared.headers)

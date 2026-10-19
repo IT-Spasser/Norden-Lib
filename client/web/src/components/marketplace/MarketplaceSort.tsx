@@ -18,7 +18,7 @@ export function MarketplaceSort(props: {
   const [open, setOpen] = createSignal(false);
   return (
     <Select.Root
-      class="nlib-nui-select mp-sort"
+      class="norden-nui-select mp-sort"
       collection={collection}
       value={[props.value]}
       open={open()}
@@ -32,21 +32,21 @@ export function MarketplaceSort(props: {
       <Select.Control>
         <Select.Trigger
           aria-label="Sort items"
-          class="nlib-nui-control nlib-nui-input nlib-nui-select-trigger"
+          class="norden-nui-control norden-nui-input norden-nui-select-trigger"
         >
           <Select.ValueText />
-          <Select.Indicator class="nlib-nui-select-indicator">
+          <Select.Indicator class="norden-nui-select-indicator">
             <ChevronDown size={16} />
           </Select.Indicator>
         </Select.Trigger>
       </Select.Control>
       <Show when={open()}>
         <Portal>
-          <Select.Positioner class="nlib-nui-surface nlib-nui-select-positioner">
-            <Select.Content class="nlib-nui-select-content">
+          <Select.Positioner class="norden-nui-surface norden-nui-select-positioner">
+            <Select.Content class="norden-nui-select-content">
               <For each={collection.items}>
                 {(item) => (
-                  <Select.Item item={item} class="nlib-nui-select-item">
+                  <Select.Item item={item} class="norden-nui-select-item">
                     <Select.ItemText>{item.label}</Select.ItemText>
                     <Select.ItemIndicator>
                       <Check size={14} />

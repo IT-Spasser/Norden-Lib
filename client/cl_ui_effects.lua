@@ -3,13 +3,13 @@
 -- and no per-frame native calls.
 UIEffects = {}
 
-local log = Logger.create('NLib/ui-effects')
+local log = Logger.create('norden_lib/ui-effects')
 local leases, count = {}, 0
 local applied, stopped = false, false
 local FADE_MS = 200.0
 
 local function supported()
-    return _NLIB_IS_FIVEM and _NLIB_SIDE == 'client'
+    return _NORDEN_LIB_IS_FIVEM and _NORDEN_LIB_SIDE == 'client'
         and type(TriggerScreenblurFadeIn) == 'function'
         and type(TriggerScreenblurFadeOut) == 'function'
 end
@@ -76,15 +76,15 @@ end)
 -- Two inputs, player over server, because the server owner is setting a house
 -- default and the player is stating an accessibility need:
 --
---   nlib_reduce_motion  (convar, `setr`)   server default, 0 or 1
---   nlib.motion         (KVP)              the player's own answer, if any
+--   norden_lib_reduce_motion  (convar, `setr`)   server default, 0 or 1
+--   norden_lib.motion         (KVP)              the player's own answer, if any
 --
--- A consumer with its own ui_page owns its own document, so NLib cannot write
+-- A consumer with its own ui_page owns its own document, so Norden Lib cannot write
 -- the property there. It publishes the ANSWER instead and the consumer applies
--- it to its own root: `exports.NLib:GetReduceMotion()` to read it now, and the
--- `nlib:reduceMotion` event for when it changes.
+-- it to its own root: `exports.norden_lib:GetReduceMotion()` to read it now, and the
+-- `norden_lib:reduceMotion` event for when it changes.
 
-local MOTION_KVP = 'nlib.motion'
+local MOTION_KVP = 'norden_lib.motion'
 local reduceMotion = false
 
 local function readPreference()
@@ -94,11 +94,11 @@ local function readPreference()
     if stored == 'reduce' then return true end
     if stored == 'full' then return false end
     if type(GetConvar) ~= 'function' then return false end
-    return GetConvar('nlib_reduce_motion', '0') == '1'
+    return GetConvar('norden_lib_reduce_motion', '0') == '1'
 end
 
 local function publish()
-    -- NLib's own page. `--motion: 1` is the sheet's default, so the full-motion
+    -- Norden Lib's own page. `--motion: 1` is the sheet's default, so the full-motion
     -- case writes it back rather than removing the property: a consumer theme
     -- may have set it, and leaving a stale 0 behind is the failure that is hard
     -- to diagnose from inside the game.
@@ -108,7 +108,7 @@ local function publish()
     -- Platform.TriggerEvent, not the global: every other event in this tree goes
     -- through the adapter, and a bare global was the one call that did not.
     if Platform and Platform.TriggerEvent then
-        Platform.TriggerEvent('nlib:reduceMotion', reduceMotion)
+        Platform.TriggerEvent('norden_lib:reduceMotion', reduceMotion)
     end
 end
 
@@ -131,15 +131,15 @@ end
 
 -- Guarded, matching `supported()` above and `readPreference`'s convar check.
 -- This module is loaded by several Lua test hosts that provide only the blur
--- surface, and NLib's adapter is also the seam a non-FiveM platform would come
+-- surface, and Norden Lib's adapter is also the seam a non-FiveM platform would come
 -- in through — so the motion preference degrades to an in-memory value rather
 -- than taking the whole file down with it.
 if Platform and Platform.wrapExport then
-    Platform.wrapExport('NLib', 'GetReduceMotion', function() return reduceMotion end)
-    Platform.wrapExport('NLib', 'SetReduceMotion', function(value) return UIEffects.setReduceMotion(value) end)
+    Platform.wrapExport('norden_lib', 'GetReduceMotion', function() return reduceMotion end)
+    Platform.wrapExport('norden_lib', 'SetReduceMotion', function(value) return UIEffects.setReduceMotion(value) end)
 end
 
-if type(RegisterCommand) == 'function' then RegisterCommand('nlibmotion', function(_, args)
+if type(RegisterCommand) == 'function' then RegisterCommand('nordenmotion', function(_, args)
     local arg = args and args[1] and tostring(args[1]):lower() or nil
     if arg == 'on' or arg == 'full' then UIEffects.setReduceMotion(false)
     elseif arg == 'off' or arg == 'reduce' then UIEffects.setReduceMotion(true)

@@ -9,7 +9,7 @@ import {
 } from "../../server/lib/http/icons";
 
 /**
- * Three bugs met here on 2026-10-15 and between them meant NO shipped NLib
+ * Three bugs met here on 2026-10-15 and between them meant NO shipped Norden Lib
  * rendered a hub icon, while the dev box looked fine:
  *
  *   1. The FXServer branch asked for `<root>/server/http/icons.json`, missing

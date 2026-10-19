@@ -21,7 +21,7 @@ export interface HudLayoutClient {
 }
 declare global {
   interface Window {
-    /** Provided by https://cfx-nui-NLib/client/ui/assets/hud-layout.js, not this type-only module. */
-    NLibHudLayout?: HudLayoutClient;
+    /** Provided by https://cfx-nui-norden_lib/client/ui/assets/hud-layout.js, not this type-only module. */
+    NordenLibHudLayout?: HudLayoutClient;
   }
 }

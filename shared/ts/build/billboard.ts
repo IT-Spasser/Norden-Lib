@@ -26,7 +26,7 @@
  *
  * `showcase` is the odd one out and deliberately so: the other three are GTA-billboard pastiche,
  * and a set made only of those reads as one joke told four times. It borrows the look of the
- * resources' own thumb/banner art instead — NLib's light rig, Alte Haas rather than condensed
+ * resources' own thumb/banner art instead — Norden Lib's light rig, Alte Haas rather than condensed
  * caps — which is also the only layout that suits the best source material there is here: real
  * in-game screenshots. A night shot of a lit Charger or a mobile radio on a dashboard is a
  * photograph, and photographs want a scrim and a caption, not a flat colour field.
@@ -530,7 +530,7 @@ export async function renderBillboard(spec: BillboardSpec): Promise<void> {
       ? `/* Showcase.
      The store art's look, over a photograph. Three things make it that rather
      than "a screenshot with words on": the scrim, so type sits on something
-     dark enough to read at distance; NLib's light rig, which is the same rig
+     dark enough to read at distance; Norden Lib's light rig, which is the same rig
      the thumbs and banners use; and the brand face instead of the condensed
      caps the pastiche layouts set. */
   .b { font-family: "Alte Haas Grotesk", Arial, sans-serif; }

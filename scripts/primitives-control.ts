@@ -1,10 +1,10 @@
 // Negative control for the three shared primitives ten resources are about to be
-// migrated onto: nlib.permission's client half, nlib.net and nlib.opengate.
+// migrated onto: norden_lib.permission's client half, norden_lib.net and norden_lib.opengate.
 //
 // Plus imports.lua's AUTOLOAD list, which is not a primitive but is patched by the
 // same machinery for free, because tests/lua/imports-autoload.lua loads imports.lua
 // by name the way the others `dofile` a module. The failure it guards raises no
-// error at all: a consumer that declares nothing and never calls nlib.telemetry
+// error at all: a consumer that declares nothing and never calls norden_lib.telemetry
 // from Lua simply never loads the module, so the NUI's flush lands on an
 // unregistered callback and nothing transmits.
 //
@@ -94,7 +94,7 @@ interface Defect {
 }
 
 const DEFECTS: Defect[] = [
-  // nlib.net, the client guard
+  // norden_lib.net, the client guard
   {
     mode: "source-guard-nil",
     path:
@@ -139,7 +139,7 @@ const DEFECTS: Defect[] = [
     ],
   },
 
-  // nlib.net, the server half
+  // norden_lib.net, the server half
   {
     mode: "ratelimit-defaulted-off",
     path:
@@ -175,7 +175,7 @@ const DEFECTS: Defect[] = [
     path:
       "Net.fromClient's grant test. A truthy 1 crossing from a framework export is not " +
       "a grant — IsPlayerAceAllowed is the one native in this estate that answers with " +
-      "it, and reaching it any way other than through nlib.permission skips the " +
+      "it, and reaching it any way other than through norden_lib.permission skips the " +
       "normalisation.",
     module: "shared/imports/net/server.lua",
     find: "if allowed ~= true then",
@@ -185,7 +185,7 @@ const DEFECTS: Defect[] = [
     ],
   },
 
-  // nlib.opengate, the server half
+  // norden_lib.opengate, the server half
   {
     mode: "allow-before-configok",
     path:
@@ -218,7 +218,7 @@ const DEFECTS: Defect[] = [
     expect: [{ suite: "opengate", line: 157, message: "a missing allow says so at boot" }],
   },
 
-  // nlib.opengate, the client half
+  // norden_lib.opengate, the client half
   {
     mode: "reopen-round-trips",
     path:
@@ -260,22 +260,22 @@ const DEFECTS: Defect[] = [
     ],
   },
 
-  // nlib.permission, the client mirror
+  // norden_lib.permission, the client mirror
   {
     mode: "seed-removed",
     path:
-      "The load-scope seed in permission/client.lua. NLib's server answers only a " +
-      "request and NLib's own client asks once at ITS resource start, so a module that " +
+      "The load-scope seed in permission/client.lua. Norden Lib's server answers only a " +
+      "request and Norden Lib's own client asks once at ITS resource start, so a module that " +
       "loads lazily on a consumer's first onChange has already missed the one reply and " +
       "would report 0 until something happened to re-ask.",
     module: "shared/imports/permission/client.lua",
-    find: "local seedOk, seeded = pcall(function() return exports[NLibName]:GetPermissionLevel() end)",
+    find: "local seedOk, seeded = pcall(function() return exports[NordenLibName]:GetPermissionLevel() end)",
     replace: "local seedOk, seeded = false, nil",
     expect: [
       {
         suite: "permission-onchange",
         line: 58,
-        message: "the level is seeded from NLib own client cache",
+        message: "the level is seeded from Norden Lib own client cache",
       },
     ],
   },
@@ -299,7 +299,7 @@ const DEFECTS: Defect[] = [
   {
     mode: "mirror-source-guard-nil",
     path:
-      "The mirror's own source guard, which is separate code from nlib.net's and is " +
+      "The mirror's own source guard, which is separate code from norden_lib.net's and is " +
       "the one three resources carried as six byte-identical lines. Weakened, any " +
       "resource or cheat menu in the process promotes the player to admin in every " +
       "consumer's cache at once.",
@@ -311,7 +311,7 @@ const DEFECTS: Defect[] = [
     ],
   },
 
-  // nlib.permission, the server half
+  // norden_lib.permission, the server half
   {
     mode: "hasall-skips-nil",
     path:
@@ -337,7 +337,7 @@ const DEFECTS: Defect[] = [
   // `dofile` theirs, so the same machinery repoints it with no special case.
   //
   // Needed because the failure the list prevents has no error in it. A consumer
-  // that declares nothing and never calls `nlib.telemetry` from Lua simply never
+  // that declares nothing and never calls `norden_lib.telemetry` from Lua simply never
   // loads the module, so the NUI's flush lands on a callback nobody registered
   // and nothing transmits. Without a planted defect here, nothing proves the
   // list is what loads it rather than something else in the chain.
@@ -346,7 +346,7 @@ const DEFECTS: Defect[] = [
     path:
       "The autoload loop with nothing to iterate. This is the state the estate was " +
       "in before the list existed, when eight manifests each carried a " +
-      "nlib_modules entry to do the same job: the module never loads, there is no " +
+      "norden_lib_modules entry to do the same job: the module never loads, there is no " +
       "error, and telemetry is off in every consumer whose producer is the NUI.",
     module: "imports.lua",
     find: "local AUTOLOAD = {",
@@ -359,11 +359,11 @@ const DEFECTS: Defect[] = [
     mode: "autoload-studio-gate-ignored",
     path:
       "The studioOnly condition dropped, so telemetry autoloads into every consumer " +
-      "regardless of author. NLib is MIT: this is a flush thread and a consent " +
+      "regardless of author. Norden Lib is MIT: this is a flush thread and a consent " +
       "subscription in the VM of a resource that never asked for either.",
     module: "imports.lua",
-    find: "if (not entry.studioOnly or studioResource()) and not rawget(nlib, entry.name) then",
-    replace: "if not rawget(nlib, entry.name) then",
+    find: "if (not entry.studioOnly or studioResource()) and not rawget(norden_lib, entry.name) then",
+    replace: "if not rawget(norden_lib, entry.name) then",
     expect: [
       {
         suite: "imports-autoload",
@@ -376,15 +376,15 @@ const DEFECTS: Defect[] = [
     mode: "autoload-failure-silent",
     path:
       "The autoload loop inheriting the manifest loop's silence — loadModule called " +
-      "for its side effect with nothing reported. A name NLib does not ship then " +
+      "for its side effect with nothing reported. A name Norden Lib does not ship then " +
       "resolves to the export proxy, and the first use throws 'attempt to index a " +
       "function value' wherever it happens to be, naming the consumer.",
     module: "imports.lua",
-    find: "if not loadModule(nlib, entry.name) and nlibReadable() then",
+    find: "if not loadModule(norden_lib, entry.name) and nordenLibReadable() then",
     // Still LOADS -- the point is that the failure is not reported, not that the
     // load never happens. `if false then` would have skipped loadModule entirely
     // and reddened the wiring tests instead, measuring the wrong thing.
-    replace: "if not loadModule(nlib, entry.name) and false then",
+    replace: "if not loadModule(norden_lib, entry.name) and false then",
     expect: [
       {
         suite: "imports-autoload",
@@ -404,9 +404,9 @@ const DEFECTS: Defect[] = [
       "is not 'telemetry is off', it is every t* resource refusing to start. Reddens " +
       "imports-has, whose fixture serves no files on purpose, as well as this suite.",
     module: "imports.lua",
-    find: "if not loadModule(nlib, entry.name) and nlibReadable() then",
+    find: "if not loadModule(norden_lib, entry.name) and nordenLibReadable() then",
     replace:
-      "if not loadModule(nlib, entry.name) then error('autoload: ' .. entry.name, 0) elseif false then",
+      "if not loadModule(norden_lib, entry.name) then error('autoload: ' .. entry.name, 0) elseif false then",
     expect: [
       { suite: "imports-autoload", message: "imports.lua raised" },
       { suite: "imports-has", message: "autoload: occupancy" },
@@ -414,7 +414,7 @@ const DEFECTS: Defect[] = [
   },
 ];
 
-const dir = mkdtempSync(join(tmpdir(), "nlib-primitives-control-"));
+const dir = mkdtempSync(join(tmpdir(), "norden-primitives-control-"));
 let failures = 0;
 
 /** A substitution that did not match exactly once. The control refuses the run. */

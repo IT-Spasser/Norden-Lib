@@ -1,5 +1,5 @@
 --[[
-    NLib/shared/imports/telemetry — opt-in diagnostics (shared half).
+    norden_lib/shared/imports/telemetry — opt-in diagnostics (shared half).
     One file with a branch, not shared+client: imports.lua concatenates them.
     Design notes: docs/internal/telemetry-consent.md and
     docs/internal/telemetry-wire-contract.md.
@@ -10,29 +10,29 @@ local Telemetry = {}
 
 -- Names
 
-Telemetry.CONVAR = 'nlib_telemetry'
+Telemetry.CONVAR = 'norden_lib_telemetry'
 
 --- Client -> server. One name for every consumer: net events are global by name
---- and NLib's server VM is the only registrant.
-Telemetry.INGEST_EVENT = 'nlib:diag:ingest'
+--- and Norden Lib's server VM is the only registrant.
+Telemetry.INGEST_EVENT = 'norden_lib:diag:ingest'
 
 --- Server -> client, on join and on every consent change.
-Telemetry.CONSENT_EVENT = 'nlib:diag:consent'
+Telemetry.CONSENT_EVENT = 'norden_lib:diag:consent'
 
 --- Client -> server, asked once at boot by a consumer that started late.
-Telemetry.CONSENT_REQUEST_EVENT = 'nlib:diag:consentPlease'
+Telemetry.CONSENT_REQUEST_EVENT = 'norden_lib:diag:consentPlease'
 
 --- The NUI callback `installDiagnostics` posts to. Mirrors DIAG_NUI_CALLBACK in
 --- shared/ts/telemetry/collect.ts.
-Telemetry.NUI_CALLBACK = 'nlib:diagnostics'
+Telemetry.NUI_CALLBACK = 'norden_lib:diagnostics'
 
 -- tWeb's names, not ours. An undeclared event name is refused PER EVENT and
 -- counted on its dashboard, which is invisible from here.
-Telemetry.EVENT_ERROR = 'nlib.error_reported'
-Telemetry.EVENT_WARNING = 'nlib.warning_reported'
-Telemetry.EVENT_CRASH = 'nlib.crash_reported'
-Telemetry.EVENT_SLOW = 'nlib.slow_operation'
-Telemetry.EVENT_ENVIRONMENT = 'nlib.environment_reported'
+Telemetry.EVENT_ERROR = 'norden_lib.error_reported'
+Telemetry.EVENT_WARNING = 'norden_lib.warning_reported'
+Telemetry.EVENT_CRASH = 'norden_lib.crash_reported'
+Telemetry.EVENT_SLOW = 'norden_lib.slow_operation'
+Telemetry.EVENT_ENVIRONMENT = 'norden_lib.environment_reported'
 
 --- Dimension caps, tWeb's. A longer value is truncated here rather than there.
 Telemetry.CAP_RESOURCE = 32
@@ -254,10 +254,10 @@ end
 --- instrument anything whose budget is a few milliseconds on this side.
 ---@param opts table  { now = function, report = function(outlier) }
 function Telemetry.createTimers(opts)
-    assert(type(opts) == 'table', 'nlib.telemetry.createTimers: opts must be a table')
+    assert(type(opts) == 'table', 'norden_lib.telemetry.createTimers: opts must be a table')
     local now = opts.now or function() return (GetGameTimer and GetGameTimer()) or 0 end
     local report = opts.report
-    assert(type(report) == 'function', 'nlib.telemetry.createTimers: report must be a function')
+    assert(type(report) == 'function', 'norden_lib.telemetry.createTimers: report must be a function')
     local cooldown = opts.thresholdCooldownMs or Telemetry.THRESHOLD_COOLDOWN_MS
     local p95Interval = opts.p95IntervalMs or Telemetry.P95_INTERVAL_MS
 
@@ -350,11 +350,11 @@ local isServer = type(IsDuplicityVersion) == 'function' and IsDuplicityVersion()
 --- and re-checks before every POST. See docs/internal/telemetry-consent.md.
 local consentCache = { enabled = false, source = 'default', locked = false }
 
---- Ask NLib for the real answer. Server VMs only. pcall'd at two levels: an
+--- Ask Norden Lib for the real answer. Server VMs only. pcall'd at two levels: an
 --- export that throws returns nil and the real error vanishes.
-local function refreshConsentFromNLib()
+local function refreshConsentFromNordenLib()
     if not isServer then return end
-    local ok, raw = pcall(function() return exports['NLib']:DiagConsent() end)
+    local ok, raw = pcall(function() return exports['norden_lib']:DiagConsent() end)
     if not ok or type(raw) ~= 'string' or raw == '' then return end
     local decoded
     ok, decoded = pcall(json.decode, raw)
@@ -396,7 +396,7 @@ end
 
 -- Dedupe, same window and reason as the NUI collector's: a fault inside a
 -- per-frame thread repeats sixty times a second, and without dedupe the first
--- broken install saturates NLib's server ring, evicting every other player's.
+-- broken install saturates Norden Lib's server ring, evicting every other player's.
 local DEDUPE_WINDOW_MS = 120000
 local lastSeen = {}
 
@@ -425,7 +425,7 @@ local function send()
     })
     pendingEvents = {}
     if isServer then
-        pcall(function() exports['NLib']:DiagIngest(0, batch) end)
+        pcall(function() exports['norden_lib']:DiagIngest(0, batch) end)
     else
         pcall(TriggerServerEvent, Telemetry.INGEST_EVENT, batch)
     end
@@ -534,7 +534,7 @@ if not isServer and type(RegisterNetEvent) == 'function' then
             locked = payload.locked == true,
         }
         if type(SendNUIMessage) == 'function' then
-            pcall(SendNUIMessage, { action = 'nlib:diag:consent', data = consentCache })
+            pcall(SendNUIMessage, { action = 'norden_lib:diag:consent', data = consentCache })
         end
     end)
 
@@ -571,7 +571,7 @@ elseif isServer and type(CreateThread) == 'function' then
     CreateThread(function()
         Wait(2000)
         while true do
-            refreshConsentFromNLib()
+            refreshConsentFromNordenLib()
             send()
             Wait(15000)
         end

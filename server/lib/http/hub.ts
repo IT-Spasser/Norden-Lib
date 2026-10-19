@@ -9,7 +9,7 @@
 
 // THERE WAS A DIAGNOSTICS PANEL HERE, AND IT IS GONE ON PURPOSE.
 //
-// It reported the `nlib_telemetry` convar read-only — the state, the convar's
+// It reported the `norden_lib_telemetry` convar read-only — the state, the convar's
 // value, the queue depth, the breaker, and the per-install-id disclosure. The
 // owner removed it: the hub is app discovery, not a settings surface. Before
 // that, a state-changing switch had already been removed from the same panel,
@@ -17,7 +17,7 @@
 // unauthenticated with no auth primitive in `server/lib/http/` to gate anything
 // with. So neither half is to be rebuilt here:
 //
-//   • the setting's state → `nlib_telemetry_status` in the server console;
+//   • the setting's state → `norden_lib_telemetry_status` in the server console;
 //   • the per-install-id disclosure → `docs/content/convars.mdx`, under
 //     "What this convar does *not* cover: the per-install id". That disclosure
 //     is load-bearing (browse, community configs and the update check send the
@@ -32,7 +32,7 @@ import { type HubDestination, hubDestinations, type Mount } from "./registry";
  * Every value here comes from the registering resource and none is trusted:
  * title and description are escaped, and the accent reaches the page through a
  * custom property the registry has already matched against a hex pattern. The
- * icon is raw only because the resource supplies a name and the markup is NLib's
+ * icon is raw only because the resource supplies a name and the markup is Norden Lib's
  * own.
  */
 function renderCard(m: HubDestination): string {
@@ -109,14 +109,14 @@ export function renderIndex(mounts: Mount[], serverName: string): string {
   const body =
     destinations.length === 0
       ? `<h1>${escapeHtml(serverName)}</h1>
-<p class="sub">NLib router</p>
+<p class="sub">Norden Lib router</p>
 <div class="empty">No destinations are listed on this hub.
 Resources may still be available at their direct URLs.</div>`
       : `<h1>${escapeHtml(serverName)}</h1>
 <p class="sub">${destinations.length} ${destinations.length === 1 ? "destination" : "destinations"} available</p>
 <ul>${destinations.map(renderCard).join("")}</ul>`;
 
-  return SHELL(serverName, `${body}<footer>NLib</footer>`);
+  return SHELL(serverName, `${body}<footer>Norden Lib</footer>`);
 }
 
 /** 404 for no mount, 502 for a dead upstream. */

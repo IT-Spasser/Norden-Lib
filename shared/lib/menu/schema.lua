@@ -1,6 +1,6 @@
 -- The menu protocol: what a definition may contain, what may cross the wire and
 -- how an oversized one is chunked. Pure Lua -- no natives, no Platform, no
--- globals beyond the module table -- so the same file loads inside NLib's VM and
+-- globals beyond the module table -- so the same file loads inside Norden Lib's VM and
 -- inside a consumer's (shared/imports/menu/shared.lua), letting a resource validate a
 -- definition before it reaches an export boundary.
 --
@@ -11,12 +11,12 @@ MenuSchema = {}
 local S = MenuSchema
 
 S.events = {
-    request  = 'nlib:menu:request',
-    response = 'nlib:menu:response',
-    refresh  = 'nlib:menu:refresh',
-    options  = 'nlib:menu:options',
-    patch    = 'nlib:menu:patch',
-    chunk    = 'nlib:menu:snapshotChunk',
+    request  = 'norden_lib:menu:request',
+    response = 'norden_lib:menu:response',
+    refresh  = 'norden_lib:menu:refresh',
+    options  = 'norden_lib:menu:options',
+    patch    = 'norden_lib:menu:patch',
+    chunk    = 'norden_lib:menu:snapshotChunk',
 }
 
 -- Ordinary manifests go as one direct event; only unusually large ones fall back
@@ -244,7 +244,7 @@ function S.theme(theme)
             end
             out.theme = value
         elseif key == 'skin' then
-            -- Presentation, not colour: 'default' is the shared look NLib's
+            -- Presentation, not colour: 'default' is the shared look Norden Lib's
             -- dialogs and toasts use, 'vmenu' the legacy vMenu one. A closed set,
             -- because it selects a stylesheet rather than supplying a value to one.
             if value ~= 'default' and value ~= 'vmenu' then

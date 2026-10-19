@@ -1,12 +1,12 @@
 // The Lua-facing surface of the router.
 //
-//   exports['NLib']:RegisterWebApp({
+//   exports['norden_lib']:RegisterWebApp({
 //     id         = 'radio',              -- stable identifier
 //     mount      = '/dispatch',          -- path prefix to serve it under
 //     port       = 54231,                -- YOUR loopback listen port. Read it
 //                                        -- back off your own listener; do not
-//                                        -- ask the operator for it. NLib's
-//                                        -- nlib_http_port is the only port
+//                                        -- ask the operator for it. Norden Lib's
+//                                        -- norden_lib_http_port is the only port
 //                                        -- anyone should have to set.
 //     host       = '127.0.0.1',          -- optional, must be loopback
 //     stripPrefix= false,                -- true if you cannot emit the prefix
@@ -24,11 +24,11 @@
 //   })
 //
 // Returns { ok = true, url = '...' } or { ok = false, error = '...' }, and
-// { ok = false, retryable = true } while NLib is still binding or discovering
+// { ok = false, retryable = true } while Norden Lib is still binding or discovering
 // its public address. Call it after your own listener is up; to catch readiness,
-// subscribe to 'NLib:http:status' before querying GetHttpStatus, and re-register
-// after onResourceStart('NLib'). Mounts drop automatically when the owning
-// resource or NLib stops.
+// subscribe to 'norden_lib:http:status' before querying GetHttpStatus, and re-register
+// after onResourceStart('norden_lib'). Mounts drop automatically when the owning
+// resource or Norden Lib stops.
 //
 // GetHttpStatus.localUrl is the real listener, for health checks; publicUrl may
 // name an HTTPS proxy on another port. GetHubUrl is '' until both are ready
@@ -87,7 +87,7 @@ export function registerBridge(
       return {
         ok: false,
         retryable: true,
-        error: current.error ?? "NLib HTTP is waiting for its listener and public address",
+        error: current.error ?? "norden_lib HTTP is waiting for its listener and public address",
       };
     }
 

@@ -1,7 +1,7 @@
 -- Real HUD, dialog and native-menu backend modules against mocked FiveM natives.
 local checks = 0
 local function check(value, message) checks = checks + 1; assert(value, message) end
-_NLIB_IS_FIVEM, _NLIB_SIDE = true, 'client'
+_NORDEN_LIB_IS_FIVEM, _NORDEN_LIB_SIDE = true, 'client'
 Logger = { create = function() return function() end end }
 local events, exports, commands, threads, timers = {}, {}, {}, {}, {}
 local clock, ownFocus, externalFocus, acquisitions = 0, false, false, 0
@@ -19,7 +19,7 @@ local function nui(name, data)
 end
 function RegisterNuiCallbackType() end
 function RegisterCommand(name, fn) commands[name] = fn end
-function GetCurrentResourceName() return 'NLib' end
+function GetCurrentResourceName() return 'norden_lib' end
 function GetInvokingResource() return 'consumer' end
 function SetNuiFocus(state) ownFocus = state; if state then acquisitions = acquisitions + 1 end end
 function SetNuiFocusKeepInput() end
@@ -63,14 +63,14 @@ local function tick(ms)
     clock = clock + ms
     local ok, err = coroutine.resume(watchdog); check(ok, err)
 end
-local function command(action) commands.nlibhud(0, action and { action } or {}) end
+local function command(action) commands.nordenhud(0, action and { action } or {}) end
 -- Queue a HUD-open callback ahead of the dialog's ready callback. At that exact
 -- transition readiness is true but native focus is still false.
 local transitionOpened
 Platform.onNUIReady(function() transitionOpened = exports.OpenHudEditor() end)
 exports.ShowDialog('pending', { title = 'Pending' })
 check(not ownFocus, 'pending dialog does not focus a cold renderer')
-nui('__nlib_nui_ready')
+nui('__norden_lib_nui_ready')
 check(transitionOpened == false, 'HUD must reject a pending dialog during the ready callback flush')
 check(ownFocus and not HudLayout.isEditing(), 'dialog alone owns the ready transition')
 exports.CloseDialog('pending')
@@ -110,8 +110,8 @@ emit('onClientResourceStop', 'consumer')
 check(not HudLayout.isEditing() and not ownFocus and not move and not look, 'opener stop discards and unlocks')
 command('open')
 check(HudLayout.isEditing(), 'command-owned editor can open after consumer stop')
-emit('onClientResourceStop', 'NLib')
-check(not HudLayout.isEditing() and not ownFocus and not move and not look, 'NLib stop tears down editor and locks')
+emit('onClientResourceStop', 'norden_lib')
+check(not HudLayout.isEditing() and not ownFocus and not move and not look, 'norden_lib stop tears down editor and locks')
 check(not exports.OpenHudEditor(), 'stopped service cannot be reopened by retained exports')
 command()
 check(not HudLayout.isEditing(), 'stopped service cannot be reopened by retained command')

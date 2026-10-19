@@ -28,8 +28,8 @@
     "moduleDetection": "force",
     "paths": {
       "@/*": ["./src/*"],
-      "@nlib/shared": ["../../shared/ts/index.ts"],
-      "@nlib/shared/*": ["../../shared/ts/*"],
+      "@norden_lib/shared": ["../../shared/ts/index.ts"],
+      "@norden_lib/shared/*": ["../../shared/ts/*"],
 
       /* THIS REDIRECT IS WHAT MAKES @ark-ui/solid TYPE-CHECK ON SOLID 2.
          DO NOT REMOVE IT WITHOUT READING src/types/solid-js.d.ts.
@@ -77,7 +77,7 @@
     }
   },
   /* `tests` is in here deliberately. The DOM suite is TypeScript that imports
-     the same components the app does, through the same `@nlib/shared` and `@/`
+     the same components the app does, through the same `@norden_lib/shared` and `@/`
      aliases, so leaving it out would make the one directory asserting those
      components the one directory with no type checking at all. Measured when it
      was added: three real errors, including a `HudAnchor` written as `topleft`

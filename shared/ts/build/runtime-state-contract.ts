@@ -32,23 +32,23 @@
  * matters for the same reason: `data.json` is written next to whichever file the
  * resource points its writer at, which is not always the root.
  *
- * ## 2. `checkDeclaredModules` — `nlib_modules` is an honest inventory
+ * ## 2. `checkDeclaredModules` — `norden_lib_modules` is an honest inventory
  *
- * `nlib_modules` in a consumer's fxmanifest only makes a load EAGER; `nlib.<x>`
+ * `norden_lib_modules` in a consumer's fxmanifest only makes a load EAGER; `norden_lib.<x>`
  * would lazy-load either way. It matters anyway, for a reason every manifest in
- * the estate writes out: NLib's `imports.lua` answers an unknown module name
+ * the estate writes out: Norden Lib's `imports.lua` answers an unknown module name
  * with a truthy export PROXY rather than nil, so an absent module is not caught
- * by any `if nlib.x` guard — the first index throws "attempt to index a function
+ * by any `if norden_lib.x` guard — the first index throws "attempt to index a function
  * value" halfway down a script and takes the whole file with it.
  *
  * And `imports.lua`'s eager loop is worse than that: `loadModule` returns nil
  * for a name that resolves to no file, with **no error**. A typo in
- * `nlib_modules` is therefore completely silent — it is not a failed load, it is
+ * `norden_lib_modules` is therefore completely silent — it is not a failed load, it is
  * not a load at all.
  *
  * ### What this does NOT check, and why — read before adding it
  *
- * **The undeclared direction.** `nlib.<name>` used without declaring it is NOT a
+ * **The undeclared direction.** `norden_lib.<name>` used without declaring it is NOT a
  * bug: lazy loading is legal and is what most consumers rely on. It is only a
  * bug when the use is at FILE SCOPE, because then the chunk runs before any
  * lazy load could happen. Deciding "is this reference at file scope" needs a Lua
@@ -76,9 +76,9 @@ export interface RuntimeStateFinding {
    *
    * Exactly one rule is soft — `R-MODULE-UNUSED` — and it is soft because it
    * cannot distinguish a stale declaration from a legitimate one. A consumer may
-   * declare a module it never names itself, because a NLib module it DOES use
+   * declare a module it never names itself, because a Norden Lib module it DOES use
    * needs that one loaded eagerly: tDetector declares `assets` and never calls
-   * `nlib.assets`, but `soundstore` calls `nlib.assets.reconcile` at boot.
+   * `norden_lib.assets`, but `soundstore` calls `norden_lib.assets.reconcile` at boot.
    * MEASURED across the eight resources here: 1 ghost-free, 4 unused, and at
    * least one of the four is that pattern rather than a mistake.
    *
@@ -127,7 +127,7 @@ export const FORBIDDEN_RUNTIME_STATE: Array<{ rule: string; match: RegExp; why: 
     rule: "R-DATA-MIGRATION-BAK",
     match: /^data\.json\.v[0-9]+\.bak$/,
     why:
-      "a one-off pre-migration snapshot written by nlib.jsonstore. It is per-install by " +
+      "a one-off pre-migration snapshot written by norden_lib.jsonstore. It is per-install by " +
       "construction and shipping one puts a stale document where an owner will later look " +
       "for their own.",
   },
@@ -149,7 +149,7 @@ export const FORBIDDEN_RUNTIME_STATE: Array<{ rule: string; match: RegExp; why: 
       "beside the resource at runtime; a new install correctly has none.",
   },
   // `R-TELEMETRY-INSTALL-ID` (`/^telemetry-install-id\.txt$/`) WAS HERE AND IS
-  // DELETED, not disabled. The per-install id moved inside NLib's own
+  // DELETED, not disabled. The per-install id moved inside Norden Lib's own
   // `data.json` (see `shared/ts/install-id.ts`), so `R-DATA-FILE` above already
   // covers it — by BASENAME AT ANY DEPTH, which
   // `runtime-state-contract-control.ts` asserts with a `server/storage/data.json`
@@ -260,12 +260,12 @@ export function checkStagedTree(options: StagedTreeOptions): StagedTreeResult {
   return { findings, fileCount: files.length, totalBytes, sawManifest };
 }
 
-// 2. Declared NLib modules
+// 2. Declared Norden Lib modules
 
 export interface DeclaredModulesResult {
   findings: RuntimeStateFinding[];
   declared: string[];
-  /** Module names that exist in NLib, for the report. Empty is a failure. */
+  /** Module names that exist in Norden Lib, for the report. Empty is a failure. */
   available: string[];
   /** Informational: declared, present, but server-only. Never fails. */
   serverOnly: string[];
@@ -274,8 +274,8 @@ export interface DeclaredModulesResult {
 export interface DeclaredModulesOptions {
   /** The consumer resource's root (the directory holding fxmanifest.lua). */
   root: string;
-  /** NLib's root, which owns `shared/imports/<name>/`. */
-  nlib: string;
+  /** Norden Lib's root, which owns `shared/imports/<name>/`. */
+  norden_lib: string;
   skip?: string[];
 }
 
@@ -284,22 +284,24 @@ export interface StrictOption {
   strict?: boolean;
 }
 
-/** `nlib_module {...}` and `nlib_modules {...}`, both spellings, comments gone. */
+/** `norden_lib_module {...}` and `norden_lib_modules {...}`, both spellings, comments gone. */
 export function declaredModules(manifest: string): string[] {
   const source = stripLuaComments(manifest);
   const names: string[] = [];
   // `imports.lua` reads both keys, so both are read here. A block may span many
   // lines and carry long comments, which `stripLuaComments` has already removed.
-  for (const block of source.matchAll(/\bnlib_modules?\s*(?:\{([\s\S]*?)\}|(['"])(.*?)\2)/g)) {
+  for (const block of source.matchAll(
+    /\bnorden_lib_modules?\s*(?:\{([\s\S]*?)\}|(['"])(.*?)\2)/g
+  )) {
     const body = block[1] ?? block[3] ?? "";
     for (const entry of body.matchAll(/['"]([A-Za-z0-9_]+)['"]/g)) names.push(entry[1]);
   }
   return [...new Set(names)].sort();
 }
 
-/** Module names NLib actually provides, by the same rule `imports.lua` uses. */
-export function availableModules(nlib: string): string[] {
-  const dir = join(nlib, "shared", "imports");
+/** Module names Norden Lib actually provides, by the same rule `imports.lua` uses. */
+export function availableModules(norden_lib: string): string[] {
+  const dir = join(norden_lib, "shared", "imports");
   if (!existsSync(dir)) return [];
   return readdirSync(dir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -324,7 +326,7 @@ function luaFiles(root: string): string[] {
 }
 
 export function checkDeclaredModules(options: DeclaredModulesOptions): DeclaredModulesResult {
-  const { root, nlib, skip = [] } = options;
+  const { root, norden_lib, skip = [] } = options;
   const findings: RuntimeStateFinding[] = [];
   const manifestPath = join(root, "fxmanifest.lua");
 
@@ -338,18 +340,18 @@ export function checkDeclaredModules(options: DeclaredModulesOptions): DeclaredM
   }
 
   const declared = declaredModules(readFileSync(manifestPath, "utf8"));
-  const available = availableModules(nlib);
+  const available = availableModules(norden_lib);
 
   // A floor, for the same reason as above. `availableModules` returns [] for
-  // a NLib path that does not exist, and every `R-MODULE-GHOST` below is then
+  // a Norden Lib path that does not exist, and every `R-MODULE-GHOST` below is then
   // green-by-emptiness — no, worse: every declared name becomes a ghost. Both
   // directions are wrong, so refuse rather than report either.
   if (available.length === 0 && !skip.includes("R-IMPORTS-FLOOR")) {
     findings.push({
       rule: "R-IMPORTS-FLOOR",
-      file: join(nlib, "shared", "imports"),
+      file: join(norden_lib, "shared", "imports"),
       detail:
-        "NLib provides no modules at all, which cannot be true. The NLib path is wrong, so " +
+        "norden_lib provides no modules at all, which cannot be true. The Norden Lib path is wrong, so " +
         "neither direction of this check can be trusted.",
     });
     return { findings, declared, available, serverOnly: [] };
@@ -367,10 +369,10 @@ export function checkDeclaredModules(options: DeclaredModulesOptions): DeclaredM
         rule: "R-MODULE-GHOST",
         file: "fxmanifest.lua",
         detail:
-          `nlib_modules declares "${name}", which NLib does not provide. ⛔ This is SILENT ` +
+          `norden_lib_modules declares "${name}", which Norden Lib does not provide. ⛔ This is SILENT ` +
           "today: imports.lua's eager loop calls loadModule, which returns nil for a name " +
           "that resolves to no file and raises nothing. It is not a failed load, it is not " +
-          "a load at all — and the first `nlib." +
+          "a load at all — and the first `norden_lib." +
           name +
           "` is then an export proxy that throws " +
           '"attempt to index a function value" wherever it happens to be used.',
@@ -383,7 +385,7 @@ export function checkDeclaredModules(options: DeclaredModulesOptions): DeclaredM
     // resource uses" -- and a stale entry costs an eager load of a module
     // nobody calls, in a chain where load order is already load-bearing.
     const used = new RegExp(
-      `\\bnlib\\s*[.:]\\s*${name}\\b|nlib\\.has\\s*\\(\\s*['"]${name}['"]`
+      `\\bnorden_lib\\s*[.:]\\s*${name}\\b|norden_lib\\.has\\s*\\(\\s*['"]${name}['"]`
     ).test(source);
     if (!used && !skip.includes("R-MODULE-UNUSED")) {
       findings.push({
@@ -391,14 +393,14 @@ export function checkDeclaredModules(options: DeclaredModulesOptions): DeclaredM
         file: "fxmanifest.lua",
         soft: true,
         detail:
-          `nlib_modules declares "${name}" but no runtime Lua in this resource references ` +
-          `nlib.${name}. Either it is left over from a feature that was removed, or the ` +
+          `norden_lib_modules declares "${name}" but no runtime Lua in this resource references ` +
+          `norden_lib.${name}. Either it is left over from a feature that was removed, or the ` +
           "reference moved into a bundled .ts — in which case say so beside the entry, " +
           "because the whole value of this block is being an honest inventory.",
       });
     }
 
-    const dir = join(nlib, "shared", "imports", name);
+    const dir = join(norden_lib, "shared", "imports", name);
     if (
       existsSync(join(dir, "server.lua")) &&
       !existsSync(join(dir, "client.lua")) &&
@@ -441,7 +443,7 @@ export function formatFindings(
 // CLI
 //
 //   bun runtime-state-contract.ts --dist <staged tree>
-//   bun runtime-state-contract.ts --root <resource> --nlib <NLib root>
+//   bun runtime-state-contract.ts --root <resource> --norden_lib <Norden Lib root>
 //
 // Either or both. Runnable by path, so it needs no package.json entry to be
 // usable from a prod.ts that imports the functions directly instead.
@@ -454,13 +456,13 @@ if (import.meta.main) {
   };
   const dist = flag("--dist");
   const root = flag("--root");
-  const nlib = flag("--nlib");
+  const norden_lib = flag("--norden_lib");
   const skip = flag("--skip")?.split(",").filter(Boolean) ?? [];
   const strict = argv.includes("--strict");
 
   if (!dist && !root) {
     console.error(
-      "usage: bun runtime-state-contract.ts [--dist <staged tree>] [--root <resource> --nlib <NLib root>] [--skip R-X]"
+      "usage: bun runtime-state-contract.ts [--dist <staged tree>] [--root <resource> --norden_lib <Norden Lib root>] [--skip R-X]"
     );
     process.exit(2);
   }
@@ -480,16 +482,16 @@ if (import.meta.main) {
   }
 
   if (root) {
-    if (!nlib) {
+    if (!norden_lib) {
       console.error(
-        "runtime-state-contract: --root needs --nlib, or neither direction can be judged"
+        "runtime-state-contract: --root needs --norden_lib, or neither direction can be judged"
       );
       process.exit(2);
     }
-    const result = checkDeclaredModules({ root, nlib, skip });
+    const result = checkDeclaredModules({ root, norden_lib, skip });
     console.log(
       formatFindings(
-        "check:nlib-modules",
+        "check:norden-modules",
         result.findings,
         `${result.declared.length} declared of ${result.available.length} available` +
           (result.serverOnly.length > 0

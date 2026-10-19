@@ -1,7 +1,7 @@
 --[[
-    NLib — per-player rate limiting for net events (server)
+    Norden Lib — per-player rate limiting for net events (server)
 
-        local gate = nlib.ratelimit.bucket('requestVehicleProps', 1000)
+        local gate = norden_lib.ratelimit.bucket('requestVehicleProps', 1000)
 
         RegisterNetEvent('tdet:requestVehicleProps', function()
             local src = source
@@ -96,9 +96,9 @@ end
 --- @return fun(src: number|string): boolean  true when the call is REFUSED
 function RateLimit.bucket(name, intervalMs)
     assert(type(name) == 'string' and name ~= '',
-        'nlib.ratelimit.bucket: name must be a non-empty string')
+        'norden_lib.ratelimit.bucket: name must be a non-empty string')
     assert(type(intervalMs) == 'number' and intervalMs >= 0,
-        'nlib.ratelimit.bucket: intervalMs must be a non-negative number')
+        'norden_lib.ratelimit.bucket: intervalMs must be a non-negative number')
 
     installSweep()
 

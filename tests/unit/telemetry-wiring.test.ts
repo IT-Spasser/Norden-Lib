@@ -4,7 +4,7 @@
  *
  * WHY A FILE-READING TEST AND NOT A LUA SUITE. The event names exist twice in
  * Lua — once in `shared/imports/telemetry/shared.lua`, which runs in CONSUMER
- * VMs, and once in `server/sv_telemetry.lua`, which runs in NLib's own. There is
+ * VMs, and once in `server/sv_telemetry.lua`, which runs in Norden Lib's own. There is
  * no VM in which both are loaded, so neither can import the other and no Lua
  * suite can compare them. `imports.lua` carries its own copy of `parseVer` for
  * exactly this reason. fengari also ships no `io`, so a Lua suite could not read
@@ -55,11 +55,11 @@ describe("the event names exist twice in Lua and must agree", () => {
   test("the convar name is the same in Lua and in TypeScript", () => {
     // Three copies: the consumer module, the bundle's consent resolver, and the
     // operator-facing fallback in the status command's export.
-    expect(luaString(consumerLua, "Telemetry\\.CONVAR")).toBe("nlib_telemetry");
+    expect(luaString(consumerLua, "Telemetry\\.CONVAR")).toBe("norden_lib_telemetry");
     expect(read("server/lib/telemetry/consent.ts")).toContain(
-      'export const TELEMETRY_CONVAR = "nlib_telemetry"'
+      'export const TELEMETRY_CONVAR = "norden_lib_telemetry"'
     );
-    expect(serverLua).toContain("nlib_telemetry");
+    expect(serverLua).toContain("norden_lib_telemetry");
   });
 
   test("the NUI callback name is the same in TypeScript and in Lua", () => {
@@ -71,8 +71,8 @@ describe("the event names exist twice in Lua and must agree", () => {
 
   test("the consent NUI message name is the same on both sides", () => {
     // Lua sends it with SendNUIMessage; collect.ts subscribes with onNuiEvent.
-    expect(consumerLua).toContain("'nlib:diag:consent'");
-    expect(read("shared/ts/telemetry/collect.ts")).toContain('"nlib:diag:consent"');
+    expect(consumerLua).toContain("'norden_lib:diag:consent'");
+    expect(read("shared/ts/telemetry/collect.ts")).toContain('"norden_lib:diag:consent"');
   });
 });
 
@@ -84,11 +84,11 @@ describe("the event names exist twice more — in Lua and in TypeScript", () => 
    * symptom is one empty chart among four populated ones.
    */
   const luaNames: Array<[string, string]> = [
-    ["Telemetry.EVENT_ERROR", "nlib.error_reported"],
-    ["Telemetry.EVENT_WARNING", "nlib.warning_reported"],
-    ["Telemetry.EVENT_CRASH", "nlib.crash_reported"],
-    ["Telemetry.EVENT_SLOW", "nlib.slow_operation"],
-    ["Telemetry.EVENT_ENVIRONMENT", "nlib.environment_reported"],
+    ["Telemetry.EVENT_ERROR", "norden_lib.error_reported"],
+    ["Telemetry.EVENT_WARNING", "norden_lib.warning_reported"],
+    ["Telemetry.EVENT_CRASH", "norden_lib.crash_reported"],
+    ["Telemetry.EVENT_SLOW", "norden_lib.slow_operation"],
+    ["Telemetry.EVENT_ENVIRONMENT", "norden_lib.environment_reported"],
   ];
 
   for (const [name, expected] of luaNames) {
@@ -124,7 +124,7 @@ describe("the manifest", () => {
 
 describe("stampContext", () => {
   const event = {
-    event: "nlib.error_reported",
+    event: "norden_lib.error_reported",
     at: 1,
     dimensions: { stackHash: "00000001" },
     measures: {},

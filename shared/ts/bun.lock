@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@nlib/shared",
+      "name": "@norden_lib/shared",
       "dependencies": {
         "clsx": "^2.1.1",
         "fflate": "^0.8.2",

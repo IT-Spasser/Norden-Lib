@@ -1,6 +1,6 @@
-// Registers the rt* exports at NLib boot. The WebSocket server itself starts on
-// the first consumer call, so NLib stays a pure library until a resource
-// declares `nlib_module { 'realtime' }` and uses it.
+// Registers the rt* exports at Norden Lib boot. The WebSocket server itself starts on
+// the first consumer call, so Norden Lib stays a pure library until a resource
+// declares `norden_lib_module { 'realtime' }` and uses it.
 
 import { resolveConfig as resolveHttpConfig } from "../http/config";
 import { makeEmitHooks, registerBridge } from "./bridge";
@@ -19,7 +19,7 @@ import { RealtimeServer } from "./server";
 let instance: RealtimeServer | null = null;
 
 function log(level: "info" | "warn" | "error", msg: string): void {
-  const prefix = "[NLib/realtime]";
+  const prefix = "[norden_lib/realtime]";
   if (level === "error") console.error(`${prefix} ${msg}`);
   else if (level === "warn") console.warn(`${prefix} ${msg}`);
   else console.log(`${prefix} ${msg}`);
@@ -55,12 +55,12 @@ export function current(): RealtimeServer | null {
 
 /** True iff `resource` declares the realtime module in its manifest.
  *
- *  Both spellings, because imports.lua accepts both: `nlib_module { 'realtime' }`
- *  and `nlib_modules { 'kvp', 'realtime' }`. Checking only the singular meant
+ *  Both spellings, because imports.lua accepts both: `norden_lib_module { 'realtime' }`
+ *  and `norden_lib_modules { 'kvp', 'realtime' }`. Checking only the singular meant
  *  realtime never installed for any resource that used the plural form — which
  *  is every consumer in this repo. */
 function requestsRealtime(resource: string): boolean {
-  for (const key of ["nlib_module", "nlib_modules"]) {
+  for (const key of ["norden_lib_module", "norden_lib_modules"]) {
     const count = fGetNumResourceMetadata(resource, key);
     for (let j = 0; j < count; j++) {
       if (fGetResourceMetadata(resource, key, j) === "realtime") return true;
@@ -101,7 +101,7 @@ function install(): void {
 
 /**
  * Called once from server/main.ts, and does nothing unless a consumer opts in
- * with `nlib_module { 'realtime' }`. The gate is re-checked whenever a resource
+ * with `norden_lib_module { 'realtime' }`. The gate is re-checked whenever a resource
  * starts, so an `ensure` after boot still wires things up while a server that
  * never needs realtime sees no registrations, no port and no log line.
  */

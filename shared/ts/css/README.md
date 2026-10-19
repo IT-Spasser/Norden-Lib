@@ -1,19 +1,19 @@
 # `shared/ts/css/` — package-relative specifiers for `shared/css/`
 
 Every file here is a one-line `@import` of the real stylesheet in
-`NLib/shared/css/`. Nothing is authored here; edit the target.
+`norden_lib/shared/css/`. Nothing is authored here; edit the target.
 
 ## Why the indirection exists
 
 The stylesheets belong beside each other in `shared/css/`, which is OUTSIDE this
-package (`@nlib/shared` is rooted at `shared/ts`). Node's `exports` map cannot
+package (`@norden_lib/shared` is rooted at `shared/ts`). Node's `exports` map cannot
 name a target above its own package root, so `"./css/surface.css": "../../css/surface.css"`
 is not a legal entry and a consumer could only reach the file by relative path.
 
 That relative path is a real trap, not a stylistic one. tUnit's global.css reaches
-theme-tokens.css with `../../../../NLib/shared/css/theme-tokens.css` and carries a
+theme-tokens.css with `../../../../norden_lib/shared/css/theme-tokens.css` and carries a
 20-line comment explaining that the depth is four because the file sits in
-`src/`, while the `@nlib` alias resolves from `client/web` and climbs three — and
+`src/`, while the `@norden_lib` alias resolves from `client/web` and climbs three — and
 that **getting it wrong does not fail the build**. Vite prints "Unable to resolve
 @import" and exits 0, so the bundle ships with the palette simply absent and every
 surface silently falls back.
@@ -21,9 +21,9 @@ surface silently falls back.
 With these shims that becomes:
 
 ```css
-@import "@nlib/shared/css/theme-tokens.css";
-@import "@nlib/shared/css/fonts.css";
-@import "@nlib/shared/css/surface.css";
+@import "@norden_lib/shared/css/theme-tokens.css";
+@import "@norden_lib/shared/css/fonts.css";
+@import "@norden_lib/shared/css/surface.css";
 ```
 
 — no depth to count, and it resolves identically from any directory in any

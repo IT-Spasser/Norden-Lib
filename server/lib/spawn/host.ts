@@ -1,10 +1,10 @@
 /**
- * The process table: what NLib started, for whom, and how it gets reaped.
+ * The process table: what Norden Lib started, for whom, and how it gets reaped.
  *
  * This is the half of the consolidation that is an engineering risk rather than
  * a security one. Before it, a child died with its owner's VM for free — stop
  * tDB and PocketBase went with it, because PocketBase was tDB's child. Started
- * from NLib's VM it is NLib's child, and stopping tDB does nothing to it unless
+ * from Norden Lib's VM it is Norden Lib's child, and stopping tDB does nothing to it unless
  * something here does it deliberately. An orphaned PocketBase holds its HTTP
  * port and its SQLite data directory, and the next start fails as a bind error
  * or a locked database — a failure that reads like configuration and is not.
@@ -14,7 +14,7 @@
  *
  *  - the owner stops or restarts → `killAll(owner)` from `onResourceStop`;
  *  - the owner asks → `unserve`;
- *  - NLib stops or restarts → `killEverything()`, because a restart that left
+ *  - Norden Lib stops or restarts → `killEverything()`, because a restart that left
  *    them running would find its own ports held by its own children.
  *
  * A caller restarting is **kill-and-respawn**, not reuse. `onResourceStop` fires
@@ -242,12 +242,12 @@ export class SpawnHost {
     // caller notices something is wrong. Cleared by the next serve of this key.
     started.child.on("exit", (code) => {
       entry.exit = code ?? 0;
-      if (code) this.log(`[NLib] spawn: ${resource}'s ${key} exited with code ${code}`);
+      if (code) this.log(`[norden_lib] spawn: ${resource}'s ${key} exited with code ${code}`);
     });
     started.child.on("error", (err) => {
       entry.exit = -1;
       entry.lines.push({ stream: "stderr", text: err.message });
-      this.log(`[NLib] spawn: ${resource}'s ${key} failed — ${err.message}`);
+      this.log(`[norden_lib] spawn: ${resource}'s ${key} failed — ${err.message}`);
     });
     return JSON.stringify({ pid });
   }
@@ -283,7 +283,7 @@ export class SpawnHost {
 
     if (entry.mode === "bytes") {
       // The cursor addresses chunks here, and consuming them frees the backlog.
-      // Nothing is dropped on NLib's side: a reader that falls far enough behind
+      // Nothing is dropped on Norden Lib's side: a reader that falls far enough behind
       // gets its child killed with a reason rather than a hole in its stream.
       const start = Math.max(0, Math.min(entry.chunks.length, since - entry.chunkFirst));
       const chunks = entry.chunks.slice(start);
@@ -457,10 +457,10 @@ export class SpawnHost {
   }
 
   /**
-   * NLib itself stopping: nothing it started may outlive it.
+   * Norden Lib itself stopping: nothing it started may outlive it.
    *
    * No SIGKILL escalation here, unlike every other path. The escalation is a
-   * five-second timer, and this runs from NLib's own `onResourceStop` — so the
+   * five-second timer, and this runs from Norden Lib's own `onResourceStop` — so the
    * timer would be scheduled inside a runtime that is about to be destroyed and
    * would fire, if it fired at all, into a dead one. Nothing catches that. The
    * signal already sent is what these children get; on Windows it is a
@@ -481,7 +481,7 @@ export class SpawnHost {
     return killed;
   }
 
-  /** Diagnostics for the `nlib spawn` console command. */
+  /** Diagnostics for the `norden_lib spawn` console command. */
   list(): { resource: string; program: string; key: string; pid: number; alive: boolean }[] {
     const out: { resource: string; program: string; key: string; pid: number; alive: boolean }[] =
       [];

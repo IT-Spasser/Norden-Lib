@@ -1,13 +1,13 @@
 --[[
-    NLib — shared 3D prop editor (Lua half)
+    Norden Lib — shared 3D prop editor (Lua half)
 
     Loaded into the CONSUMER's client VM, like every other module under
-    shared/imports/: `nlib.propeditor`. It has to run there rather than inside
-    NLib's own VM because it registers NUI callbacks against the consumer's
+    shared/imports/: `norden_lib.propeditor`. It has to run there rather than inside
+    Norden Lib's own VM because it registers NUI callbacks against the consumer's
     `ui_page`, sends NUI messages to the consumer's page, and creates and owns
     objects the consumer's own prop lifecycle then tracks.
 
-        local editor = nlib.propeditor.create({ ... descriptor ... })
+        local editor = norden_lib.propeditor.create({ ... descriptor ... })
 
     Everything that IS a particular resource arrives in the descriptor. Four of
     them are silent to get wrong: `vehicleKey` (how placements are keyed -- two
@@ -91,7 +91,7 @@ PropEditor.orbit = orbit
 --- motion and then zero for as long as the button is held. That is the measured
 --- "it moves a pixel and then stops" symptom, and disabling controls 1 and 2
 --- first does not restore it. The page is the only source of this delta — see
---- `NLib/shared/ts/camera-drag.ts`.
+--- `norden_lib/shared/ts/camera-drag.ts`.
 orbit.ORBIT_SENS_PX = 0.22
 --- Fraction of the orbit distance panned per pixel of pointer drag.
 orbit.PAN_SENS_PX = 0.0022
@@ -309,8 +309,8 @@ local BONE_HEAD = 31086
 local function suppressInputAfterClose()
     Citizen.CreateThread(function()
         Citizen.Wait(0)
-        nlib.platform.setKeepInputActive(false)
-        nlib.platform.setInputMode(0)
+        norden_lib.platform.setKeepInputActive(false)
+        norden_lib.platform.setInputMode(0)
         for _ = 1, 15 do
             DisableControlAction(0, 199, true)
             DisableControlAction(0, 200, true)
@@ -326,7 +326,7 @@ local function alwaysTrue() return true end
 
 --- English text for every string the shared chrome can show. The Lua half only
 --- needs the two it says out loud; the other 36 belong to the TSX half and live
---- in `NLib/internal/shared-ts/prop-editor/strings.ts`.
+--- in `norden_lib/internal/shared-ts/prop-editor/strings.ts`.
 local DEFAULT_STRINGS = {
     not_in_vehicle = '~y~You must be in a vehicle to open the prop editor.~w~',
     model_load_failed = '~r~Failed to load the prop model.~w~',
@@ -366,15 +366,15 @@ PropEditor.DEFAULT_STRINGS = DEFAULT_STRINGS
 ---   onClose       fun()              after the page is told to close.
 ---   fov           number             defaults to 50.
 function PropEditor.create(descriptor)
-    assert(type(descriptor) == 'table', 'nlib.propeditor.create: descriptor table required')
+    assert(type(descriptor) == 'table', 'norden_lib.propeditor.create: descriptor table required')
     for _, key in ipairs({ 'prefix', 'decor', 'saveEvent', 'removeEvent' }) do
         assert(type(descriptor[key]) == 'string' and descriptor[key] ~= '',
-            ('nlib.propeditor.create: descriptor.%s must be a non-empty string'):format(key))
+            ('norden_lib.propeditor.create: descriptor.%s must be a non-empty string'):format(key))
     end
     for _, key in ipairs({ 'vehicleKey', 'placements', 'resolvePropModel',
                            'isRegisteredPropModel', 'loadPropModel' }) do
         assert(type(descriptor[key]) == 'function',
-            ('nlib.propeditor.create: descriptor.%s must be a function'):format(key))
+            ('norden_lib.propeditor.create: descriptor.%s must be a function'):format(key))
     end
 
     local d = descriptor
@@ -422,7 +422,7 @@ function PropEditor.create(descriptor)
     -- Uniform scale. ONE scalar, by the owner's decision, though the matrix
     -- underneath supports three. 1.0 is "normal size" and is what every record
     -- written before records had a scale means.
-    local scale = nlib.drivenprop.SCALE_DEFAULT
+    local scale = norden_lib.drivenprop.SCALE_DEFAULT
     local panelHovered = false
     local camMode = false   -- WASD camera
     local lastTime = 0
@@ -561,7 +561,7 @@ function PropEditor.create(descriptor)
     -- scale. The entity never detaches; `IsEntityAttached` stays true throughout.
     --
     -- So a scaled prop is driven instead: detached, frozen, and its matrix
-    -- written from the vehicle's. `nlib.drivenprop` is that mechanism, with the
+    -- written from the vehicle's. `norden_lib.drivenprop` is that mechanism, with the
     -- measurements and the handedness invariant at its head.
     --
     -- A prop at UNIT scale stays attached, because attachment is free and every
@@ -572,7 +572,7 @@ function PropEditor.create(descriptor)
     -- lifecycle can share it, for the same reason `markOwnedProp` is shared: one
     -- prop is handed back and forth between the editor and the lifecycle through
     -- takeProp/giveProp, and two drivers could both think they owned its matrix.
-    local driver = nlib.drivenprop.create({
+    local driver = norden_lib.drivenprop.create({
         onError = function(message) notify(tostring(message)) end,
     })
 
@@ -593,7 +593,7 @@ function PropEditor.create(descriptor)
             scale = scale,
         }
 
-        if nlib.drivenprop.isUnitScale(scale) then
+        if norden_lib.drivenprop.isUnitScale(scale) then
             if driver.isDriven(prop) then
                 driver.remove(prop)
                 -- Frozen by the driver, and an attached entity must not be:
@@ -670,8 +670,8 @@ function PropEditor.create(descriptor)
     --- omits it hands the prop back at normal size, which for the cancel branch
     --- would silently discard the scale the record was saved with.
     local function attachAt(pos, rot, s)
-        s = nlib.drivenprop.normaliseScale(s)
-        if nlib.drivenprop.isUnitScale(s) then
+        s = norden_lib.drivenprop.normaliseScale(s)
+        if norden_lib.drivenprop.isUnitScale(s) then
             if driver.isDriven(prop) then
                 driver.remove(prop)
                 FreezeEntityPosition(prop, false)
@@ -730,11 +730,11 @@ function PropEditor.create(descriptor)
             rotation = { x = existing.rx + 0.0, y = existing.ry + 0.0, z = existing.rz + 0.0 }
             -- Normalised rather than read raw: `scale` is absent on every record
             -- written before this feature, and `normaliseScale(nil)` is 1.0.
-            scale = nlib.drivenprop.normaliseScale(existing.scale)
+            scale = norden_lib.drivenprop.normaliseScale(existing.scale)
         else
             offset = { x = 0.0, y = 0.0, z = 0.0 }
             rotation = { x = 0.0, y = 0.0, z = 0.0 }
-            scale = nlib.drivenprop.SCALE_DEFAULT
+            scale = norden_lib.drivenprop.SCALE_DEFAULT
         end
 
         local hash = GetHashKey(propModel)
@@ -769,8 +769,8 @@ function PropEditor.create(descriptor)
         createCam()
         FreezeEntityPosition(vehicle, true)
 
-        nlib.platform.setInputMode(1)
-        nlib.platform.setKeepInputActive(true)
+        norden_lib.platform.setInputMode(1)
+        norden_lib.platform.setKeepInputActive(true)
 
         SendNUIMessage({
             action = event('propEditorInit'),
@@ -839,7 +839,7 @@ function PropEditor.create(descriptor)
         -- does not inherit the last edit's. `open` sets it from the record
         -- either way; this is belt and braces for the window in between, where
         -- `currentScale()` would otherwise answer with a finished edit's value.
-        scale = nlib.drivenprop.SCALE_DEFAULT
+        scale = norden_lib.drivenprop.SCALE_DEFAULT
         camMode = false
         panelHovered = false
         onStateChange(false, nil)
@@ -991,7 +991,7 @@ function PropEditor.create(descriptor)
         cb(1)
         if not active then return end
         if type(data) ~= 'table' then return end
-        scale = nlib.drivenprop.normaliseScale(data.scale)
+        scale = norden_lib.drivenprop.normaliseScale(data.scale)
         reattach()
     end)
 
@@ -1009,7 +1009,7 @@ function PropEditor.create(descriptor)
             -- anyone nudged its position would add a key to every legacy record
             -- on disk, and a reader cannot then tell "deliberately normal size"
             -- from "never had an opinion". It also keeps data.json diffs honest.
-            scale = (not nlib.drivenprop.isUnitScale(scale)) and scale or nil,
+            scale = (not norden_lib.drivenprop.isUnitScale(scale)) and scale or nil,
             -- nil on a record that never had one, which keeps it exactly as
             -- legacy as it was. See PropEditor.savedModelFor.
             model = savedModel,
@@ -1031,7 +1031,7 @@ function PropEditor.create(descriptor)
 
     -- One batch of pointer movement from the page, already accumulated over an
     -- animation frame; deltas are device pixels. See orbit.ORBIT_SENS_PX for why
-    -- this cannot be read from the pad, and NLib/shared/ts/camera-drag.ts for
+    -- this cannot be read from the pad, and norden_lib/shared/ts/camera-drag.ts for
     -- the sender.
     RegisterNUICallback(event('propEditorCamDrag'), function(data, cb)
         cb(1)
@@ -1098,7 +1098,7 @@ function PropEditor.create(descriptor)
         --- reason `currentKey` is: a consumer that adds its own NUI callback
         --- should read the editor's state rather than keep a second copy.
         currentScale = function() return scale end,
-        --- The shared `nlib.drivenprop` driver.
+        --- The shared `norden_lib.drivenprop` driver.
         ---
         --- A CONSUMER'S LIFECYCLE MUST USE THIS ONE, not a driver of its own.
         --- One prop is handed back and forth between the editor and the

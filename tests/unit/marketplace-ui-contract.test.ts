@@ -9,7 +9,7 @@
  * The half of this file that matters most is `the shipped corpus still installs`:
  * a gate that refuses a layout which would have rendered is worse than no gate,
  * so the directory listings of all ten shipped layouts are asserted to pass. They
- * are fixtures rather than a `readdir` of the sibling resources because NLib is
+ * are fixtures rather than a `readdir` of the sibling resources because Norden Lib is
  * published on its own and must test without them on disk — the lists were
  * measured from the tree on 2026-10-15.
  *

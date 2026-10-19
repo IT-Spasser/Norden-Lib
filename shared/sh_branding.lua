@@ -6,7 +6,7 @@
 -- registry uses it to exempt a resource from the per-owner registration count
 -- limits. The two must agree, hence one copy.
 --
--- Free of every NLib global -- no Platform, no Logger -- so it can be loaded
+-- Free of every Norden Lib global -- no Platform, no Logger -- so it can be loaded
 -- standalone into a consumer's Lua VM through LoadResourceFile, the way
 -- shared/imports/menu/shared.lua loads shared/lib/menu/schema.lua. Keep it dependency-free and
 -- keep it in `shared_scripts` and `files`, or one side silently ends up with no

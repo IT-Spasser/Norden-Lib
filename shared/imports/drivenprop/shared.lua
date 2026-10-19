@@ -1,5 +1,5 @@
 --[[
-    NLib — the driven-matrix prop: uniform scale for an attached prop.
+    Norden Lib — the driven-matrix prop: uniform scale for an attached prop.
 
     There is no `SetEntityScale`; scale lives in the basis-vector lengths of
     `SetEntityMatrix`, and it does NOT survive `AttachEntityToEntity`. So a
@@ -79,7 +79,7 @@ end
 function DrivenProp.assertHandedness(fwd, right, up, where)
     local h = DrivenProp.handedness(fwd, right, up)
     if h > 0 then return h end
-    error(('nlib.drivenprop: basis is not right-handed (dot(cross(right, fwd), up) = %s)%s' ..
+    error(('norden_lib.drivenprop: basis is not right-handed (dot(cross(right, fwd), up) = %s)%s' ..
         ' — the mesh would render inside-out. right x forward must equal up.')
         :format(tostring(h), where and (' at ' .. tostring(where)) or ''), 2)
 end
@@ -337,7 +337,7 @@ function DrivenProp.create(opts)
                     if onError then
                         onError(tostring(err))
                     else
-                        print('[nlib.drivenprop] ' .. tostring(err))
+                        print('[norden_lib.drivenprop] ' .. tostring(err))
                     end
                     for prop in pairs(driven) do
                         local good = pcall(instance.write, prop)

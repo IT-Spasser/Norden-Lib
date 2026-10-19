@@ -16,7 +16,7 @@ local function competingInput()
         or (MenuInput and MenuInput.isTyping()) or dialogActive()
 end
 local rendererId
-local log = Logger.create('NLib/layout')
+local log = Logger.create('norden_lib/layout')
 local function callable(fn)
     if type(fn) == 'function' then return true end
     if type(fn) ~= 'table' then return false end
@@ -100,7 +100,7 @@ local function close(save)
     active = nil
     for _, timer in pairs(session.pending) do Platform.clearTimeout(timer) end
     Platform.sendUIEvent(ui, 'layoutClose', { session = session.id })
-    -- Do not unlock a known NLib successor (including a pending dialog). For
+    -- Do not unlock a known Norden Lib successor (including a pending dialog). For
     -- external NUI, releasing our own resource's focus entry does not acquire or
     -- refocus theirs. Never try SetNuiFocus(true) from a watchdog.
     if session.focused then releaseFocus() end
@@ -193,7 +193,7 @@ local function register(name, id, options, fn)
     end
     if not components[component.key] and (count >= 64 or ownCount >= 16) then return false, 'HUD component limit reached' end
     -- Consumer-owned placement always starts from the supplied state. Retire any
-    -- prior NLib record even if this component unregisters before the next Finish,
+    -- prior Norden Lib record even if this component unregisters before the next Finish,
     -- otherwise the retained-record pass would resurrect the old placement.
     -- Disk cleanup remains transactional: only a successful Finish writes KVP.
     if not component.persist then saved[component.key] = nil end
@@ -225,15 +225,15 @@ local function unregister(key, notifyOwner)
     return true
 end
 local function addDemo()
-    if components['NLib:demo'] then return true end
-    return register('NLib', 'demo', { label = 'NLib test HUD', width = 240, height = 90,
+    if components['norden_lib:demo'] then return true end
+    return register('norden_lib', 'demo', { label = 'norden_lib test HUD', width = 240, height = 90,
         -- Offsets are reference pixels over 1080: 48px in from the bottom-right corner.
         defaults = { x = -48 / 1080, y = -48 / 1080, scale = 1, visible = true, anchor = 'bottom-right' } }, function() end)
 end
 local function open(name)
     if stopped then return false, 'HUD layout service is stopping' end
-    if not _NLIB_IS_FIVEM then return false, 'HUD editing is currently FiveM-only' end
-    if H.isEditing() then return false, 'HUD editor is already open; use /nlibhud cancel to discard' end
+    if not _NORDEN_LIB_IS_FIVEM then return false, 'HUD editing is currently FiveM-only' end
+    if H.isEditing() then return false, 'HUD editor is already open; use /nordenhud cancel to discard' end
     if not Platform.isNUIReady() then return false, 'UI is not ready' end
     if (type(IsNuiFocused) == 'function' and yes(IsNuiFocused()))
         or competingInput() then return false, 'Another UI owns or is waiting for input' end
@@ -261,13 +261,13 @@ end
 
 function H.init(webui)
     ui = webui
-    if _NLIB_IS_FIVEM then
-        local profile = GetConvar('nlib_hud_profile', '')
+    if _NORDEN_LIB_IS_FIVEM then
+        local profile = GetConvar('norden_lib_hud_profile', '')
         if profile == '' and type(GetCurrentServerEndpoint) == 'function' then profile = GetCurrentServerEndpoint() or '' end
         if profile ~= '' then
             -- The 'v1' in the key name is historical and is not the payload version;
             -- renaming it would orphan every existing player's saved placement.
-            storageKey = 'nlib:hud:v1:' .. tostring(GetHashKey(profile))
+            storageKey = 'norden_lib:hud:v1:' .. tostring(GetHashKey(profile))
             local raw = GetResourceKvpString(storageKey)
             if type(raw) == 'string' and #raw <= 131072 then
                 local ok, value = pcall(json.decode, raw)
@@ -285,9 +285,9 @@ function H.init(webui)
                     end
                 end
             end
-        else log('HUD layouts are session-only: no server endpoint or nlib_hud_profile is available', 3) end
+        else log('HUD layouts are session-only: no server endpoint or norden_lib_hud_profile is available', 3) end
     end
-    register('NLib', 'toasts', { label = 'Notifications', width = 360, height = 160, canHide = false,
+    register('norden_lib', 'toasts', { label = 'Notifications', width = 360, height = 160, canHide = false,
         defaults = { x = -24 / 1080, y = 24 / 1080, scale = 1, visible = true, anchor = 'top-right' } }, function(data)
         Platform.sendUIEvent(ui, 'toastLayout', data)
     end)
@@ -295,7 +295,7 @@ function H.init(webui)
     -- It returned eight flags (consumerPersistence, minVisibility,
     -- universalMinVisibility, referenceOffsets, layoutVersion, separateDefaults,
     -- resetExport, liveLayoutWrite), every one of them a hardcoded `true` naming a
-    -- NLib release that introduced something. Only 0.6 was ever released and it has
+    -- Norden Lib release that introduced something. Only 0.6 was ever released and it has
     -- none of them, so the flags could not distinguish anything a consumer could
     -- reach -- while four consumers each carried a pcall-wrapped probe of it and
     -- collapsed `layout` into `defaults` when it did not answer, which is exactly
@@ -303,22 +303,22 @@ function H.init(webui)
     -- now unconditional: RegisterHudComponent takes `layout` (where the widget is)
     -- alongside `defaults` (where Reset puts it back), x/y are ratios of a 1080px
     -- reference height on both axes, and SetHudLayout/ResetHudLayout exist.
-    Platform.export('NLib', 'RegisterHudComponent', function(id, options, fn)
+    Platform.export('norden_lib', 'RegisterHudComponent', function(id, options, fn)
         local name = owner()
         if not name then return false, 'Cannot identify calling resource' end
         return register(name, id, options, fn)
     end)
-    Platform.export('NLib', 'UnregisterHudComponent', function(id)
+    Platform.export('norden_lib', 'UnregisterHudComponent', function(id)
         local name = owner()
         if not name or not S.id(id) then return false end
         return unregister(name .. ':' .. id)
     end)
-    Platform.export('NLib', 'GetHudLayout', function(id)
+    Platform.export('norden_lib', 'GetHudLayout', function(id)
         local name = owner()
         local component = name and S.id(id) and components[name .. ':' .. id]
         return component and S.copy(component.layout) or nil
     end)
-    Platform.export('NLib', 'SetHudLayout', function(id, layout)
+    Platform.export('norden_lib', 'SetHudLayout', function(id, layout)
         -- An exception inside an export reaches the caller as `undefined`, which
         -- resurfaces as a JSON parse error at the far end. Never let one out.
         local name = owner()
@@ -327,13 +327,13 @@ function H.init(webui)
         if not ok then return false, tostring(result) end
         return result == true, err
     end)
-    Platform.export('NLib', 'OpenHudEditor', function(options)
+    Platform.export('norden_lib', 'OpenHudEditor', function(options)
         local name = owner()
         if not name then return false, 'Cannot identify calling resource' end
         if type(options) == 'table' and options.demo == true then addDemo() end
         return open(name)
     end)
-    Platform.export('NLib', 'ResetHudLayout', function(id)
+    Platform.export('norden_lib', 'ResetHudLayout', function(id)
         -- No owner check: this is the recovery path, and refusing to un-break a
         -- HUD because the caller could not be identified helps nobody.
         -- Parenthesised: the export's documented answer is a count, and resetLayouts
@@ -344,7 +344,7 @@ function H.init(webui)
         if not name or not S.id(id) then return 0 end
         return (resetLayouts({ [name .. ':' .. id] = true }))
     end)
-    Platform.export('NLib', 'CloseHudEditor', function()
+    Platform.export('norden_lib', 'CloseHudEditor', function()
         local name = owner()
         if not active or active.owner ~= name then return false end
         return close(false)
@@ -386,7 +386,7 @@ function H.init(webui)
         end
         if rendererId and rendererId ~= data.renderer then close(false) end
         rendererId = data.renderer
-        if components['NLib:toasts'] then notify(components['NLib:toasts'], active and 'preview' or 'restore') end
+        if components['norden_lib:toasts'] then notify(components['norden_lib:toasts'], active and 'preview' or 'restore') end
         reply({ ok = true })
     end)
     Platform.onUIRequest(ui, 'layoutHeartbeat', function(data, reply)
@@ -395,19 +395,19 @@ function H.init(webui)
         reply({ ok = valid == true })
     end)
     local function resourceStopped(name)
-        local self = type(GetCurrentResourceName) == 'function' and GetCurrentResourceName() or 'NLib'
+        local self = type(GetCurrentResourceName) == 'function' and GetCurrentResourceName() or 'norden_lib'
         if name == self then stopped = true; close(false); ui = nil end
         if active and active.owner == name then close(false) end
         local remove = {}
         for key, component in pairs(components) do if component.owner == name then remove[#remove + 1] = key end end
         for _, key in ipairs(remove) do unregister(key, false) end
     end
-    if _NLIB_IS_FIVEM then
+    if _NORDEN_LIB_IS_FIVEM then
         AddEventHandler('onClientResourceStop', resourceStopped)
-        RegisterCommand('nlibhud', function(_, args)
+        RegisterCommand('nordenhud', function(_, args)
             local action = args and args[1]
             -- Player escape hatch is intentionally not restricted to the export
-            -- owner. F8: nlibhud cancel works even when the browser cannot reply.
+            -- owner. F8: nordenhud cancel works even when the browser cannot reply.
             if action == 'cancel' or action == 'close' then close(false); return end
             -- The unbrick command. Works with the editor shut, with the editor
             -- wedged open, and with every widget dragged off the screen.
@@ -422,12 +422,12 @@ function H.init(webui)
                 return
             end
             if action and action ~= 'demo' and action ~= 'open' then
-                log('Usage: /nlibhud [demo|open|cancel|reset] (no arguments toggles; closing discards; reset restores defaults)', 3)
+                log('Usage: /nordenhud [demo|open|cancel|reset] (no arguments toggles; closing discards; reset restores defaults)', 3)
                 return
             end
             if active and action ~= 'open' then close(false); return end
             if action == 'demo' then addDemo() end
-            local ok, err = open('NLib')
+            local ok, err = open('norden_lib')
             if not ok then log(err, 3) end
         end, false)
         Platform.createThread(function()
@@ -435,7 +435,7 @@ function H.init(webui)
                 local session, now = active, Platform.now()
                 if session then
                     local reason
-                    if competingInput() then reason = 'another NLib UI owns input'
+                    if competingInput() then reason = 'another Norden Lib UI owns input'
                     elseif now - session.touched > HEARTBEAT_TIMEOUT_MS then reason = 'renderer stopped responding'
                     elseif type(IsNuiFocused) == 'function' then
                         if yes(IsNuiFocused()) then session.focusLostAt = nil
@@ -445,7 +445,7 @@ function H.init(webui)
                         end
                     end
                     if reason and active == session then
-                        log('HUD editor discarded: ' .. reason .. '. Reopen with /nlibhud.', 3)
+                        log('HUD editor discarded: ' .. reason .. '. Reopen with /nordenhud.', 3)
                         close(false)
                     end
                 end

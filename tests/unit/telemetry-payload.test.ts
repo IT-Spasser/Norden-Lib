@@ -59,11 +59,11 @@ describe("the event names are tWeb's", () => {
   test("all five, exactly", () => {
     // An undeclared name is refused PER EVENT and counted on their dashboard.
     expect([...DIAG_EVENTS]).toEqual([
-      "nlib.error_reported",
-      "nlib.warning_reported",
-      "nlib.crash_reported",
-      "nlib.slow_operation",
-      "nlib.environment_reported",
+      "norden_lib.error_reported",
+      "norden_lib.warning_reported",
+      "norden_lib.crash_reported",
+      "norden_lib.slow_operation",
+      "norden_lib.environment_reported",
     ]);
   });
 });
@@ -75,7 +75,7 @@ describe("fnv1a — the cross-language pin", () => {
   });
 
   test("the literals tests/lua/telemetry-core.lua pins", () => {
-    expect(fnv1a("nlib")).toBe("a3620e9a");
+    expect(fnv1a("norden_lib")).toBe("22ee93f7");
     expect(fnv1a("TypeError|at x (nui/assets/index.js:1)")).toBe("9e6c6ac2");
     expect(fnv1a("warning:layout-missing")).toBe("d581e878");
     expect(fnv1a("crash:heap-near-limit")).toBe("f28ad9db");
@@ -428,7 +428,7 @@ describe("unsafeDimensions — refuse locally rather than remotely", () => {
 
   test("a message or a stack can never be a dimension", () => {
     // The single most important consequence of the charset, and the reason
-    // `nlib.error_reported` carries a TOP-LEVEL `stack` instead.
+    // `norden_lib.error_reported` carries a TOP-LEVEL `stack` instead.
     expect(unsafeDimensions({ message: "Cannot read properties of null (reading 'x')" })).toEqual([
       "message",
     ]);

@@ -90,7 +90,7 @@ describe("register", () => {
       mount: "/rt",
       title: "Realtime",
       listed: false,
-      resourceName: "NLib",
+      resourceName: "norden_lib",
       onUpgrade: () => {},
     });
     expect(r.ok).toBe(true);

@@ -1,6 +1,6 @@
-![NLib](docs/public/banner.jpg)
+![norden_lib](docs/public/banner.jpg)
 
-# NLib (Nordic Lib)
+# norden_lib (Norden Lib)
 
 A shared utility library for FiveM resources. Provides a UI component suite (menus, dialogs, toasts, themes), 40 reusable Lua import modules (access, permission, config, KVP, settings, platform, and more), and TypeScript/NUI utilities (undo system, coordinate helpers) that other resources can depend on.
 
@@ -13,7 +13,7 @@ adapter, so a second runtime could be added without touching the subsystems abov
 
 ### Menu System
 
-One NUI menu, shared by every resource on the server. NLib owns the screen, the
+One NUI menu, shared by every resource on the server. Norden Lib owns the screen, the
 keyboard and the permission check; a consumer declares pages and handles rows.
 
 The API is **declarative, and split across the two sides deliberately**. Pages are
@@ -29,7 +29,7 @@ cannot identify the caller; pass it as its own argument, never as the result of 
 in the last argument slot (`f(json.decode(x))` expands to *two* values and the second
 lands in `declaredOwner`).
 
-**Start here:** [Developing modular menu resources](docs/content/menu-consumers.mdx) covers a complete standalone consumer, registration/restart lifecycle, stable host slots, ownership and placement. `nlib.lifecycle` (shared import) and `nlib.menuhost` (server import) both expose API `version = 1`; they run in the caller's VM and contain no consumer-specific policy.
+**Start here:** [Developing modular menu resources](docs/content/menu-consumers.mdx) covers a complete standalone consumer, registration/restart lifecycle, stable host slots, ownership and placement. `norden_lib.lifecycle` (shared import) and `norden_lib.menuhost` (server import) both expose API `version = 1`; they run in the caller's VM and contain no consumer-specific policy.
 
 **Server — declaring the tree**
 - `DefineMenuNamespace(spec)` — Required first. `{ ace, catalog?, order?, capabilities?, theme? }`. `ace` gates the whole namespace.
@@ -53,7 +53,7 @@ lands in `declaredOwner`).
 
 | Skin | |
 |---|---|
-| `default` | The shared look. The same controls, checkboxes, sliders and face as NLib's dialogs and toasts. |
+| `default` | The shared look. The same controls, checkboxes, sliders and face as Norden Lib's dialogs and toasts. |
 | `vmenu` | The legacy vMenu-styled presentation, kept switchable for a test or a side-by-side comparison. |
 
 `theme` names a theme registered with `AddTheme`, which is where full CSS-variable control lives — referenced rather than duplicated, so there is one theme registry and not two. To make a menu, its toasts and its dialogs match, register **one** theme id setting the `nui-*` variables (see the Theme System section) and pass that id as the menu's `theme`, as `ShowDialog`'s `theme` option, and as `ShowToast`'s `theme` argument.
@@ -114,7 +114,7 @@ Modal form dialogs supporting multiple field types. Results are delivered via lo
 | `submitLabel` | `string` | Override the submit button label (default `"Submit"`). |
 | `cancelLabel` | `string` | Override the cancel button label (default `"Cancel"`). |
 | `size` | `string` | `"sm"` \| `"md"` \| `"lg"` (default `"md"`). |
-| `theme` | `string` | Id of a registered NLib theme to scope this dialog's appearance. |
+| `theme` | `string` | Id of a registered Norden Lib theme to scope this dialog's appearance. |
 | `fields` | `table[]` | Array of field definition tables. |
 
 **Field Types**
@@ -129,9 +129,9 @@ Modal form dialogs supporting multiple field types. Results are delivered via lo
 All fields share: `id` (required), `type`, `label`, `description`, `required`, `disabled`.
 
 **Events**
-- `NLib:dialog:opened` — `(dialogId)`
-- `NLib:dialog:submitted` — `(dialogId, values)` — `values` is a table keyed by field `id`.
-- `NLib:dialog:cancelled` — `(dialogId)`
+- `norden_lib:dialog:opened` — `(dialogId)`
+- `norden_lib:dialog:submitted` — `(dialogId, values)` — `values` is a table keyed by field `id`.
+- `norden_lib:dialog:cancelled` — `(dialogId)`
 
 ---
 
@@ -159,10 +159,10 @@ IDs are local to the producing resource. Updates/dismissals cannot alter another
 | `loading` | Persistent until `DismissToast` / `UpdateToast` |
 
 **Events**
-- `NLib:toast:shown` — `(id, toastType, title, owner)`
-- `NLib:toast:updated` — `(id, patch, owner)`
-- `NLib:toast:dismissed` — `(id, owner)` for explicit dismissal
-- `NLib:toast:dismissedAll` — `(owner)`
+- `norden_lib:toast:shown` — `(id, toastType, title, owner)`
+- `norden_lib:toast:updated` — `(id, patch, owner)`
+- `norden_lib:toast:dismissed` — `(id, owner)` for explicit dismissal
+- `norden_lib:toast:dismissedAll` — `(owner)`
 
 ---
 
@@ -204,15 +204,15 @@ The menu, dialogs and toasts all render the same controls, so one set of variabl
 These take **full CSS colours** (`#7c5cff`, `oklch(...)`, `color-mix(...)`), not the bare HSL channel triples the shadcn-style `--primary`/`--card` variables expect. Mixing the two conventions is the mistake this set exists to avoid. A theme's variables are applied as inline styles on the surface it is scoped to, so anything set here overrides the defaults for that surface only — other open UI keeps its own theme.
 
 **Events**
-- `NLib:theme:added` — `(id)`
-- `NLib:theme:removed` — `(id)`
-- `NLib:theme:set` — `(id)`
+- `norden_lib:theme:added` — `(id)`
+- `norden_lib:theme:removed` — `(id)`
+- `norden_lib:theme:set` — `(id)`
 
 ---
 
 ### HUD Layout
 
-One HUD editor for the whole server. A resource registers its on-screen element and NLib
+One HUD editor for the whole server. A resource registers its on-screen element and Norden Lib
 gives the player a single place to move, scale and hide every registered element together.
 
 - `RegisterHudComponent(id, options, fn)` — `fn(layout)` runs whenever this component's
@@ -221,8 +221,8 @@ gives the player a single place to move, scale and hide every registered element
 - `UnregisterHudComponent(id)`, `GetHudLayout(id)`
 - `OpenHudEditor(opts)` / `CloseHudEditor()` — `{ demo = true }` adds a sample component.
 
-Layouts are stored per server endpoint. Without one — no `nlib_hud_profile` convar and no
-endpoint — they are session-only, and NLib logs that at startup rather than silently losing
+Layouts are stored per server endpoint. Without one — no `norden_lib_hud_profile` convar and no
+endpoint — they are session-only, and Norden Lib logs that at startup rather than silently losing
 them.
 
 ---
@@ -239,10 +239,10 @@ The marketplace needs **no credential and no setup** — it works on a fresh ins
 The only convar here is optional, and only if you self-host:
 
 ```cfg
-setr nlib_api_base_url "https://timmygstudios.com"   # only to self-host
+setr norden_lib_api_base_url "https://timmygstudios.com"   # only to self-host
 ```
 Unset, browse/preview/install and community-config publish refuse and log the convar
-name once rather than falling back to a shared built-in value. `nlib_api_base_url`
+name once rather than falling back to a shared built-in value. `norden_lib_api_base_url`
 is the opposite case: client Lua reads it too, so it needs `setr` or the in-game panel
 keeps talking to the default host while the server talks to yours.
 
@@ -263,7 +263,7 @@ Structured console logger with level filtering. Available on both client and ser
 -- Levels: 1=DEBUG  2=INFO  3=WARN  4=ERROR
 ```
 
-**Within NLib (same Lua VM)**
+**Within Norden Lib (same Lua VM)**
 ```lua
 local log = Logger.create('mypkg/module')
 
@@ -274,43 +274,43 @@ log('Something went wrong', 4)   -- ERROR
 
 **From another resource**
 ```lua
-local log = exports['NLib']:CreateLogger('mypkg', print)
+local log = exports['norden_lib']:CreateLogger('mypkg', print)
 
 log('Something happened')       -- INFO
 log('Something went wrong', 4)  -- ERROR
 ```
 
 **Exports**
-- `exports['NLib']:CreateLogger(loggerId, printFn, opts)` — A log function pinned to a source name. `opts.minLevel` overrides the global level for this logger alone.
-- `exports['NLib']:Log(loggerId, args)` — Format and filter one line, and leave the printing to the caller. Returns the formatted string, or `nil` when filtered or empty.
-- `exports['NLib']:SetLogLevel(level)` — Set the global minimum log level (`1`–`4`).
+- `exports['norden_lib']:CreateLogger(loggerId, printFn, opts)` — A log function pinned to a source name. `opts.minLevel` overrides the global level for this logger alone.
+- `exports['norden_lib']:Log(loggerId, args)` — Format and filter one line, and leave the printing to the caller. Returns the formatted string, or `nil` when filtered or empty.
+- `exports['norden_lib']:SetLogLevel(level)` — Set the global minimum log level (`1`–`4`).
 
 ---
 
 ### Public HTTP hub and application mounts
 
-`NLib` owns one public HTTP listener and the hub at `/`. Apps own their routes and
+`norden_lib` owns one public HTTP listener and the hub at `/`. Apps own their routes and
 login/authorization; registering an app does **not** add shared authentication.
-The listener starts with NLib even when no consumer opts into web publication.
+The listener starts with Norden Lib even when no consumer opts into web publication.
 Exposure and hub visibility are separate: zero visible destinations shows an empty
 state, exactly one redirects to that destination, and multiple destinations show
 sibling cards. GET and HEAD use the same status/headers (HEAD has no body). A
 single visible Radio Admin destination therefore redirects `/` to `/dispatch/admin`.
 
-Configure networking once in `server.cfg`, before starting NLib:
+Configure networking once in `server.cfg`, before starting norden_lib:
 
 ```cfg
-set nlib_http_port 7777
-set nlib_http_host "0.0.0.0"
+set norden_lib_http_port 7777
+set norden_lib_http_host "0.0.0.0"
 # Optional: use your reachable address instead of automatic public-IP detection.
-set nlib_http_public_url "192.0.2.10"
+set norden_lib_http_public_url "192.0.2.10"
 ```
 
 Defaults are port `7777`, bind host `0.0.0.0`, and an empty public-URL override.
 Bare IP/localhost shorthand uses HTTP and the listener port; `example.com` uses
 `https://example.com`; an explicit URL is honored. A public URL is an advertised
 address, not a request to bind that address or provision TLS. For HTTPS, terminate
-TLS at your proxy/tunnel and forward to NLib's actual HTTP listener. Use an origin
+TLS at your proxy/tunnel and forward to Norden Lib's actual HTTP listener. Use an origin
 without an extra path prefix for the built-in `/dispatch` and `/db` integrations.
 Only open/forward the listener if browser access is wanted; app-internal loopback
 ports are never firewall settings. A configured URL is not proof of external
@@ -329,11 +329,11 @@ Consumer exposure is a separate startup decision:
   and API**, not just a login page. `/db` redirects to `/db/_/`. Set it explicitly
   to `false` to keep local PocketBase private; internal database consumers still
   work. A missing setting defaults to false. Remote PocketBase mode is not
-  published through NLib. `Config.ShowInHub = true` controls the Database card
+  published through Norden Lib. `Config.ShowInHub = true` controls the Database card
   independently; false hides it but does not unpublish `/db` when ExposeAdmin is true.
 
 Restart the relevant resource to apply its exposure setting. Neither app owns a
-public port, and disabling its mount does not shut down NLib's hub or other apps.
+public port, and disabling its mount does not shut down Norden Lib's hub or other apps.
 
 **Server exports**
 
@@ -371,13 +371,13 @@ change root counting. Primary destinations honor a valid `index` entrypoint.
 Hiding the primary destination does not hide an explicitly listed child. **Hidden
 is not authenticated or private**—only the app's auth rules control access.
 
-With prefix stripping, NLib also rewrites cookie paths and root-relative
+With prefix stripping, Norden Lib also rewrites cookie paths and root-relative
 redirects; URLs in response bodies and browser-generated paths remain the app's
 responsibility. Overlapping mounts are rejected, not silently replaced.
 
 **Readiness and retry lifecycle**
 
-`GetHttpStatus()` and the server-local **`NLib:http:status`** event use the same
+`GetHttpStatus()` and the server-local **`norden_lib:http:status`** event use the same
 snapshot (nullable fields may arrive as `nil` in Lua):
 
 | Field | Meaning |
@@ -394,29 +394,29 @@ For example, with public `https://example.com` and local listener 7777, probe
 from `GetHubUrl()`.
 
 1. Start the app's private loopback listener and retain the port it actually got.
-2. Subscribe to `NLib:http:status`, **then query** `GetHttpStatus()` so readiness
-   cannot be missed if NLib finished before the app started.
+2. Subscribe to `norden_lib:http:status`, **then query** `GetHttpStatus()` so readiness
+   cannot be missed if Norden Lib finished before the app started.
 3. When ready, register once and advertise only the successful result's `url`.
    A retryable failure reserves no mount; retry when a ready notification arrives.
    A validation/collision failure needs correction, not a tight retry loop.
-4. Clear published links when readiness is lost or NLib stops. Keep unrelated
-   local/native functionality running. On NLib resource start, re-query and
+4. Clear published links when readiness is lost or Norden Lib stops. Keep unrelated
+   local/native functionality running. On Norden Lib resource start, re-query and
    re-register once ready; do not reuse a registration from its previous lifetime.
 5. Stopping the app removes its mounts automatically. Rebinding while the app
    stays running requires unregistering before registering the new port.
 
 Failed automatic IP discovery does not advertise localhost or create speculative
-OAuth callbacks. Set `nlib_http_public_url` to a reachable address (explicit
-`localhost` is valid for development), then restart NLib and let consumers
+OAuth callbacks. Set `norden_lib_http_public_url` to a reachable address (explicit
+`localhost` is valid for development), then restart Norden Lib and let consumers
 re-register. Listener bind failures are reported separately and require fixing
 the local bind configuration before retrying.
 
 ### HTTP Helper
 
-Non-blocking server-side HTTP/HTTPS requests through FiveM's native `PerformHttpRequest`. This helper is separate from NLib's public HTTP routing hub.
+Non-blocking server-side HTTP/HTTPS requests through FiveM's native `PerformHttpRequest`. This helper is separate from Norden Lib's public HTTP routing hub.
 
-- `Platform.Fetch(opts, callback)` — Internal adapter API used within NLib.
-- `exports['NLib']:Fetch(opts, callback)` — Public export for use from other packages.
+- `Platform.Fetch(opts, callback)` — Internal adapter API used within Norden Lib.
+- `exports['norden_lib']:Fetch(opts, callback)` — Public export for use from other packages.
 
 **`Fetch` opts**
 
@@ -435,10 +435,10 @@ Redirect following is enabled. This wrapper does not expose custom timeout or TL
 
 ## Import Modules
 
-Lightweight Lua modules a dependent resource reaches through the `nlib` global. Each is isolated and loads on first access, so nothing has to be declared — `@NLib/imports.lua` in `shared_scripts` is the whole setup. `nlib_modules` is still accepted as a parts list; see `docs/content/import-modules.mdx` for what it does and does not buy.
+Lightweight Lua modules a dependent resource reaches through the `norden_lib` global. Each is isolated and loads on first access, so nothing has to be declared — `@norden_lib/imports.lua` in `shared_scripts` is the whole setup. `norden_lib_modules` is still accepted as a parts list; see `docs/content/import-modules.mdx` for what it does and does not buy.
 
 ```lua
-local coords = nlib.coords
+local coords = norden_lib.coords
 ```
 
 ### coords
@@ -452,7 +452,7 @@ Vehicle coordinate math helpers for transforming positions between local and wor
 
 ### kvp
 
-Typed KVP wrapper with automatic community-prefixing (reads `nlib_community_id` or `sv_projectName`) so each server gets isolated storage.
+Typed KVP wrapper with automatic community-prefixing (reads `norden_lib_community_id` or `sv_projectName`) so each server gets isolated storage.
 
 - `kvp.getString/getFloat/getInt/getBool/getJson(key, default)` — Typed getters with fallback
 - `kvp.setString/setFloat/setInt/setBool/setJson(key, value)` — Typed setters
@@ -494,16 +494,16 @@ installer consumes it — but on a FiveM resource a sound is a flat audio file i
 `layouts/sounds/`, so that an operator can drag a `.wav` in with no manifest to
 author. The installer reads a sound module and writes only its audio.
 
-**Replaces `nlib.layouts`, which never shipped outside this tree** — see
+**Replaces `norden_lib.layouts`, which never shipped outside this tree** — see
 `docs/content/import-modules.mdx` for what a consumer writes instead.
 
 ---
 
 ## TypeScript / NUI Utilities
 
-NLib ships a set of TypeScript modules (`@nlib/shared`) for use in resource NUI frontends.
+Norden Lib ships a set of TypeScript modules (`@norden_lib/shared`) for use in resource NUI frontends.
 
-### Undo (`@nlib/shared/undo`)
+### Undo (`@norden_lib/shared/undo`)
 
 Registry-based undo/redo system decoupled from any specific store or framework.
 
@@ -512,7 +512,7 @@ Registry-based undo/redo system decoupled from any specific store or framework.
 - `pushUndo(label, tags)` / `commitUndo()` — Manual batch control
 - `undo()`, `redo()`, `canUndo()`, `canRedo()`, `clearHistory()`
 
-### Coordinate Utils (`@nlib/shared/coordinate-utils`)
+### Coordinate Utils (`@norden_lib/shared/coordinate-utils`)
 
 Converts between FiveM's coordinate system (Z-up) and Three.js (Y-up) for web editor scenes.
 
@@ -524,11 +524,11 @@ Converts between FiveM's coordinate system (Z-up) and Three.js (Y-up) for web ed
 
 ## Installation
 
-1. Download the latest release and extract `NLib` into your server's resources directory.
-2. Add `ensure NLib` to your `server.cfg` **before** any resource that depends on it.
+1. Download the latest release and extract `norden_lib` into your server's resources directory.
+2. Add `ensure norden_lib` to your `server.cfg` **before** any resource that depends on it.
 3. That's it — nothing else is required. The marketplace needs no configuration.
 
-Every convar NLib reads — name, unit, default, and whether it needs `set` or `setr` — is
+Every convar Norden Lib reads — name, unit, default, and whether it needs `set` or `setr` — is
 listed in one place: [`docs/content/convars.mdx`](docs/content/convars.mdx).
 
 ---

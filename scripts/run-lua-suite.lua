@@ -1,4 +1,4 @@
--- Entry point for every Lua suite under tests/lua, run from the NLib resource root:
+-- Entry point for every Lua suite under tests/lua, run from the Norden Lib resource root:
 --   bunx --bun fengari scripts/run-lua-suite.lua tests/lua/<suite>.lua
 --
 -- It exists for one reason: fengari's CLI can print an unhandled Lua error while
@@ -7,7 +7,7 @@
 --
 -- Deliberately thin. A suite loads the engine files it is an oracle for itself,
 -- with its own host stubs, because which files a suite needs -- and what has to be
--- defined before they load, like _NLIB_SIDE or Platform -- is part of what the
+-- defined before they load, like _NORDEN_LIB_SIDE or Platform -- is part of what the
 -- suite is asserting. A runner that pre-loaded them would be deciding that for it.
 -- Bound BEFORE any suite can run, because several suites replace the global `print`
 -- to read back what the code under test emitted. With a plain `print` on the line
@@ -16,7 +16,7 @@
 -- shown nothing. The right exit code with no way to tell what went wrong.
 --
 -- MEASURED in tCAD, whose runner has carried this fix for a while: a real failure in
--- its json-adapter suite produced ZERO output. NLib's copy never got it, and
+-- its json-adapter suite produced ZERO output. Norden Lib's copy never got it, and
 -- tests/lua/diag-command.lua works around it by binding its own realPrint -- a
 -- per-suite patch for a runner-level problem, which is why only that one suite was
 -- protected. Ported here 2026-10-05 so every suite is.

@@ -1,6 +1,6 @@
 -- shared/imports/opengate — the "may I open my panel?" handshake, both halves.
 --
--- Driven through the REAL nlib.net and the REAL nlib.ratelimit, because the
+-- Driven through the REAL norden_lib.net and the REAL norden_lib.ratelimit, because the
 -- three things worth pinning here all live in the composition: the decision
 -- ORDER (rate limit, then config, then access), that every reply is server-only,
 -- and that reopen() does not go near the server.
@@ -46,23 +46,23 @@ end
 TriggerClientEvent = TriggerClient
 
 local ratelimit = dofile('shared/imports/ratelimit/server.lua')
-nlib = {
+norden_lib = {
     ratelimit = ratelimit,
-    net       = nil,  -- filled below; the modules read nlib.net at call time
+    net       = nil,  -- filled below; the modules read norden_lib.net at call time
 }
 
 local netServer = dofile('shared/imports/net/server.lua')
 local netClient = dofile('shared/imports/net/client.lua')
 
--- One `nlib.net` for both halves: fromClient comes from the server file,
+-- One `norden_lib.net` for both halves: fromClient comes from the server file,
 -- fromServer from the client file. In a real VM the context decides which file
 -- loads; here both are needed in one state.
-nlib.net = { fromClient = netServer.fromClient, fromServer = netClient.fromServer }
+norden_lib.net = { fromClient = netServer.fromClient, fromServer = netClient.fromServer }
 
 local opengate = dofile('shared/imports/opengate/server.lua')
 local opengateClient = dofile('shared/imports/opengate/client.lua')
 
-local BASE = 'tRadar:nlib:opengate:settings'
+local BASE = 'tRadar:norden_lib:opengate:settings'
 
 --- Fire the client's request as if the player had typed the command.
 local function ask(panel, src)
@@ -136,7 +136,7 @@ local cfgPanel = opengateClient.panel({
 })
 throwingConfig = true
 cfgPanel:open()
-source = 7; handlers['tRadar:nlib:opengate:throwcfg:request'](); source = nil
+source = 7; handlers['tRadar:norden_lib:opengate:throwcfg:request'](); source = nil
 assert(cfgBroken == 1 and cfgOpen == 0, 'a throwing configOk reports broken')
 
 --  allow is required, and a missing one denies everyone
@@ -158,7 +158,7 @@ local noAllowPanel = opengateClient.panel({
     onDenied = function() noAllowDenied = noAllowDenied + 1 end,
 })
 noAllowPanel:open()
-source = 7; handlers['tRadar:nlib:opengate:noallow:request'](); source = nil
+source = 7; handlers['tRadar:norden_lib:opengate:noallow:request'](); source = nil
 assert(noAllowOpen == 0 and noAllowDenied == 1, 'and denies every player at runtime')
 
 -- "Open to everyone" has to be written down, which is greppable in a way a
@@ -171,7 +171,7 @@ local everyonePanel = opengateClient.panel({
     onDenied = function() end,
 })
 everyonePanel:open()
-source = 123; handlers['tRadar:nlib:opengate:everyone:request'](); source = nil
+source = 123; handlers['tRadar:norden_lib:opengate:everyone:request'](); source = nil
 assert(everyoneOpen == 1, 'allow = function() return true end opens for anyone')
 
 -- An allow that throws denies. tAFK own handler documents the reason: an export
@@ -186,7 +186,7 @@ local taPanel = opengateClient.panel({
 })
 capture()
 taPanel:open()
-source = 7; handlers['tRadar:nlib:opengate:throwallow:request'](); source = nil
+source = 7; handlers['tRadar:norden_lib:opengate:throwallow:request'](); source = nil
 release()
 assert(taOpen == 0 and taDenied == 1, 'a throwing allow denies')
 assert(said('errored'), 'and the error is printed rather than swallowed')
@@ -208,7 +208,7 @@ local tpPanel = opengateClient.panel({
 })
 capture()
 tpPanel:open()
-source = 7; handlers['tRadar:nlib:opengate:throwpayload:request'](); source = nil
+source = 7; handlers['tRadar:norden_lib:opengate:throwpayload:request'](); source = nil
 release()
 assert(tpOpen == 1, 'a throwing payload builder does not block the panel')
 
@@ -253,7 +253,7 @@ local limPanel = opengateClient.panel({
     onDenied = function() end,
 })
 
-local LIM = 'tRadar:nlib:opengate:limited'
+local LIM = 'tRadar:norden_lib:opengate:limited'
 local function askLimited(src)
     serverCalls = serverCalls + 1
     limPanel:open()
@@ -298,7 +298,7 @@ assert(said('reopen() with no previous open'), 'and says why')
 
 -- Denied does not create a grant either.
 neverPanel:open()
-source = 7; handlers['tRadar:nlib:opengate:never:request'](); source = nil
+source = 7; handlers['tRadar:norden_lib:opengate:never:request'](); source = nil
 capture()
 assert(neverPanel:reopen() == false, 'a denial is not a grant to replay')
 release()
@@ -322,13 +322,13 @@ local nbPanel = opengateClient.panel({
 })
 capture()
 nbPanel:open()
-source = 7; handlers['tRadar:nlib:opengate:nobroken:request'](); source = nil
+source = 7; handlers['tRadar:norden_lib:opengate:nobroken:request'](); source = nil
 assert(nbDenied == 0, 'a broken config is NOT reported as a denial')
 assert(nbOpen == 0, 'and certainly does not open the panel')
 assert(said('no `onBroken` handler'), 'the missing handler is named in the console')
 -- Once, not per press.
 nbPanel:open()
-source = 7; handlers['tRadar:nlib:opengate:nobroken:request'](); source = nil
+source = 7; handlers['tRadar:norden_lib:opengate:nobroken:request'](); source = nil
 release()
 local n = 0
 for _, l in ipairs(lines) do if l:find('no `onBroken` handler', 1, true) then n = n + 1 end end

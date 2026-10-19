@@ -1,23 +1,23 @@
 /**
- * The per-install id, resolved from NLib's own `data.json`.
+ * The per-install id, resolved from Norden Lib's own `data.json`.
  *
  * The id itself — what it is, what it is not, why it is on every tWeb-bound
  * request and why deleting it is not an opt-out — is documented once, in
  * `shared/ts/install-id.ts`. This file is only the storage half.
  *
- * WHY IT IS NOT WRITTEN THROUGH `nlib.jsonstore`
+ * WHY IT IS NOT WRITTEN THROUGH `norden_lib.jsonstore`
  *
- * `nlib.jsonstore` is the module that owns a resource's `data.json`, and it is
- * the right answer for every Lua consumer. It is also **Lua**, in NLib's shared
+ * `norden_lib.jsonstore` is the module that owns a resource's `data.json`, and it is
+ * the right answer for every Lua consumer. It is also **Lua**, in Norden Lib's shared
  * VM, and the id has to be resolvable from the NODE bundle — that is where every
  * request is built (`shared/ts/marketplace/catalogue.ts`), and the request path
  * cannot wait on a round trip into another VM for a header.
  *
  * So this is a direct read-modify-write, and it is safe for a reason worth
- * stating rather than assuming: **NLib's own `data.json` has exactly one
- * writer, and it is this file.** `nlib.jsonstore`, `CreateServerSettings` and
+ * stating rather than assuming: **Norden Lib's own `data.json` has exactly one
+ * writer, and it is this file.** `norden_lib.jsonstore`, `CreateServerSettings` and
  * `CreateDiscovery` all write the *invoking* resource's document — tDetector's,
- * tELS's — never NLib's. Nothing in NLib opens a store on NLib.
+ * tELS's — never Norden Lib's. Nothing in Norden Lib opens a store on Norden Lib.
  *
  * IF THAT EVER CHANGES, it still holds, but only because this write MERGES:
  * it re-reads the whole document, sets one key and writes it back, which is the
@@ -32,7 +32,7 @@
  * install that never opted in had no id on its disk at all. That property is
  * gone by decision, not by accident: the id is now on marketplace browse, on the
  * version check and on community-configs, all of which run regardless of
- * `nlib_telemetry`. The first of those mints it. Pretending otherwise would mean
+ * `norden_lib_telemetry`. The first of those mints it. Pretending otherwise would mean
  * either a request with no id or a fresh random one per restart, and the second
  * makes the only figure the id exists for silently wrong.
  */
@@ -68,7 +68,7 @@ function dataFile(): string | null {
  * The whole document, or `{}`.
  *
  * An unparseable `data.json` answers `{}` for READING and is handled as a
- * refusal to WRITE below — the same split `nlib.jsonstore` makes, and for its
+ * refusal to WRITE below — the same split `norden_lib.jsonstore` makes, and for its
  * reason: a reader that returns empty is right, and a writer that treats empty
  * as "brand new install" would put a one-key document over the owner's
  * configuration.

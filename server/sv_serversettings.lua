@@ -1,6 +1,6 @@
 -- Admin-configurable settings, persisted to a JSON file in the owning resource.
 --
---   local ss = exports['NLib']:CreateServerSettings({
+--   local ss = exports['norden_lib']:CreateServerSettings({
 --       file         = 'data.json',
 --       section      = 'settings',           -- key within that file; optional
 --       defaults     = { voiceVolume = 65 },
@@ -14,7 +14,7 @@
 -- onRequest adds extra fields to the payload a client receives; onAfterSave runs
 -- once the save has broadcast.
 
-local log = Logger.create('NLib/serversettings')
+local log = Logger.create('norden_lib/serversettings')
 
 ServerSettings = {}
 
@@ -36,7 +36,7 @@ local _rateBuckets = {}
 local function rateLimited(bucket, src, intervalMs)
     -- Platform.now() is a stub off FiveM, where there are no net events to
     -- limit in the first place.
-    if not _NLIB_IS_FIVEM then return false end
+    if not _NORDEN_LIB_IS_FIVEM then return false end
     local b = _rateBuckets[bucket]
     if not b then
         b = {}
@@ -67,7 +67,7 @@ local function deepMerge(target, source)
 end
 
 function ServerSettings.create(opts)
-    -- The invoking resource, captured by the export wrapper -- not NLib.
+    -- The invoking resource, captured by the export wrapper -- not Norden Lib.
     local resName     = opts._resourceName or GetInvokingResource() or GetCurrentResourceName()
     local file        = opts.file or 'data.json'
     local section     = opts.section
@@ -94,7 +94,7 @@ function ServerSettings.create(opts)
     local function saveToFile()
         -- Demo mode keeps the change in `settings` (already updated by the
         -- caller) and off disk, so it lasts the session and no longer. `Demo` is
-        -- NLib's own copy of the module consumers reach as `nlib.demo`.
+        -- Norden Lib's own copy of the module consumers reach as `norden_lib.demo`.
         if Demo and Demo.dropWrite(('%s/%s'):format(resName, file)) then return end
         if section then
             -- Read, replace our section, write back, so siblings survive.
@@ -215,7 +215,7 @@ function ServerSettings.create(opts)
 end
 
 function ServerSettings.registerExports()
-    Platform.export('NLib', 'CreateServerSettings', function(opts)
+    Platform.export('norden_lib', 'CreateServerSettings', function(opts)
         opts._resourceName = opts._resourceName or GetInvokingResource()
         return ServerSettings.create(opts)
     end)

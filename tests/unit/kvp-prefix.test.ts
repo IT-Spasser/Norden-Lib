@@ -40,7 +40,7 @@ describe("KVP key composition", () => {
   const scope = { community: "tgstudios", serverTag: "a1b2c3d4" };
 
   test("an unscoped key is the community prefix and nothing else", () => {
-    // What `nlib.kvp.key(key)` has always produced.
+    // What `norden_lib.kvp.key(key)` has always produced.
     expect(composeKvpKey("radio_setting_volume", scope)).toBe("tgstudios_radio_setting_volume");
     expect(composeKvpKey("radio_setting_volume", scope, false)).toBe(
       "tgstudios_radio_setting_volume"
@@ -48,7 +48,7 @@ describe("KVP key composition", () => {
   });
 
   test("a server-scoped key carries the tag inside the community prefix", () => {
-    // tRadio Lua, before: nlib.kvp.key(key .. "_" .. serverTag())
+    // tRadio Lua, before: norden_lib.kvp.key(key .. "_" .. serverTag())
     // tRadio TypeScript, before: this.prefix + definition.key + this.suffix
     expect(composeKvpKey("radio_setting_fx_overrides", scope, true)).toBe(
       "tgstudios_radio_setting_fx_overrides_a1b2c3d4"

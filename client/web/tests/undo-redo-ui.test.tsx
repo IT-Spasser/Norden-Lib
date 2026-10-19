@@ -182,18 +182,18 @@ describeWithUiKit("UndoHint", () => {
   test("the font size is a class, not an arbitrary utility that can be merged away", () => {
     // THE REGRESSION THIS PINS. `text-[11px] text-muted-foreground` is ONE
     // `unoMerge` conflict group, so one of the two is dropped. It was safe here
-    // only because NLib's `cn` shields the `text-size` group (`cn.ts:197-208`) —
+    // only because Norden Lib's `cn` shields the `text-size` group (`cn.ts:197-208`) —
     // which means any consumer reaching `unoMerge` directly (tWeb, tCinematics
     // and every `internal/*` project do) lost one of them.
     //
-    // The fix moves the size into `.nlib-undo-hint` in `undo-redo.css`, so the
+    // The fix moves the size into `.norden-undo-hint` in `undo-redo.css`, so the
     // class string carries a colour and no size at all and there is nothing left
     // to collide. Asserted as the ABSENCE of an arbitrary text size rather than
     // as the presence of the class, because the absence is the property that
     // makes it safe.
     const { container } = render(() => <UndoHint />);
     const cls = container.firstElementChild!.getAttribute("class")!;
-    expect(cls).toContain("nlib-undo-hint");
+    expect(cls).toContain("norden-undo-hint");
     expect(cls).toContain("text-muted-foreground");
     expect(cls).not.toMatch(/text-\[/);
   });
@@ -202,7 +202,7 @@ describeWithUiKit("UndoHint", () => {
     const { container } = render(() => <UndoHint class="ml-auto" />);
     const cls = container.firstElementChild!.getAttribute("class")!;
     expect(cls).toContain("ml-auto");
-    expect(cls).toContain("nlib-undo-hint");
+    expect(cls).toContain("norden-undo-hint");
     expect(cls).toContain("text-muted-foreground");
   });
 });

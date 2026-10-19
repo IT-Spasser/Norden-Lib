@@ -21,7 +21,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 
-const scratch = await mkdtemp(resolve(tmpdir(), "nlib-escape-probe-"));
+const scratch = await mkdtemp(resolve(tmpdir(), "norden-escape-probe-"));
 const entry = resolve(scratch, "entry.ts");
 
 // The probe's page script. It imports the REAL module by path, so there is no

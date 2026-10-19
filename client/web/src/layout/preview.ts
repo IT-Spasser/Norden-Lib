@@ -1,4 +1,4 @@
-import type { Layout, Viewport } from "@nlib/shared/hud-geometry";
+import type { Layout, Viewport } from "@norden_lib/shared/hud-geometry";
 import { fetchNui } from "@/lib/nui";
 
 type Status = "pending" | "ok" | "failed";

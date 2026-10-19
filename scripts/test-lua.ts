@@ -1,8 +1,8 @@
-// Runs NLib's Lua suites: bun run test:lua
+// Runs Norden Lib's Lua suites: bun run test:lua
 //
 // These are the menu engine's own oracles. They drive client/lib/menu/*.lua directly
 // against stub hosts and know nothing about any consumer, which is the point --
-// NLib is the engine, so the suites that say what the engine does belong here
+// Norden Lib is the engine, so the suites that say what the engine does belong here
 // rather than in whichever resource happens to be the first to use it. The
 // consuming resources keep their own suites for their own content.
 //
@@ -44,4 +44,4 @@ for (const suite of suites) {
   if (result.exitCode !== 0) process.exit(result.exitCode || 1);
 }
 
-console.log(`PASS: ${suites.length} NLib Lua suites`);
+console.log(`PASS: ${suites.length} Norden Lib Lua suites`);

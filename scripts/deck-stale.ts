@@ -6,9 +6,9 @@
  * One shared gate for all three deck resources, invoked from each one's
  * package.json the same way `secrets:check` is:
  *
- *   bun run ../NLib/scripts/deck-stale.ts --id com.timmyg-studios.tradio
- *   bun run ../NLib/scripts/deck-stale.ts --id … --repo /path/to/resource
- *   bun run ../NLib/scripts/deck-stale.ts --id … --list      # name every source file
+ *   bun run ../norden_lib/scripts/deck-stale.ts --id com.timmyg-studios.tradio
+ *   bun run ../norden_lib/scripts/deck-stale.ts --id … --repo /path/to/resource
+ *   bun run ../norden_lib/scripts/deck-stale.ts --id … --list      # name every source file
  *
  * Why this exists
  *
@@ -17,7 +17,7 @@
  * inspectors and the softkey icons, so actions a customer dragged onto a key had
  * no UI. Nothing was wrong with the repo: the artifact is tracked, the sources
  * are tracked, and no gate related the two. The measurement is in the header of
- * NLib/shared/ts/build/deck-pack.ts.
+ * norden_lib/shared/ts/build/deck-pack.ts.
  *
  * What it asserts, and what it only reports
  *

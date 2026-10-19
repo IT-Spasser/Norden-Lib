@@ -196,7 +196,7 @@ type AudioPlayerState = "idle" | "loading" | "ready" | "error";
  * The sound preview, as an `<audio>` element.
  *
  * It used to `fetch` the bytes and decode them through Web Audio, which could
- * not work from here: CEF's origin is `cfx-nui-NLib`, the marketplace host
+ * not work from here: CEF's origin is `cfx-nui-norden_lib`, the marketplace host
  * sends no `Access-Control-Allow-Origin`, and so the browser refused to hand
  * this page the body. Being a public, read-only endpoint is not what makes a
  * response readable cross-origin — the header is.
@@ -431,7 +431,7 @@ function AudioPreviewPlayer(props: { item: MarketplaceItem; baseUrl: string }) {
  * arguing that a faithful render "cannot happen inside a preview that is also the
  * panel". That was true of the surface it was written for and is not true here:
  * tRadio ships an OFFLINE panel built from the same graph as the shipped one, and
- * this frame is `cfx-nui-NLib` rather than the panel itself. So the argument held
+ * this frame is `cfx-nui-norden_lib` rather than the panel itself. So the argument held
  * only while nobody had built the thing it said was impossible.
  *
  * The creator's screenshot is no longer what a theme resolves to — `previewKind`

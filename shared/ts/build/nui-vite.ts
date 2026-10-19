@@ -17,8 +17,8 @@ import { resolve } from "node:path";
  * `plugins` stays in the consumer's config, and that is deliberate rather than
  * unfinished. A plugin array means importing `@solidjs/vite-plugin`,
  * `unocss/vite` and `unplugin-icons/vite`; imported from here they would
- * resolve out of `NLib/shared/ts/node_modules`, so the bundle would be compiled
- * by NLib's resolved Solid compiler and NLib's UnoCSS rather than its own. That
+ * resolve out of `norden_lib/shared/ts/node_modules`, so the bundle would be compiled
+ * by Norden Lib's resolved Solid compiler and Norden Lib's UnoCSS rather than its own. That
  * is the same class of hazard as the `dedupe` list below exists to prevent, and
  * it would be introduced by the very module meant to prevent it. Plugins are
  * instances; only settings are shared.
@@ -27,7 +27,7 @@ import { resolve } from "node:path";
  * dev servers are routinely up at once.
  */
 export interface NuiBundleOptions {
-  /** The bundle's own `__dirname`. Aliases and the NLib path resolve from it. */
+  /** The bundle's own `__dirname`. Aliases and the Norden Lib path resolve from it. */
   root: string;
   /** Dev-server port. Unique per resource; they run concurrently. */
   port: number;
@@ -80,12 +80,12 @@ export function nuiBundleOptions(options: NuiBundleOptions) {
     resolve: {
       alias: {
         "@": resolve(root, "src"),
-        "@nlib/shared": resolve(root, "../../../NLib/shared/ts"),
+        "@norden_lib/shared": resolve(root, "../../../norden_lib/shared/ts"),
         ...alias,
       },
 
       /**
-       * Load-bearing, and MUST NOT be tidied away. `@nlib/shared` above points
+       * Load-bearing, and MUST NOT be tidied away. `@norden_lib/shared` above points
        * into another repo which has its own `node_modules/solid-js` (bun
        * auto-installs peerDependencies), so without this the bundle carries TWO
        * copies of the Solid runtime. Two copies means two `createContext`
@@ -98,11 +98,11 @@ export function nuiBundleOptions(options: NuiBundleOptions) {
        * gone, but the hazard is the resolver's rather than the plugin's, so the
        * dedupe stays — and it also names `@solidjs/web`, which in Solid 2 is
        * where the DOM runtime and the single JSX namespace live, and which
-       * NLib's shared components import directly.
+       * Norden Lib's shared components import directly.
        *
        * `three` is here for the same reason, and is not speculative:
-       * `@nlib/shared` declares it as a PEER dependency, so bun has already
-       * installed a copy under `NLib/shared/ts/node_modules` alongside the
+       * `@norden_lib/shared` declares it as a PEER dependency, so bun has already
+       * installed a copy under `norden_lib/shared/ts/node_modules` alongside the
        * bundle's own. Two three instances means two `THREE.Object3D` prototypes
        * and two WebGLRenderer registries: an `instanceof` check across the seam
        * fails and a control from the shared editor silently refuses to attach.

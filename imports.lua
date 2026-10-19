@@ -1,29 +1,29 @@
 --[[
-    NLib/imports.lua
+    norden_lib/imports.lua
     Single entry point for consumer resources.
 
     Usage in consumer fxmanifest.lua:
-        shared_scripts { '@NLib/imports.lua' }
+        shared_scripts { '@norden_lib/imports.lua' }
 
-    Modules lazy-load on first access of `nlib.<name>`.
+    Modules lazy-load on first access of `norden_lib.<name>`.
     Design notes: docs/internal/imports-entrypoint.md
 
 ]]
 
 local resourceName = GetCurrentResourceName()
-local NLibName = 'NLib'
+local NordenLibName = 'norden_lib'
 
-if resourceName == NLibName then return end
+if resourceName == NordenLibName then return end
 
-if GetResourceState(NLibName) ~= 'started' then
-    error('^1NLib must be started before this resource.^0', 0)
+if GetResourceState(NordenLibName) ~= 'started' then
+    error('^1NordenLib must be started before this resource.^0', 0)
 end
 
 local context = IsDuplicityVersion() and 'server' or 'client'
 
--- Enforce nlib_min_version *before* anything touches nlib, so an outdated NLib
--- says "update NLib" instead of "No such export X". Duplicated from
--- versioncheck/server.lua: this file runs in consumer VMs, that one in NLib's.
+-- Enforce norden_lib_min_version *before* anything touches norden_lib, so an outdated Norden Lib
+-- says "update norden_lib" instead of "No such export X". Duplicated from
+-- versioncheck/server.lua: this file runs in consumer VMs, that one in Norden Lib's.
 local function parseVer(s)
     if not s then return { 0, 0, 0 } end
     s = s:gsub('^v', '')
@@ -33,40 +33,40 @@ local function parseVer(s)
     return parts
 end
 
-local requiredVersion = GetResourceMetadata(resourceName, 'nlib_min_version', 0)
+local requiredVersion = GetResourceMetadata(resourceName, 'norden_lib_min_version', 0)
 if requiredVersion and requiredVersion ~= '' then
-    local nlibVersion = GetResourceMetadata(NLibName, 'version', 0) or '0.0.0'
-    local req, cur = parseVer(requiredVersion), parseVer(nlibVersion)
+    local nordenLibVersion = GetResourceMetadata(NordenLibName, 'version', 0) or '0.0.0'
+    local req, cur = parseVer(requiredVersion), parseVer(nordenLibVersion)
     local outdated = false
     for i = 1, 3 do
         if cur[i] < req[i] then outdated = true; break
         elseif cur[i] > req[i] then break end
     end
     if outdated then
-        error(('\n^1[%s] requires NLib v%s or newer — installed NLib is v%s. Update NLib.^0')
-            :format(resourceName, requiredVersion, nlibVersion), 0)
+        error(('\n^1[%s] requires Norden Lib v%s or newer — installed Norden Lib is v%s. Update Norden Lib.^0')
+            :format(resourceName, requiredVersion, nordenLibVersion), 0)
     end
 end
 
 local function loadModule(self, module)
     local dir = ('shared/imports/%s'):format(module)
-    local chunk = LoadResourceFile(NLibName, ('%s/%s.lua'):format(dir, context))
-    local shared = LoadResourceFile(NLibName, ('%s/shared.lua'):format(dir))
+    local chunk = LoadResourceFile(NordenLibName, ('%s/%s.lua'):format(dir, context))
+    local shared = LoadResourceFile(NordenLibName, ('%s/shared.lua'):format(dir))
 
     if shared then
         chunk = (chunk and ('%s\n%s'):format(shared, chunk)) or shared
     end
 
     if chunk then
-        local fn, err = load(chunk, ('@@NLib/shared/imports/%s/%s.lua'):format(module, context))
+        local fn, err = load(chunk, ('@@norden_lib/shared/imports/%s/%s.lua'):format(module, context))
 
         if not fn or err then
             if shared then
-                fn, err = load(shared, ('@@NLib/shared/imports/%s/shared.lua'):format(module))
+                fn, err = load(shared, ('@@norden_lib/shared/imports/%s/shared.lua'):format(module))
             end
 
             if not fn or err then
-                return error(('\n^1Error importing NLib module (%s): %s^0'):format(dir, err), 3)
+                return error(('\n^1Error importing Norden Lib module (%s): %s^0'):format(dir, err), 3)
             end
         end
 
@@ -76,17 +76,17 @@ local function loadModule(self, module)
     end
 end
 
---- Is `module` actually present in the INSTALLED NLib?
+--- Is `module` actually present in the INSTALLED Norden Lib?
 ---
---- `nlib.<anything>` is never falsy -- an unknown name returns the export proxy,
---- a function -- so `if nlib.diag then` is not a guard. Probes files, not the
+--- `norden_lib.<anything>` is never falsy -- an unknown name returns the export proxy,
+--- a function -- so `if norden_lib.diag then` is not a guard. Probes files, not the
 --- module cache. Safe only behind the version gate above: see
 --- docs/internal/imports-entrypoint.md.
 local function moduleExists(module)
     if type(module) ~= 'string' or module == '' then return false end
     local dir = ('shared/imports/%s'):format(module)
-    return LoadResourceFile(NLibName, ('%s/%s.lua'):format(dir, context)) ~= nil
-        or LoadResourceFile(NLibName, ('%s/shared.lua'):format(dir)) ~= nil
+    return LoadResourceFile(NordenLibName, ('%s/%s.lua'):format(dir, context)) ~= nil
+        or LoadResourceFile(NordenLibName, ('%s/shared.lua'):format(dir)) ~= nil
 end
 
 local function call(self, index)
@@ -96,9 +96,9 @@ local function call(self, index)
         module = loadModule(self, index)
 
         if not module then
-            -- Fall through to NLib exports for non-import modules.
+            -- Fall through to Norden Lib exports for non-import modules.
             local function method(...)
-                return exports[NLibName][index](nil, ...)
+                return exports[NordenLibName][index](nil, ...)
             end
             self[index] = method
             return method
@@ -108,8 +108,8 @@ local function call(self, index)
     return module
 end
 
-local nlib = setmetatable({
-    name = NLibName,
+local norden_lib = setmetatable({
+    name = NordenLibName,
     context = context,
     resource = resourceName,
     has = moduleExists,
@@ -118,9 +118,9 @@ local nlib = setmetatable({
     __call = call,
 })
 
-_ENV.nlib = nlib
+_ENV.norden_lib = norden_lib
 
---- Modules whose LOADING IS THEIR WIRING, loaded by NLib itself: their file
+--- Modules whose LOADING IS THEIR WIRING, loaded by Norden Lib itself: their file
 --- scope registers the handler, and a consumer may have no Lua call to trigger
 --- the lazy load. `studioOnly` is a default, not a permission. See
 --- docs/internal/imports-entrypoint.md.
@@ -141,9 +141,9 @@ local function studioResource()
         and GetNumResourceMetadata(resourceName, 'authors') == 0 then
         return false
     end
-    local chunk = LoadResourceFile(NLibName, 'shared/sh_branding.lua')
+    local chunk = LoadResourceFile(NordenLibName, 'shared/sh_branding.lua')
     if chunk then
-        local fn = load(chunk, '@@NLib/shared/sh_branding.lua', 't',
+        local fn = load(chunk, '@@norden_lib/shared/sh_branding.lua', 't',
             setmetatable({}, { __index = _ENV }))
         local ok, branding = pcall(fn)
         if ok and type(branding) == 'table' then
@@ -153,41 +153,41 @@ local function studioResource()
     return isStudio
 end
 
---- Can this VM read NLib's files AT ALL? The discriminator between "one module
---- is missing" and "I cannot read NLib", which have different fixes. Asked only
+--- Can this VM read Norden Lib's files AT ALL? The discriminator between "one module
+--- is missing" and "I cannot read norden_lib", which have different fixes. Asked only
 --- after a module has already failed.
-local function nlibReadable()
-    return LoadResourceFile(NLibName, 'fxmanifest.lua') ~= nil
+local function nordenLibReadable()
+    return LoadResourceFile(NordenLibName, 'fxmanifest.lua') ~= nil
 end
 
 for _, entry in ipairs(AUTOLOAD) do
-    if (not entry.studioOnly or studioResource()) and not rawget(nlib, entry.name) then
-        -- These names are NLib's own, so one that resolves to no file is a NLib
+    if (not entry.studioOnly or studioResource()) and not rawget(norden_lib, entry.name) then
+        -- These names are Norden Lib's own, so one that resolves to no file is a Norden Lib
         -- packaging bug rather than a consumer typo.
-        if not loadModule(nlib, entry.name) and nlibReadable() then
+        if not loadModule(norden_lib, entry.name) and nordenLibReadable() then
             -- A print, not error(): this is a shared_script in every consumer,
             -- so raising here stops every t* resource on the server at once.
-            print(('^1[NLib] cannot load its own module "%s" — no '
-                .. 'shared/imports/%s/%s.lua and no shared.lua. NLib v%s is packaged '
+            print(('^1[norden_lib] cannot load its own module "%s" — no '
+                .. 'shared/imports/%s/%s.lua and no shared.lua. Norden Lib v%s is packaged '
                 .. 'wrong; %s is running WITHOUT it.^0')
                 :format(entry.name, entry.name, context,
-                    GetResourceMetadata(NLibName, 'version', 0) or '?', resourceName))
+                    GetResourceMetadata(NordenLibName, 'version', 0) or '?', resourceName))
         end
     end
 end
 
 -- Eagerly load modules declared in the consumer's fxmanifest:
---   nlib_module { 'coords' }   /   nlib_modules { 'coords', 'kvp' }
+--   norden_lib_module { 'coords' }   /   norden_lib_modules { 'coords', 'kvp' }
 --
--- Not load-bearing any more except for `realtime`, which NLib's server bundle
+-- Not load-bearing any more except for `realtime`, which Norden Lib's server bundle
 -- reads off the manifest to decide whether to install the realtime hub. Kept as
 -- an auditable parts list. See docs/internal/imports-entrypoint.md.
 --
-for _, key in ipairs({ 'nlib_module', 'nlib_modules' }) do
+for _, key in ipairs({ 'norden_lib_module', 'norden_lib_modules' }) do
     for i = 1, GetNumResourceMetadata(resourceName, key) do
         local name = GetResourceMetadata(resourceName, key, i - 1)
-        if name and not rawget(nlib, name) then
-            loadModule(nlib, name)
+        if name and not rawget(norden_lib, name) then
+            loadModule(norden_lib, name)
         end
     end
 end

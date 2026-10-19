@@ -1,6 +1,6 @@
 // What a `ui` marketplace item has to be, for every product that installs one.
 //
-// Why this is in NLib rather than written four times
+// Why this is in Norden Lib rather than written four times
 //
 // The installer establishes that a bundle is SAFE TO EXTRACT — zip slip, case
 // aliasing, entry counts, declared-vs-actual sizes, compression methods,

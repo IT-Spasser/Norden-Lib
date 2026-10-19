@@ -4,8 +4,8 @@ Three files, imported by every resource's NUI through the package-relative shims
 in `shared/ts/css/` (see that directory's README for why the indirection exists):
 
 ```css
-@import "@nlib/shared/css/theme-tokens.css";  /* tokens + the surface layer */
-@import "@nlib/shared/css/fonts.css";         /* self-hosted faces */
+@import "@norden_lib/shared/css/theme-tokens.css";  /* tokens + the surface layer */
+@import "@norden_lib/shared/css/fonts.css";         /* self-hosted faces */
 ```
 
 `theme-tokens.css` re-exports `surface.css`, so importing the tokens brings the
@@ -14,11 +14,11 @@ is written in terms of `hsl(var(--card))`, `var(--radius-control)` and friends.
 
 ## Why the tokens are shared
 
-They used to be declared inline in NLib's own `global.css`, and every other
+They used to be declared inline in Norden Lib's own `global.css`, and every other
 resource hand-copied the token *names* with its own *values*. The shared
 `admin-ui` controls style themselves from those names, so the same control
 rendered a different colour in each host — tELS had drifted to a blue-tinted
-palette while importing NLib's components, so one control was grey in a NLib
+palette while importing Norden Lib's components, so one control was grey in a Norden Lib
 dialog and blue in the tELS editor. Nothing was broken; the two were simply
 maintained apart with no reason to converge.
 
@@ -32,7 +32,7 @@ matching commit in each resource.
   on disk in one of them. Each resource sets its own beside its own
   `@font-face`.
 - **Anything resource-specific.** tELS's gizmo axis and LED-side colours have no
-  meaning in a NLib dialog.
+  meaning in a Norden Lib dialog.
 
 ## The layer order is declared, not inferred
 
@@ -79,7 +79,7 @@ order:
 | `--input` | a control recessed into a panel; also `--popover`, since a dropdown is one rung above the panel |
 | `--border` | the edge of any of the above |
 
-A NLib control fills itself from `--input` and draws its edge from `--input` or
+A Norden Lib control fills itself from `--input` and draws its edge from `--input` or
 `--border`. If `--card` ever rises above `--input`, every field and every edge in
 the product becomes *darker* than the panel it sits on, which reads as black
 outlines drawn around things. It has happened twice, and nothing warns you —
@@ -94,7 +94,7 @@ move nothing. If a surface needs to separate from the one behind it, use
 in it breaks the ordering, so adding a block without keeping the order fails
 `bun test`.
 
-### Overlay resources and `.nlib-overlay`
+### Overlay resources and `.norden-overlay`
 
 The ladder assumes a page shell. A resource whose NUI page is opaque — a
 full-screen editor — has `--background` painted behind everything, so `--card`
@@ -106,10 +106,10 @@ no shell, `--background` is never painted, and a `--card` panel has nothing to
 separate from except the moving 3D scene, so it reads flat. The instinct is to
 raise `--card`. That is the inversion.
 
-The supported fix is `class="nlib-overlay"` on the overlay's root element. It
+The supported fix is `class="norden-overlay"` on the overlay's root element. It
 re-declares the whole ladder one step brighter, in order, so every rung keeps its
 relationship to the rungs either side. Because it is a scope rather than a
-`:root` override, NLib's components inside it read the shifted values and nothing
+`:root` override, Norden Lib's components inside it read the shifted values and nothing
 outside it changes.
 
 ## The radius scale
@@ -117,4 +117,4 @@ outside it changes.
 One knob. `--radius` is authored and `--radius-control`, `--radius-surface` and
 `--radius-tight` are derived from it, so a control, a popover and a panel stay in
 proportion when a consumer moves it. That is the supported way to be less rounded
-than NLib without forking the scale.
+than Norden Lib without forking the scale.

@@ -1,24 +1,24 @@
 ---
 title: "Menu Consumers"
-description: "Build a standalone resource on NLib's shared menu: ownership, the lifecycle adapter, host slots, and where a page may sit."
+description: "Build a standalone resource on Norden Lib's shared menu: ownership, the lifecycle adapter, host slots, and where a page may sit."
 order: 4
-group: "NLib"
+group: "norden_lib"
 published: true
 ---
 
 A consumer declares pages on the server and handles rows on the client. The screen, the
-keyboard hints and the breadcrumb are NLib's; the page, its rows and what they do are yours.
+keyboard hints and the breadcrumb are Norden Lib's; the page, its rows and what they do are yours.
 
 <ZoomableImage
-  src="/assets/NLib/menu--list.png"
+  src="/assets/norden_lib/menu--list.png"
   width={1600}
   height={900}
-  alt="A consumer page on the shared menu, with a selector open and NLib's keyboard hint bar below it"
+  alt="A consumer page on the shared menu, with a selector open and Norden Lib's keyboard hint bar below it"
 />
 
 | Owner | Owns |
 | --- | --- |
-| NLib | Schema, rendering, navigation, authority, dispatch, state/effects, the shared adapters. |
+| Norden Lib | Schema, rendering, navigation, authority, dispatch, state/effects, the shared adapters. |
 | Consumer | Feature behaviour, menu declarations, configuration, commands, its own state. |
 | Optional host | Public slots, placement policy, allowlists, ordering. Hosting does not make it the engine. |
 
@@ -30,18 +30,18 @@ page themes for a consumer's visual identity.
 ```lua title="fxmanifest.lua"
 fx_version 'cerulean'
 game 'gta5'
-dependency 'NLib'
-nlib_min_version '1.0'
-shared_script '@NLib/imports.lua'
+dependency 'norden_lib'
+norden_lib_min_version '1.0'
+shared_script '@norden_lib/imports.lua'
 server_script 'server.lua'
 client_script 'client.lua'
 ```
 
 ```lua title="server.lua"
-local owner, menu = GetCurrentResourceName(), exports['NLib']
-local lifecycle = nlib.lifecycle
-assert(type(lifecycle) == 'table' and lifecycle.version == 1, 'Update NLib: lifecycle API v1 required')
-lifecycle.watch({ resource = 'NLib', install = function(ctx)
+local owner, menu = GetCurrentResourceName(), exports['norden_lib']
+local lifecycle = norden_lib.lifecycle
+assert(type(lifecycle) == 'table' and lifecycle.version == 1, 'Update norden_lib: lifecycle API v1 required')
+lifecycle.watch({ resource = 'norden_lib', install = function(ctx)
     ctx.once('namespace', function()
         return menu:DefineMenuNamespace({ ace = 'mytools.use' })
     end)
@@ -58,10 +58,10 @@ end })
 ```
 
 ```lua title="client.lua"
-local owner, menu = GetCurrentResourceName(), exports['NLib']
-local lifecycle = nlib.lifecycle
-assert(type(lifecycle) == 'table' and lifecycle.version == 1, 'Update NLib: lifecycle API v1 required')
-local registration = lifecycle.watch({ resource = 'NLib', install = function(ctx)
+local owner, menu = GetCurrentResourceName(), exports['norden_lib']
+local lifecycle = norden_lib.lifecycle
+assert(type(lifecycle) == 'table' and lifecycle.version == 1, 'Update norden_lib: lifecycle API v1 required')
+local registration = lifecycle.watch({ resource = 'norden_lib', install = function(ctx)
     ctx.once('actions', function()
         return menu:RegisterMenuActions({ hello = function()
             menu:ShowToast('hello', 'info', 'Tools', 'Hello!')
@@ -81,7 +81,7 @@ last argument: a multi-return Lua function can fill the optional `declaredOwner`
 
 ## Shared lifecycle adapter (API v1)
 
-`nlib.lifecycle.watch({ resource, install, cleanup?, readyEvent? })` runs in the consumer
+`norden_lib.lifecycle.watch({ resource, install, cleanup?, readyEvent? })` runs in the consumer
 VM, so its subscriptions survive a dependency restart.
 
 | Returns | Description |
@@ -120,8 +120,8 @@ resource's `fxmanifest.lua` `version`.
 Any server resource can expose navigation slots:
 
 ```lua
-local host = nlib.menuhost
-assert(type(host) == 'table' and host.version == 1, 'Update NLib: menu host API v1 required')
+local host = norden_lib.menuhost
+assert(type(host) == 'table' and host.version == 1, 'Update norden_lib: menu host API v1 required')
 host.install({
     ['tools.extensions'] = {
         menu = GetCurrentResourceName() .. ':tools',
@@ -134,13 +134,13 @@ host.install({
 
 Install once, after declaring the host's pages. It exposes the host-scoped server exports
 `RegisterPluginMenu({ id, slot, menu, label, description? })` and
-`UnregisterPluginMenu(id)`. Readiness is `nlib:menu:hostReady(hostResource)`.
+`UnregisterPluginMenu(id)`. Readiness is `norden_lib:menu:hostReady(hostResource)`.
 
 A plugin watches its configured host with the lifecycle adapter and calls
 `RegisterPluginMenu` in a checkpointed step after registering its own target page. The same
 owner and id replaces an existing link, so retrying is safe, and only the calling resource's
 namespace may be targeted. Host policy controls allowed callers and ordering; player
-permissions are checked independently by NLib.
+permissions are checked independently by Norden Lib.
 
 The host adapter composes slots sharing a page, so do **not** also write that page's dynamic
 link collection with `SetMenuLinks`. When the engine restarts, consumers recreate their own
@@ -158,7 +158,7 @@ that host's ancestor permissions mandatory, including for direct command access.
 
 ## The shared "Send feedback" row
 
-NLib adds one row of its own to **every namespace's entry page** — the page whose `parent`
+Norden Lib adds one row of its own to **every namespace's entry page** — the page whose `parent`
 is `main` or absent. You do not register it and cannot.
 
 <Callout type="warning">
@@ -168,11 +168,11 @@ counting rows on an entry page sees one more than it registered.
 </Callout>
 
 The dialog sends the player's message to TIMMYG Studios with the resource name, its manifest
-`version`, and NLib's random per-install id. Nothing else — no player name, licence, Steam
+`version`, and Norden Lib's random per-install id. Nothing else — no player name, licence, Steam
 or Discord id, no server name, no IP.
 
-- **It does not need telemetry consent** and is unaffected by `nlib_telemetry`. See
-  [Convars](/docs/NLib/convars#diagnostics).
+- **It does not need telemetry consent** and is unaffected by `norden_lib_telemetry`. See
+  [Convars](/docs/norden_lib/convars#diagnostics).
 - **It is not permission-gated**, and no ACE hides it.
 
 It appears only on an entry page, is hidden while the player is filtering, and a page with
@@ -180,6 +180,6 @@ no `owner:` prefix — the shared `main` root — gets no row.
 
 ## Verifying a consumer
 
-Test in game against a NLib restart, a permission revocation, a direct `OpenMenu` on a
+Test in game against a Norden Lib restart, a permission revocation, a direct `OpenMenu` on a
 root-hidden page, and a host that starts after you. Refresh resource discovery before a
 reload — source edits alone do not update a running resource.

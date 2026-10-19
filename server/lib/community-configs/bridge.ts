@@ -58,7 +58,7 @@ export function registerCommunityConfigsBridge(): void {
   if (installed) return;
   installed = true;
 
-  //   exports.NLib:ccPublish(payloadJson, function(ok, err, id) end)
+  //   exports.norden_lib:ccPublish(payloadJson, function(ok, err, id) end)
   //
   // The payload crosses as JSON rather than as a table because it carries the
   // model fingerprint — a nested map of ~30 bone names to 3-element arrays —
@@ -91,7 +91,7 @@ export function registerCommunityConfigsBridge(): void {
     );
   });
 
-  //   exports.NLib:ccUpdate(id, editToken, payloadJson, function(ok, err, id) end)
+  //   exports.norden_lib:ccUpdate(id, editToken, payloadJson, function(ok, err, id) end)
   //
   // JSON for the payload for the same marshalling reason as `ccPublish`.
   fExports("ccUpdate", (id: unknown, editToken: unknown, payloadJson: unknown, cb: unknown) => {
@@ -115,7 +115,7 @@ export function registerCommunityConfigsBridge(): void {
     settle(updateConfig(id, editToken, payload), cb);
   });
 
-  //   exports.NLib:ccWithdraw(id, editToken, function(ok, err, status) end)
+  //   exports.norden_lib:ccWithdraw(id, editToken, function(ok, err, status) end)
   fExports("ccWithdraw", (id: unknown, editToken: unknown, cb: unknown) => {
     if (!isCallback(cb)) return;
     if (typeof id !== "string" || !id || typeof editToken !== "string" || !editToken) {
@@ -125,7 +125,7 @@ export function registerCommunityConfigsBridge(): void {
     settle(withdrawConfig(id, editToken), cb);
   });
 
-  //   exports.NLib:ccList(script, configType, key, limit, function(ok, err, itemsJson) end)
+  //   exports.norden_lib:ccList(script, configType, key, limit, function(ok, err, itemsJson) end)
   //
   // `itemsJson` is a JSON string for the same marshalling reason as above:
   // every item carries a fingerprint and an LED-name array.
@@ -149,7 +149,7 @@ export function registerCommunityConfigsBridge(): void {
     }
   );
 
-  //   exports.NLib:ccMatch(script, configType, fpJson, key, limit, function(ok, err, itemsJson) end)
+  //   exports.norden_lib:ccMatch(script, configType, fpJson, key, limit, function(ok, err, itemsJson) end)
   //
   // Returns CANDIDATES. The caller scores them; see `api.ts`.
   fExports(
@@ -193,7 +193,7 @@ export function registerCommunityConfigsBridge(): void {
     }
   );
 
-  //   exports.NLib:ccImport(id, function(ok, err, configJson) end)
+  //   exports.norden_lib:ccImport(id, function(ok, err, configJson) end)
   //
   // `configJson` is the raw published string; the consumer decodes it.
   fExports("ccImport", (id: unknown, cb: unknown) => {
@@ -205,7 +205,7 @@ export function registerCommunityConfigsBridge(): void {
     settle(importConfig(id), cb);
   });
 
-  //   exports.NLib:ccPeek(id, function(ok, err, configJson) end)
+  //   exports.norden_lib:ccPeek(id, function(ok, err, configJson) end)
   //
   // The same payload `ccImport` returns, from a route that does NOT increment
   // the config's import counter. Consumers that read a config to render or

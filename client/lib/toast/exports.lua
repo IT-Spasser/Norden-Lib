@@ -1,5 +1,5 @@
 ToastExports = {}
-local log = Logger.create('NLib/toast')
+local log = Logger.create('norden_lib/toast')
 local ui, stopped = nil, false
 local entries, idCounter = {}, 0
 local durations = { success = 4000, error = 6000, warning = 5000, info = 4000, loading = 0 }
@@ -87,14 +87,14 @@ function ToastExports.register(webui)
 
     -- IDs are local to the producer. Return values and public events keep that
     -- local ID; the renderer sees a namespaced ID so producers cannot collide.
-    Platform.export('NLib', 'ShowToast', function(id, toastType, title, description, duration, theme)
+    Platform.export('norden_lib', 'ShowToast', function(id, toastType, title, description, duration, theme)
         if stopped or not ui then return nil end
         local owner = caller()
         if not owner then return nil end
         if type(id) ~= 'string' or id == '' then
             repeat
                 idCounter = idCounter + 1
-                id = 'nlib_toast_' .. tostring(idCounter)
+                id = 'norden_lib_toast_' .. tostring(idCounter)
             until not entries[wireId(owner, id)]
         end
         local key = wireId(owner, id)
@@ -121,13 +121,13 @@ function ToastExports.register(webui)
             theme = type(theme) == 'string' and theme ~= '' and theme or nil,
         })
         schedule(key, entry, duration)
-        Platform.TriggerEvent('NLib:toast:shown', id, toastType, title, owner)
+        Platform.TriggerEvent('norden_lib:toast:shown', id, toastType, title, owner)
         return id
     end)
 
     -- Text/theme-only patches retain their deadline. Type changes and explicit
     -- durations restart it; duration=0 restores the current type's default.
-    Platform.export('NLib', 'UpdateToast', function(id, changes)
+    Platform.export('norden_lib', 'UpdateToast', function(id, changes)
         local entry, key = owned(id)
         if not entry or type(changes) ~= 'table' then return false end
         local patch = {}
@@ -140,27 +140,27 @@ function ToastExports.register(webui)
         if patch.type then entry.type = patch.type end
         if patch.type or patch.duration ~= nil then schedule(key, entry, patch.duration) end
         Platform.sendUIEvent(ui, 'updateToast', { id = key, changes = patch })
-        Platform.TriggerEvent('NLib:toast:updated', id, patch, entry.owner)
+        Platform.TriggerEvent('norden_lib:toast:updated', id, patch, entry.owner)
         return true
     end)
 
-    Platform.export('NLib', 'DismissToast', function(id)
+    Platform.export('norden_lib', 'DismissToast', function(id)
         local entry, key = owned(id)
         if not entry then return false end
         remove(key, true)
-        Platform.TriggerEvent('NLib:toast:dismissed', id, entry.owner)
+        Platform.TriggerEvent('norden_lib:toast:dismissed', id, entry.owner)
         return true
     end)
 
     -- Public bulk dismissal is producer-scoped, never a global UI reset.
-    Platform.export('NLib', 'DismissAll', function()
+    Platform.export('norden_lib', 'DismissAll', function()
         if stopped or not ui then return false end
         local owner = caller()
         if not owner then return false end
         for key, entry in pairs(entries) do
             if entry.owner == owner then remove(key, true) end
         end
-        Platform.TriggerEvent('NLib:toast:dismissedAll', owner)
+        Platform.TriggerEvent('norden_lib:toast:dismissedAll', owner)
         return true
     end)
 end

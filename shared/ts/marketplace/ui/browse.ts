@@ -1,11 +1,11 @@
 /**
  * Request/reply wrapper around the server-side marketplace browse.
  *
- * NOT a `fetch`: CEF's origin here is `cfx-nui-NLib` and the marketplace host
+ * NOT a `fetch`: CEF's origin here is `cfx-nui-norden_lib` and the marketplace host
  * sends no `Access-Control-Allow-Origin` on that route, so the browser made the
  * request and then refused to hand this page the body. Being public is not what
  * makes a response readable cross-origin -- the header is. The request goes
- * NUI -> Lua -> NLib's Node bundle, which is where the resource secret can
+ * NUI -> Lua -> Norden Lib's Node bundle, which is where the resource secret can
  * legitimately live.
  *
  * Correlated by request ID rather than by a `fetchNui` return value, because a
@@ -191,7 +191,7 @@ export interface LikeState {
  * raw CSS, slot fragments and script.
  *
  * Through the bridge rather than fetched, for the same reason browse is: CEF's
- * origin is `cfx-nui-NLib` and the catalogue sends no `Access-Control-Allow-Origin`,
+ * origin is `cfx-nui-norden_lib` and the catalogue sends no `Access-Control-Allow-Origin`,
  * so the frame would make the request and then be refused the body. The panel the
  * definition is pushed into IS loaded cross-origin — it is an application, not a
  * document this code reads — which is exactly why only the definition needs a

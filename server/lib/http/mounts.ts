@@ -1,7 +1,7 @@
-// mounts.ts — NLib's own mounts on its own router.
+// mounts.ts — Norden Lib's own mounts on its own router.
 //
 // These are `kind: 'inprocess'`: the handler is a live function reference, not
-// a loopback address. Only NLib itself can register one, and not by policy but
+// a loopback address. Only Norden Lib itself can register one, and not by policy but
 // by construction — every FiveM resource's Node bundle runs in a separate V8
 // isolate, so no other resource could hand us a callable anyway.
 //
@@ -30,7 +30,7 @@ export function registerInProcess(log: Log): void {
     // Not a page — there is nothing for a browser to visit here, so it would
     // only be noise on the hub.
     listed: false,
-    resourceName: "NLib",
+    resourceName: "norden_lib",
     onUpgrade: (req, socket, head) => {
       // Lazily constructs the session/room machinery on the first actual
       // connection, preserving the old behaviour: a server where nobody uses

@@ -106,7 +106,7 @@ describe("HTTP publication readiness", () => {
       publicUrlState: "failed",
       publicUrl: null,
     });
-    expect(h.mount().error).toContain("nlib_http_public_url");
+    expect(h.mount().error).toContain("norden_lib_http_public_url");
     expect(h.call("GetHubUrl")).toBe("");
   });
 
@@ -135,7 +135,7 @@ describe("HTTP publication readiness", () => {
     expect(h.mount().ok).toBe(true);
   });
 
-  test("NLib restart clears old mounts and publishes only the new lifetime", () => {
+  test("norden_lib restart clears old mounts and publishes only the new lifetime", () => {
     const old = harness("old.example.com");
     old.state.listener("listening", "http://127.0.0.1:7777");
     expect(old.mount().ok).toBe(true);

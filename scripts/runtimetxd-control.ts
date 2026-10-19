@@ -55,7 +55,7 @@ const MODES: Record<string, Patch[]> = {
 };
 
 const source = readFileSync(MODULE, "utf8");
-const dir = mkdtempSync(join(tmpdir(), "nlib-runtimetxd-control-"));
+const dir = mkdtempSync(join(tmpdir(), "norden-runtimetxd-control-"));
 let failures = 0;
 
 for (const [mode, patches] of Object.entries(MODES)) {

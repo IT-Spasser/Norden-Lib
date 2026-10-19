@@ -4,7 +4,7 @@ local commands, threads, focusCalls = {}, {}, 0
 local ready, pendingDialog, typing = true, false, false
 DialogExports = { isActive = function() return pendingDialog end }
 MenuInput = { isTyping = function() return typing end }
-_NLIB_IS_FIVEM = true
+_NORDEN_LIB_IS_FIVEM = true
 local logLines = {}
 Logger = { create = function() return function(message) logLines[#logLines + 1] = tostring(message) end end }
 Platform = {
@@ -44,11 +44,11 @@ HudLayout.init({})
 local checks = 0
 local function check(value, message) checks = checks + 1; assert(value, message) end
 -- There is deliberately no GetHudLayoutCapabilities export to probe. It was
--- eight hardcoded `true` flags naming NLib releases; only 0.6 ever shipped and it
+-- eight hardcoded `true` flags naming Norden Lib releases; only 0.6 ever shipped and it
 -- has none of them, so the probe could not distinguish anything reachable. The
 -- capabilities it advertised are asserted directly below instead, as behaviour.
 check(exports.GetHudLayoutCapabilities == nil,
-    'the NLib-version capability probe is gone, not relocated')
+    'the Norden Lib-version capability probe is gone, not relocated')
 local messages = {}
 local options = { label = 'Test HUD', width = 200, height = 100,
     defaults = { x = -0.02, y = -0.02, scale = 1, visible = true, anchor = 'bottom-right' } }
@@ -127,7 +127,7 @@ local function tick(ms)
     now = now + ms
     local ok, err = coroutine.resume(threads[1]); check(ok, err)
 end
-local function command(action) commands.nlibhud(0, action and { action } or {}) end
+local function command(action) commands.nordenhud(0, action and { action } or {}) end
 ready = false
 check(not exports.OpenHudEditor(), 'Cold renderer must not take focus')
 ready = true
@@ -155,7 +155,7 @@ check(not request('layoutFinish', { session = lostSession, save = true }), 'Late
 command()
 check(HudLayout.isEditing() and latestSession() > lostSession, 'Toggle can reopen recovered editor')
 local current = latestSession()
-check(request('layoutPreview', { session = current, key = 'NLib:demo', layout = copy }))
+check(request('layoutPreview', { session = current, key = 'norden_lib:demo', layout = copy }))
 local queued
 for _, fn in pairs(timers) do if fn then queued = fn end end
 command()
@@ -194,7 +194,7 @@ externalFocus = true
 ownFocus = false
 before = focusCalls
 command('cancel')
-check(externalFocus and not ownFocus and focusCalls == before + 1, 'Cancel drops only NLib focus-stack entry')
+check(externalFocus and not ownFocus and focusCalls == before + 1, 'Cancel drops only Norden Lib focus-stack entry')
 check(not exports.OpenHudEditor(), 'External focus blocks reopening')
 externalFocus = false
 check(exports.OpenHudEditor())
@@ -207,7 +207,7 @@ dofile('client/cl_layout.lua')
 HudLayout.init({})
 check(exports.RegisterHudComponent('test', options, function() end))
 check(exports.GetHudLayout('test').x == -0.2, 'Committed layout survives a new library instance')
--- Opt-in consumer persistence must neither restore nor retain an older NLib
+-- Opt-in consumer persistence must neither restore nor retain an older Norden Lib
 -- record. The preceding instance left alpha:test persisted at x=-0.2.
 local consumerMessages = {}
 local consumerOptions = { label = 'Consumer HUD', width = 200, height = 100, persist = false,
@@ -221,7 +221,7 @@ consumerOptions.persist = false
 check(exports.RegisterHudComponent('test', consumerOptions, consumerCallback))
 check(writes == beforeConsumerWrites, 'Registration must not write storage')
 check(consumerMessages[#consumerMessages].phase == 'restore'
-    and consumerMessages[#consumerMessages].layout.x == -0.4, 'Consumer defaults override stale NLib record')
+    and consumerMessages[#consumerMessages].layout.x == -0.4, 'Consumer defaults override stale Norden Lib record')
 consumerOptions.defaults.x = -0.6
 check(exports.GetHudLayout('test').x == -0.4, 'Consumer defaults are copied')
 local consumerDraft = { x = -0.7, y = -0.1, scale = 1.1, visible = true, anchor = 'bottom-right' }
@@ -247,7 +247,7 @@ check(HudLayout.isEditing() and exports.GetHudLayout('test').x == -0.4,
 SetResourceKvp = writer
 check(request('layoutFinish', { session = session, save = true }))
 check(captured.layouts['alpha:test'] == nil, 'Consumer draft and stale retained record must both be excluded')
-check(captured.layouts['NLib:toasts'] ~= nil, 'Default component persistence remains enabled')
+check(captured.layouts['norden_lib:toasts'] ~= nil, 'Default component persistence remains enabled')
 check(consumerMessages[#consumerMessages].phase == 'commit' and not consumerMessages[#consumerMessages].editing
     and consumerMessages[#consumerMessages].layout.x == -0.7, 'Consumer receives commit for its own persistence')
 check(exports.GetHudLayout('test').x == -0.7, 'Consumer committed layout remains available for this registration')
@@ -399,7 +399,7 @@ do
 end
 
 -- The unbrick command
--- /nlibhud reset has to work with the editor shut, with the editor open, and
+-- /nordenhud reset has to work with the editor shut, with the editor open, and
 -- with every widget dragged somewhere the player cannot reach.
 consumerOptions.layout = CURRENT
 exports.UnregisterHudComponent('owned')
@@ -410,7 +410,7 @@ check(exports.RegisterHudComponent('kept', persisted, function() end))
 check(exports.OpenHudEditor())
 check(HudLayout.isEditing(), 'MUTATION GUARD: the editor really is open before the reset')
 local writesBefore = writes
-commands.nlibhud(nil, { 'reset' })
+commands.nordenhud(nil, { 'reset' })
 check(not HudLayout.isEditing(), 'reset discards an open session rather than fighting it')
 check(exports.GetHudLayout('owned').x == FACTORY.x, 'reset restores every registered component')
 check(writes > writesBefore and next(captured.layouts) == nil,
@@ -430,11 +430,11 @@ do
     check(said:find('could NOT be cleared') == nil, 'resetAll itself stays quiet; the command reports')
     before = #logLines
     SetResourceKvp = function() error('disk full') end
-    commands.nlibhud(nil, { 'reset' })
+    commands.nordenhud(nil, { 'reset' })
     SetResourceKvp = realWrite
     said = table.concat(logLines, '\n', before + 1)
     check(said:find('could NOT be cleared') ~= nil,
-        '/nlibhud reset says the saved layout survived instead of claiming it was cleared')
+        '/nordenhud reset says the saved layout survived instead of claiming it was cleared')
     check(said:find('cleared the saved layout') == nil, 'and does not also claim success')
     check(select('#', exports.ResetHudLayout()) == 1, 'the export still answers with exactly a count')
 end

@@ -29,7 +29,7 @@ local function bridgeStub(name)
 end
 
 exports = {
-    NLib = {
+    norden_lib = {
         ccPeek = bridgeStub('ccPeek'),
         ccImport = bridgeStub('ccImport'),
         ccPublish = function() end,
@@ -43,7 +43,7 @@ json = {
     decode = function() return {} end,
 }
 
-function GetCurrentResourceName() return 'NLib' end
+function GetCurrentResourceName() return 'norden_lib' end
 function GetInvokingResource() return 'tELS' end
 function GetConvar(_, default) return default end
 

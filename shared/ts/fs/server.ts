@@ -1,18 +1,18 @@
-// The Node half of `nlib.fs.writeResourceFile` — shared as CODE, not as a
+// The Node half of `norden_lib.fs.writeResourceFile` — shared as CODE, not as a
 // runtime export.
 //
-// Why this is a shared module and not one export on NLib
+// Why this is a shared module and not one export on Norden Lib
 //
-// It used to be one export: NLib registered `WriteResourceFile(resource, ...)`
-// and every consumer's Lua called `exports.NLib:WriteResourceFile(...)`. That
+// It used to be one export: Norden Lib registered `WriteResourceFile(resource, ...)`
+// and every consumer's Lua called `exports.norden_lib:WriteResourceFile(...)`. That
 // cannot work on this platform. FiveM's Node runtime sandboxes each resource to
-// its OWN directory, so NLib writing into tDetector's folder is refused before
+// its OWN directory, so Norden Lib writing into tDetector's folder is refused before
 // it reaches the disk:
 //
-//   [warning] [NLib] Filesystem write permission check from 'NLib' for
+//   [warning] [norden_lib] Filesystem write permission check from 'norden_lib' for
 //     permission fs.write on resource '...\tDetector\data.json' - write not
 //     allowed
-//   [NLib] WriteResourceFile failed for 'tDetector/data.json': Access to this
+//   [norden_lib] WriteResourceFile failed for 'tDetector/data.json': Access to this
 //     API has been restricted. Use --allow-fs-write to manage permissions.
 //
 // `--allow-fs-write` is a server STARTUP ARGUMENT, not a manifest key, so the
@@ -21,8 +21,8 @@
 // doing by accident: each resource writes to itself from its own Node bundle.
 //
 // So the implementation is shared at BUILD time — tDetector and tRadar already
-// bundle `NLib/shared/ts/` (see marketplace/agent) — and each resource calls
-// `registerWriteResourceFile()` from its own `server/main.ts`. NLib calls it
+// bundle `norden_lib/shared/ts/` (see marketplace/agent) — and each resource calls
+// `registerWriteResourceFile()` from its own `server/main.ts`. Norden Lib calls it
 // too, for its own files. Every write then originates inside the resource it
 // lands in, and the sandbox has nothing to object to.
 //
@@ -99,7 +99,7 @@ function resolveWithinResource(resourceName: unknown, relative: unknown): string
  * Write a file inside a started resource's own directory.
  *
  * Callable directly, but the registered export below is what Lua reaches, and
- * `nlib.fs.writeResourceFile` is what consumers should actually call.
+ * `norden_lib.fs.writeResourceFile` is what consumers should actually call.
  *
  * @param resourceName the resource whose directory to write into
  * @param relative     path relative to that resource's root, no `..`
@@ -149,7 +149,7 @@ export function writeResourceFile(
  *
  * The three-argument signature — `(resource, relPath, contents)` — is kept even
  * though the answer can now only ever be this resource, because that is the
- * shape `nlib.fs.writeResourceFile` already speaks and because a cross-resource
+ * shape `norden_lib.fs.writeResourceFile` already speaks and because a cross-resource
  * request has to be *answered*, not silently redirected.
  */
 export function registerWriteResourceFile(): void {

@@ -8,7 +8,7 @@
       skins/vmenu.css and overrides this; nothing here is vMenu's.
 
    Everything outside the geometry block applies to both skins. */
-.nlib-menu {
+.norden-menu {
   /* Aliases the interface face rather than naming one, so a theme `font`
      override — written to both --font-sans and --font as inline styles on this
      element — reaches the menu under either name. */
@@ -100,7 +100,7 @@
      stating the old two-colour mix as --text at the same 32% alpha composites to
      the same thing wherever the mix was ever right, and stays right over a
      lifted panel where an opaque mix of --panel would not. It is also the
-     identical expression .nlib-nui-surface uses for --nui-control-border, which
+     identical expression .norden-nui-surface uses for --nui-control-border, which
      is the point: one control border, one number. */
   --menu-control-border: hsl(var(--text-raw) / 0.32);
   --menu-danger: #ff8585;
@@ -128,7 +128,7 @@
   --safe-top: 3vh;
   --safe-left: 1.5vw;
 
-  /* .nlib-nui-surface derives its --nui-* tokens from shadcn HSL channels, which
+  /* .norden-nui-surface derives its --nui-* tokens from shadcn HSL channels, which
      the menu cannot wear because its own --border and --muted are colours. The
      same contract is restated from the menu's colours instead, so a shared
      component class renders correctly inside a row and follows the menu's theme.
@@ -150,10 +150,10 @@
      `hsl(var(--nui-text-raw) / 0.52)` resolves to `hsl( / 0.52)` — invalid,
      dropped, painting nothing — which is the same silent failure color-mix()
      causes above, arriving by the other road. The live casualty in a row is
-     .nlib-nui-control's focus ring, worn by NuiCheckbox and NuiRange: the menu
+     .norden-nui-control's focus ring, worn by NuiCheckbox and NuiRange: the menu
      is keyboard- and controller-driven, so that ring is the whole feedback. The
-     other three readers (.nlib-nui-input:hover, .nlib-nui-select-content,
-     .nlib-nui-lit) are not reachable from menu markup today; they are covered
+     other three readers (.norden-nui-input:hover, .norden-nui-select-content,
+     .norden-nui-lit) are not reachable from menu markup today; they are covered
      anyway, because the point of this block is that anything shared can land in
      a row without knowing it is in one.
 
@@ -176,7 +176,7 @@
      animations in menu.css can name it. They were a literal
      `cubic-bezier(0.2, 0, 0, 1)`, whose first control point sits at y=0 — zero
      velocity at t=0, i.e. the ease-IN-out family. That delays the movement at
-     the exact moment the player is looking at it, and it meant a NLib dialog
+     the exact moment the player is looking at it, and it meant a Norden Lib dialog
      rose on ease-out while the menu behind it rose on something else. */
   --nui-ease-entrance: cubic-bezier(0.22, 1, 0.36, 1);
 }

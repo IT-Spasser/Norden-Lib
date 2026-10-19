@@ -1,4 +1,4 @@
-# `@nlib/shared`
+# `@norden_lib/shared`
 
 The shared TypeScript surface: UI components, the marketplace client, the RAGE
 readers, the Solid 1 → 2 compatibility layer, and the build helpers every

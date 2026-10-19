@@ -6,14 +6,14 @@ local api,events,caller={},{},'one'
 function GetCurrentResourceName() return 'host' end
 function GetInvokingResource() return caller end
 function AddEventHandler(name,fn) events[name]=fn end
-function TriggerEvent(name,owner) assert(name=='nlib:menu:hostReady' and owner=='host') end
+function TriggerEvent(name,owner) assert(name=='norden_lib:menu:hostReady' and owner=='host') end
 assert(registry:defineNamespace('host',{ace='host.open'}))
 assert(registry:register('host',{id='host:renamedPage',title='Tools',parent='main',items={
     {id='host:base',label='Base',kind='action'},
 }},{ace='host.use',actions={['host:base']={ace='host.use',clientAction='base'}}}))
-exports=setmetatable({NLib={SetMenuLinks=function(_,id,rows) return registry:setMenuLinks('host',id,rows) end}},
+exports=setmetatable({norden_lib={SetMenuLinks=function(_,id,rows) return registry:setMenuLinks('host',id,rows) end}},
     {__call=function(_,name,fn) api[name]=fn end})
-nlib={menu={schema=S}}
+norden_lib={menu={schema=S}}
 local host=dofile('shared/imports/menuhost/server.lua')
 assert(host.install({
     ['public.tools']={menu='host:renamedPage',order={['one:link']=20}},

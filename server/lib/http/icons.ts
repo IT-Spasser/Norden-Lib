@@ -25,8 +25,8 @@ export const ICONS_RESOURCE_PATH = "server/lib/http/icons.json";
  * `LoadResourceFile` and NOT a filesystem path, measured 2026-10-15 on the
  * Linux test server:
  *
- *   Filesystem permission check from 'NLib' for permission fs.read on resource
- *   'C:\\Users\\Tommy\\...\\NLib\\server\\lib\\http/icons.json' - no device found
+ *   Filesystem permission check from 'norden_lib' for permission fs.read on resource
+ *   'C:\\Users\\Tommy\\...\\Norden Lib\\server\\lib\\http/icons.json' - no device found
  *
  * `__dirname` is resolved by the bundler at BUILD time, so the server bundle
  * carried the build machine's absolute Windows path and asked a Linux host for

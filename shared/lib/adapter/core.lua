@@ -1,6 +1,6 @@
 -- Threads and timers.
 
-local log = Logger.create('NLib/adapter/core')
+local log = Logger.create('norden_lib/adapter/core')
 
 -- createThread hands the body to the scheduler; createThreadNow runs it on the
 -- caller's frame and parks it only if it yields. Both give the body a coroutine it
@@ -11,7 +11,7 @@ local log = Logger.create('NLib/adapter/core')
 --
 -- Use createThreadNow when something is waiting on the result, createThread when
 -- the work is a loop or genuinely deferred.
-if _NLIB_IS_FIVEM then
+if _NORDEN_LIB_IS_FIVEM then
     function Platform.createThread(fn)
         Citizen.CreateThread(fn)
     end

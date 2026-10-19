@@ -2,7 +2,7 @@
 --
 -- What this suite is really pinning is that there IS one. tDetector, tRadar and
 -- tUnit each carried their own copy of the load / merge / encode / report dance,
--- alongside NLib's soundstore writing two sections of the same document, and the
+-- alongside Norden Lib's soundstore writing two sections of the same document, and the
 -- four were safe together only because of an invariant: every writer is
 -- read-modify-write over the WHOLE file and none yields between its read and its
 -- write. That invariant was stated in prose in two headers and tested in two
@@ -61,10 +61,10 @@ local function defaultWrite(file, contents, resource)
 end
 local recordedTimings = {}
 
-nlib = {
+norden_lib = {
     logger = { DEBUG = 1, INFO = 2, WARN = 3, ERROR = 4 },
     fs = { writeResourceFile = defaultWrite },
-    -- `nlib.telemetry.record` is called from the instrumented write path. A
+    -- `norden_lib.telemetry.record` is called from the instrumented write path. A
     -- RECORDER rather than a no-op, so this suite can assert that a slow write
     -- is actually measured -- a stub that discarded the call would let the
     -- instrumentation be deleted with every test still green.
@@ -80,7 +80,7 @@ local function reset()
     writeOk, writeErr, encodeFails = true, nil, false
     -- Two cases below swap the bridge out entirely; without this the next case
     -- inherits it and asserts against the wrong thing.
-    nlib.fs.writeResourceFile = defaultWrite
+    norden_lib.fs.writeResourceFile = defaultWrite
     JsonStore.reset()
 end
 
@@ -184,7 +184,7 @@ if writes ~= 2 then fail('expected one disk write per write() call, got ' .. wri
 reset()
 store = JsonStore.open({ log = log })
 local reentered = false
-nlib.fs.writeResourceFile = function(file, contents, resource)
+norden_lib.fs.writeResourceFile = function(file, contents, resource)
     writes = writes + 1
     files[resource .. '|' .. file] = contents
     if not reentered then
@@ -235,7 +235,7 @@ if writes ~= 0 then fail('an unencodable document was written anyway') end
 -- take out the event handler that called it.
 reset()
 store = JsonStore.open({ log = log })
-nlib.fs.writeResourceFile = function() error('bridge exploded') end
+norden_lib.fs.writeResourceFile = function() error('bridge exploded') end
 local ok = pcall(store.write, store, { props = {} })
 if not ok then fail('a throw inside the write escaped to the caller') end
 if not loggedContains('bridge exploded') then fail('a throw inside the write was swallowed') end
@@ -247,7 +247,7 @@ if store:write('props') ~= false then fail('a non-table section set was accepted
 --
 -- This asserts the diagnostics timing is actually CALLED from the write path,
 -- which no other assertion in this file would notice the loss of: delete the
--- `nlib.telemetry.record` line from Store:write and every case above stays
+-- `norden_lib.telemetry.record` line from Store:write and every case above stays
 -- green. The budget is pinned too, because the number IS the policy -- 150 ms is
 -- ~9 frames of a 60 Hz server tick, and a write slower than that is a stutter.
 local sawWriteTiming = false

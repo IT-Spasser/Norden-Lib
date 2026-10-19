@@ -21,15 +21,15 @@ declare function exports(name: string, fn: (...args: never[]) => unknown): void;
 // `installId` resolves lazily, so an install that never talks to tWeb mints none.
 setInstallIdResolver(installId);
 
-// NLib's one external port; every web surface any resource exposes is a mount on
-// it. Eager, because a consumer's Lua can call RegisterWebApp before NLib's own
+// Norden Lib's one external port; every web surface any resource exposes is a mount on
+// it. Eager, because a consumer's Lua can call RegisterWebApp before Norden Lib's own
 // onResourceStart runs -- which is also why everything below is eager.
 installHttp();
 
 // Realtime is a mount on that router at /rt rather than its own socket.
 installRealtime();
 
-// Opt-in: only a resource declaring `nlib_module { 'marketplace' }` wakes it.
+// Opt-in: only a resource declaring `norden_lib_module { 'marketplace' }` wakes it.
 installMarketplace();
 
 // The `cc*` exports behind sv_community_configs.lua. Registered separately from
@@ -42,7 +42,7 @@ installCommunityConfigs();
 // each ship local inference load one copy between them.
 installInference();
 
-// The gated child-process broker, so `add_unsafe_child_process_permission NLib`
+// The gated child-process broker, so `add_unsafe_child_process_permission norden_lib`
 // is the only line an operator writes -- and what sits behind it is narrower than
 // the four unrestricted grants it replaced. See server/lib/spawn/catalog.ts.
 installSpawn();
@@ -107,7 +107,7 @@ function scanResource(resourceName: unknown, subdir: unknown, want: "file" | "di
 
 // List a resource's files, from Lua:
 //
-//   local names = json.decode(exports.NLib:ListResourceFiles('tAFK', 'audio') or '[]')
+//   local names = json.decode(exports.norden_lib:ListResourceFiles('tAFK', 'audio') or '[]')
 //
 // Returns JSON-encoded filenames, or '[]' on any error, so callers never branch.
 // Prefer ScanResourceFiles where unreadable and empty must not be alike.
@@ -118,7 +118,7 @@ exports("ListResourceFiles", (resourceName: unknown, subdir: unknown): string =>
 
 // The honest counterparts:
 //
-//   local scan = json.decode(exports.NLib:ScanResourceFiles('tAFK', 'audio') or '{}')
+//   local scan = json.decode(exports.norden_lib:ScanResourceFiles('tAFK', 'audio') or '{}')
 //   if scan and scan.ok then ... end
 //
 // `{ ok = true, entries = { ... } }` or `{ ok = false, reason = '<code>' }`.
@@ -137,7 +137,7 @@ const MAX_READ_BYTES = 256 * 1024;
 // drop-in install work: LoadResourceFile answers from the index FiveM builds at
 // resource start, so a folder copied in afterwards is on disk but not in it.
 //
-//   local raw = exports.NLib:ReadResourceFile('tRadio', 'layouts/QRX-720/module.json')
+//   local raw = exports.norden_lib:ReadResourceFile('tRadio', 'layouts/QRX-720/module.json')
 //
 // Returns the file as a UTF-8 string, or '' on any failure, so callers never
 // branch. Bounded, and refuses anything that is not a regular file -- a manifest
@@ -159,12 +159,12 @@ exports("ReadResourceFile", (resourceName: unknown, relPath: unknown): string =>
   }
 });
 
-// The write counterpart. NLib registers this for its OWN files; it is NOT the
+// The write counterpart. Norden Lib registers this for its OWN files; it is NOT the
 // bridge other resources call, and cannot be -- FiveM's Node runtime sandboxes
-// each resource to its own directory, so a write NLib issued into another
+// each resource to its own directory, so a write Norden Lib issued into another
 // resource's folder was refused before reaching the disk. Each consumer registers
 // the same shared implementation from its own `server/main.ts`. This registration
-// stays because NLib legitimately writes its own files.
+// stays because Norden Lib legitimately writes its own files.
 registerWriteResourceFile();
 
 // The directory counterpart. Every consumer that ships "packs" needs the folder
@@ -172,7 +172,7 @@ registerWriteResourceFile();
 // io.readdir returns an empty list for every path, including the resource's own
 // root. Same flattened-failure contract as ListResourceFiles.
 //
-//   local dirs = json.decode(exports.NLib:ListResourceDirs('tELS', 'layouts') or '[]')
+//   local dirs = json.decode(exports.norden_lib:ListResourceDirs('tELS', 'layouts') or '[]')
 //
 exports("ListResourceDirs", (resourceName: unknown, subdir: unknown): string => {
   const result = scanResource(resourceName, subdir, "dir");
@@ -221,7 +221,7 @@ exports(
       return true;
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.log(`[NLib] AppendToManifest error for '${resourceName}': ${msg}`);
+      console.log(`[norden_lib] AppendToManifest error for '${resourceName}': ${msg}`);
       return false;
     }
   }

@@ -1,5 +1,5 @@
 -- Coordinates requests only; the consumer's bundled agent owns download/disk I/O.
-local log = Logger.create('NLib/marketplace')
+local log = Logger.create('norden_lib/marketplace')
 local _typeRegistrations, _locks, _pending = {}, {}, {}
 local PENDING_MS, INSPECTION_PENDING_MS = 75000, 10000
 local _seq = 0
@@ -27,22 +27,22 @@ end
 
 -- The one admin rule, for every marketplace gate.
 --
--- This used to be `IsPlayerAceAllowed(src, 'nlib.admin')`, inlined at three
+-- This used to be `IsPlayerAceAllowed(src, 'norden_lib.admin')`, inlined at three
 -- call sites (install/uninstall/inspect, the browse read gate, and the
--- inspection re-check on the way back out). That spelling is NOT NLib's admin
--- rule: sv_permission.lua answers `nlib.superadmin` first and treats it as
--- level 2, so `exports.NLib:IsPlayerAdmin` grants a superadmin and the
--- marketplace denied one. A server owner who granted only `nlib.superadmin`
--- had an admin everywhere in NLib except here.
+-- inspection re-check on the way back out). That spelling is NOT Norden Lib's admin
+-- rule: sv_permission.lua answers `norden_lib.superadmin` first and treats it as
+-- level 2, so `exports.norden_lib:IsPlayerAdmin` grants a superadmin and the
+-- marketplace denied one. A server owner who granted only `norden_lib.superadmin`
+-- had an admin everywhere in Norden Lib except here.
 --
 -- `shared/imports/permission/` is the consumer-side mirror of this same rule
 -- (see its header: it exists because four resources hand-rolled it three ways
--- and drifted). It cannot be used from inside NLib's own VM — fxmanifest ships
+-- and drifted). It cannot be used from inside Norden Lib's own VM — fxmanifest ships
 -- it in `files{}`, not `server_scripts{}`, because it is loaded by a consumer.
 -- So the convergence here is onto the rule it mirrors, which is loaded above
 -- this file (fxmanifest server_scripts: sv_permission.lua precedes this one).
 --
--- Error text deliberately still names `nlib.admin` — it is the permission an
+-- Error text deliberately still names `norden_lib.admin` — it is the permission an
 -- operator is expected to grant, and naming the superadmin alternative in a
 -- denial message would only ever be read as advice to escalate.
 local function isAdmin(src)
@@ -74,7 +74,7 @@ end
 --
 -- `installFromData` answers with an absolute filesystem path
 -- (`<resourceRoot>/<installPath>/<slug>`), and this used to forward it to the
--- game client, where its only reader was a NLib log line printing the server's
+-- game client, where its only reader was a Norden Lib log line printing the server's
 -- directory layout into an admin's own console. `installer/inspection.ts` states
 -- the rule for the read path — "emits no absolute paths" — and
 -- `tests/lua/marketplace-coordinator.lua` already asserted an inspect reply
@@ -86,7 +86,7 @@ end
 local function reply(p, result)
     if not p.src then return end
     -- Never trust scope supplied by an agent; bind every response to its request.
-    TriggerClientEvent('nlib:marketplace:' .. p.action .. 'Result', p.src, {
+    TriggerClientEvent('norden_lib:marketplace:' .. p.action .. 'Result', p.src, {
         ok = result.ok == true, error = result.error,
         slug = p.slug, resource = p.resourceName, resourceName = p.resourceName,
         type = p.itemType, action = p.action, token = p.token,
@@ -127,7 +127,7 @@ local function demoSweep(resource)
     Demo.sweepMarketplace(resource)
 end
 
-Platform.export('NLib', 'RegisterMarketplaceType', function(kind, opts)
+Platform.export('norden_lib', 'RegisterMarketplaceType', function(kind, opts)
     if not itemType(kind) or type(opts) ~= 'table'
         or type(opts.installPath) ~= 'string' or opts.installPath == '' then
         log('RegisterMarketplaceType: invalid type/options', 3)
@@ -139,7 +139,7 @@ Platform.export('NLib', 'RegisterMarketplaceType', function(kind, opts)
         return false
     end
     local called, ok = pcall(function()
-        return exports['NLib']:mpRegisterType(resource, kind, opts.installPath)
+        return exports['norden_lib']:mpRegisterType(resource, kind, opts.installPath)
     end)
     if not called or not ok then
         log('RegisterMarketplaceType: node bridge rejected registration for "' .. kind .. '"', 3)
@@ -169,7 +169,7 @@ local function request(action, resource, kind, slug, version, requestId)
         return
     end
     if not isAdmin(p.src) then
-        reply(p, { ok = false, error = 'not authorized (needs nlib.admin ACE)' })
+        reply(p, { ok = false, error = 'not authorized (needs norden_lib.admin ACE)' })
         return
     end
     local regKey = resource .. ':' .. kind
@@ -209,7 +209,7 @@ local function request(action, resource, kind, slug, version, requestId)
         -- waiting for and whose reply would be dropped.
         if _pending[p.token] ~= p then return end
         local ok, err = pcall(TriggerEvent,
-            'nlib:marketplace:do' .. agentAction .. ':' .. resource, payload)
+            'norden_lib:marketplace:do' .. agentAction .. ':' .. resource, payload)
         if not ok and _pending[p.token] == p then
             log('marketplace agent dispatch failed: ' .. tostring(err), 3)
             fail(p, 'marketplace agent dispatch failed')
@@ -222,8 +222,8 @@ local function request(action, resource, kind, slug, version, requestId)
     -- resource. Nothing above proves the ITEM belongs to it. The registry keys
     -- on `resource:type` and writes into that resource's own registered
     -- installPath, so a tELS item could never land in tRadar's directory — but
-    -- `nlib:marketplace:install('tRadar', 'ui', '<a-tELS-slug>')` passed every
-    -- check and NLib fetched and installed it anyway.
+    -- `norden_lib:marketplace:install('tRadar', 'ui', '<a-tELS-slug>')` passed every
+    -- check and Norden Lib fetched and installed it anyway.
     --
     -- Only install needs this. UNINSTALL AND INSPECT ARE DELIBERATELY NOT
     -- GATED: they act on files already on this server's disk, addressed by the
@@ -240,7 +240,7 @@ local function request(action, resource, kind, slug, version, requestId)
         return
     end
     local asked, askErr = pcall(function()
-        exports['NLib']:mpAssertItemResource(resource, slug, function(ok, err)
+        exports['norden_lib']:mpAssertItemResource(resource, slug, function(ok, err)
             if _pending[p.token] ~= p then return end
             if ok then
                 dispatch()
@@ -262,13 +262,13 @@ local function request(action, resource, kind, slug, version, requestId)
     end
 end
 
-RegisterNetEvent('nlib:marketplace:install', function(resource, kind, slug, version)
+RegisterNetEvent('norden_lib:marketplace:install', function(resource, kind, slug, version)
     request('install', resource, kind, slug, version)
 end)
-RegisterNetEvent('nlib:marketplace:uninstall', function(resource, kind, slug)
+RegisterNetEvent('norden_lib:marketplace:uninstall', function(resource, kind, slug)
     request('uninstall', resource, kind, slug)
 end)
-RegisterNetEvent('nlib:marketplace:inspect', function(resource, kind, slug, requestId)
+RegisterNetEvent('norden_lib:marketplace:inspect', function(resource, kind, slug, requestId)
     request('inspect', resource, kind, slug, nil, requestId)
 end)
 
@@ -277,7 +277,7 @@ end)
 -- The panel used to make both of these itself, straight out of CEF, and
 -- neither could ever have worked: the marketplace host sends no
 -- Access-Control-Allow-Origin, so the browser made each request and then
--- refused to hand a `cfx-nui-NLib` origin the body. Every browse failed, which
+-- refused to hand a `cfx-nui-norden_lib` origin the body. Every browse failed, which
 -- is why tDetector and tRadar — whose only marketplace UI is that panel —
 -- looked like they had no marketplace at all.
 --
@@ -300,7 +300,7 @@ local _reads = {}
 local function readReply(src, action, requestId, payload)
     if not src then return end
     payload.requestId = requestId
-    TriggerClientEvent('nlib:marketplace:' .. action .. 'Result', src, payload)
+    TriggerClientEvent('norden_lib:marketplace:' .. action .. 'Result', src, payload)
 end
 
 -- The shared gate for both reads. Returns a one-shot `settle`, or nil once it
@@ -314,7 +314,7 @@ local function beginRead(src, action, opts)
     if not name(requestId, 128, '^[%w_%-]+$') then return end
 
     if not isAdmin(src) then
-        readReply(src, action, requestId, { ok = false, error = 'not authorized (needs nlib.admin ACE)' })
+        readReply(src, action, requestId, { ok = false, error = 'not authorized (needs norden_lib.admin ACE)' })
         return
     end
 
@@ -371,7 +371,7 @@ end
 -- flow, which produces an identity proven at the website's own origin).
 --
 -- AND NOTE WHO CAN REACH THIS AT ALL: every marketplace read in this file
--- goes through `beginRead`, which requires the `nlib.admin` ACE. So the in-game
+-- goes through `beginRead`, which requires the `norden_lib.admin` ACE. So the in-game
 -- like path is reachable only by server administrators. That is a mitigation
 -- (an ordinary player on somebody's server cannot spam likes through the panel)
 -- and simultaneously the sharpest form of the limitation above, because the
@@ -390,7 +390,7 @@ local function playerLicense(src)
     return license:lower()
 end
 
-RegisterNetEvent('nlib:marketplace:browse', function(opts)
+RegisterNetEvent('norden_lib:marketplace:browse', function(opts)
     local src = source
     local settle = beginRead(src, 'browse', opts)
     if not settle then return end
@@ -433,7 +433,7 @@ RegisterNetEvent('nlib:marketplace:browse', function(opts)
     }
 
     local dispatched, dispatchErr = pcall(function()
-        exports['NLib']:mpBrowse(json.encode(params), function(ok, err, resultJson)
+        exports['norden_lib']:mpBrowse(json.encode(params), function(ok, err, resultJson)
             if not ok then
                 settle({ ok = false, error = tostring(err or 'marketplace unavailable') })
                 return
@@ -465,7 +465,7 @@ end)
 -- IT GOES THROUGH `beginRead` LIKE THE TWO READS, DESPITE BEING A WRITE, and
 -- that is deliberate rather than a copy-paste. `beginRead` is the shared gate
 -- for this panel, and it supplies three things a like needs for exactly the same
--- reasons a read does: the `nlib.admin` ACE (the panel is admin-only in its
+-- reasons a read does: the `norden_lib.admin` ACE (the panel is admin-only in its
 -- entirety, so a separate weaker gate here would be the one way in), the
 -- requestId binding that stops a stale reply overwriting a newer one, and the
 -- in-flight cap that stops the panel being used to make this server issue
@@ -475,7 +475,7 @@ end)
 -- it wants, so a retry after the 20s backstop cannot invert anything — which it
 -- could if this flipped a value it read. The marketplace is idempotent in both
 -- directions for the same reason.
-RegisterNetEvent('nlib:marketplace:like', function(opts)
+RegisterNetEvent('norden_lib:marketplace:like', function(opts)
     local src = source
     local settle = beginRead(src, 'like', opts)
     if not settle then return end
@@ -502,7 +502,7 @@ RegisterNetEvent('nlib:marketplace:like', function(opts)
     end
 
     local dispatched, dispatchErr = pcall(function()
-        exports['NLib']:mpLike(slug, license, opts.next == true, function(ok, err, stateJson)
+        exports['norden_lib']:mpLike(slug, license, opts.next == true, function(ok, err, stateJson)
             if not ok then
                 settle({ ok = false, error = tostring(err or 'marketplace unavailable') })
                 return
@@ -537,7 +537,7 @@ end)
 -- it — it injects the data-hud-* preview script and derives the canvas size
 -- from a comment inside the markup — so a cross-origin `<iframe src>` would not
 -- do: a frame from another origin cannot be read or scripted by its parent.
-RegisterNetEvent('nlib:marketplace:preview', function(opts)
+RegisterNetEvent('norden_lib:marketplace:preview', function(opts)
     local src = source
     local settle = beginRead(src, 'preview', opts)
     if not settle then return end
@@ -549,7 +549,7 @@ RegisterNetEvent('nlib:marketplace:preview', function(opts)
     end
 
     local dispatched, dispatchErr = pcall(function()
-        exports['NLib']:mpPreviewHtml(slug, function(ok, err, html)
+        exports['norden_lib']:mpPreviewHtml(slug, function(ok, err, html)
             if not ok or type(html) ~= 'string' then
                 settle({ ok = false, error = tostring(err or 'preview unavailable') })
                 return
@@ -572,7 +572,7 @@ end)
 -- a UI document is parsed and rewritten here, a theme definition is handed
 -- verbatim to tRadio's offline panel, which applies it through the same code an
 -- install does.
-RegisterNetEvent('nlib:marketplace:themeJson', function(opts)
+RegisterNetEvent('norden_lib:marketplace:themeJson', function(opts)
     local src = source
     local settle = beginRead(src, 'themeJson', opts)
     if not settle then return end
@@ -584,7 +584,7 @@ RegisterNetEvent('nlib:marketplace:themeJson', function(opts)
     end
 
     local dispatched, dispatchErr = pcall(function()
-        exports['NLib']:mpThemeJson(slug, function(ok, err, json)
+        exports['norden_lib']:mpThemeJson(slug, function(ok, err, json)
             if not ok or type(json) ~= 'string' then
                 settle({ ok = false, error = tostring(err or 'theme preview unavailable') })
                 return
@@ -603,7 +603,7 @@ end)
 -- Local-only event: never RegisterNetEvent. GetInvokingResource is a runtime
 -- stack lookup, not a payload identity. Some local bridges have no invoking VM;
 -- nil can only be correlated by pending token, not authenticated as a producer.
-AddEventHandler('nlib:marketplace:agentResult', function(result)
+AddEventHandler('norden_lib:marketplace:agentResult', function(result)
     if type(result) ~= 'table' or type(result.token) ~= 'string' or type(result.ok) ~= 'boolean' then return end
     local p = _pending[result.token]
     if not p then return end
@@ -612,7 +612,7 @@ AddEventHandler('nlib:marketplace:agentResult', function(result)
     if p.action == 'inspect' then
         result = sanitizeInspection(p, result)
         if p.src and not isAdmin(p.src) then
-            result = { ok = false, error = 'not authorized (needs nlib.admin ACE)' }
+            result = { ok = false, error = 'not authorized (needs norden_lib.admin ACE)' }
         end
     end
     release(p) -- retire before callbacks: duplicate/reentrant results are stale
@@ -638,7 +638,7 @@ AddEventHandler('nlib:marketplace:agentResult', function(result)
         --   tELS       gave up and logged server-side, with a comment saying why
         --
         -- tELS's comment names the exact cause: retargeting at the installing admin
-        -- "is the honest alternative, but `p.src` is known only inside NLib's
+        -- "is the honest alternative, but `p.src` is known only inside Norden Lib's
         -- sv_marketplace.lua and is not carried on the payload". So the fix belongs
         -- here rather than four times over in the consumers.
         --

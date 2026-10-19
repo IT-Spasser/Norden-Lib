@@ -4,7 +4,7 @@
 -- Every operation is scoped to this client: the snapshot request is answered to
 -- `source` only, and no function here takes a player argument.
 
-if _NLIB_SIDE ~= 'client' then return end
+if _NORDEN_LIB_SIDE ~= 'client' then return end
 
 MenuClient = {}
 local MC = MenuClient
@@ -43,17 +43,17 @@ local CALLBACK = {
     highlight = 'menu_highlight',
     action    = 'menu_action',
     selftest  = 'menu_selftest',
-    -- The shared feedback dialog NLib's menu injects into every owner's root
-    -- page. One callback for every t* resource, because the browser is NLib's
+    -- The shared feedback dialog Norden Lib's menu injects into every owner's root
+    -- page. One callback for every t* resource, because the browser is Norden Lib's
     -- and so is the row.
     feedback  = 'menu_feedback',
 }
 
 -- Client-local events, for resources in this player's own Lua runtime.
 local EVENTS = {
-    opened    = 'nlib:menu:opened',
-    closed    = 'nlib:menu:closed',
-    highlight = 'nlib:menu:highlight',
+    opened    = 'norden_lib:menu:opened',
+    closed    = 'norden_lib:menu:closed',
+    highlight = 'norden_lib:menu:highlight',
 }
 
 -- Runs the body on the current frame instead of queueing it for the scheduler's
@@ -84,22 +84,22 @@ end
 
 -- Every duration convar carries its unit (`_ms`). Three once did not, and the
 -- unit-less spellings were read as aliases with a deprecation print. Do not
--- bring that back: the only released NLib is 0.6, which predates all three
+-- bring that back: the only released Norden Lib is 0.6, which predates all three
 -- names, so there has never been a server.cfg carrying one. The alias existed
 -- purely to smooth an unreleased rename, and its own message said it went in the
 -- next major version — 1.0.0 is that version.
 
 local settings = {
-    command          = convar('nlib_menu_command', 'nlibmenu'),
-    key              = convar('nlib_menu_key', 'F1'),
-    padKey           = convar('nlib_menu_pad_key', 'start_index'),
-    label            = convar('nlib_menu_label', 'Open Menu'),
-    searchKey        = convar('nlib_menu_search_key', 'F3'),
-    keySlots         = convarNumber('nlib_menu_key_slots', 8, 0, 16),
-    locale           = convar('nlib_menu_locale', 'en'),
-    requestTimeoutMs = convarNumber('nlib_menu_request_timeout_ms', 10000, 1000, 60000),
-    refreshMs        = convarNumber('nlib_menu_permission_refresh_ms', 5000, 1000, 60000),
-    settleMs         = convarNumber('nlib_menu_highlight_settle_ms', 120, 0, 2000),
+    command          = convar('norden_lib_menu_command', 'nordenmenu'),
+    key              = convar('norden_lib_menu_key', 'F1'),
+    padKey           = convar('norden_lib_menu_pad_key', 'start_index'),
+    label            = convar('norden_lib_menu_label', 'Open Menu'),
+    searchKey        = convar('norden_lib_menu_search_key', 'F3'),
+    keySlots         = convarNumber('norden_lib_menu_key_slots', 8, 0, 16),
+    locale           = convar('norden_lib_menu_locale', 'en'),
+    requestTimeoutMs = convarNumber('norden_lib_menu_request_timeout_ms', 10000, 1000, 60000),
+    refreshMs        = convarNumber('norden_lib_menu_permission_refresh_ms', 5000, 1000, 60000),
+    settleMs         = convarNumber('norden_lib_menu_highlight_settle_ms', 120, 0, 2000),
 }
 MC.settings = settings
 
@@ -123,7 +123,7 @@ local selectedMenuId, leavingMenuId = interface.root.id, interface.root.id
 local actionNavigation
 local close, refreshContext, clearSnapshotTransfer, openMenu
 
-local function log(message) print('[NLib/menu] ' .. tostring(message)) end
+local function log(message) print('[norden_lib/menu] ' .. tostring(message)) end
 local function send(action, data) Platform.sendUIEvent(ui, action, data) end
 
 -- A provider rather than a catalog, because building one walks thousands of rows
@@ -573,7 +573,7 @@ end
 -- The browser owns the dictionaries and validates tags against them, so this side
 -- checks tag shape only. Precedence is player, then server, then the default.
 
-local LOCALE_KEY = 'NLib:Menu:locale'
+local LOCALE_KEY = 'norden_lib:Menu:locale'
 local currentLocale
 
 -- Returns the normalized tag; callers must use the return value, not the input.
@@ -775,7 +775,7 @@ local function installCallbacks()
     nui(CALLBACK.sound, function(data, finish)
         finish({ ok = true })
         local name = type(data) == 'table' and frontendSounds[data.sound]
-        if name and visible and not stopping and _NLIB_IS_FIVEM then
+        if name and visible and not stopping and _NORDEN_LIB_IS_FIVEM then
             PlaySoundFrontend(-1, name, 'HUD_FRONTEND_DEFAULT_SOUNDSET', false)
         end
     end)
@@ -913,7 +913,7 @@ local function installCallbacks()
         -- Read before the permission round trip, and from the game rather than from
         -- browser data, which cannot supply a native modifier.
         local ctrl = false
-        if _NLIB_IS_FIVEM then
+        if _NORDEN_LIB_IS_FIVEM then
             local pressed = IsControlPressed and IsControlPressed(0, 36)
             local disabledPressed = IsDisabledControlPressed and IsDisabledControlPressed(0, 36)
             ctrl = pressed == true or pressed == 1 or disabledPressed == true or disabledPressed == 1
@@ -1084,7 +1084,7 @@ end
 local menuKeySlots = {}
 
 local function installCommands()
-    if not _NLIB_IS_FIVEM then return end
+    if not _NORDEN_LIB_IS_FIVEM then return end
     RegisterCommand(settings.command, function()
         -- The interface may refuse an open without saying why; only the configuring
         -- resource can judge which binding fired.
@@ -1204,8 +1204,8 @@ local function selftestStatic(report)
 end
 
 local function installSelftest()
-    if not _NLIB_IS_FIVEM then return end
-    RegisterCommand('nlib_menu_selftest', function()
+    if not _NORDEN_LIB_IS_FIVEM then return end
+    RegisterCommand('norden_lib_menu_selftest', function()
         if selftesting then log('Self-test is already running'); return end
         if visible then log('Close the menu before running the self-test'); return end
         if not ready or busy or stopping then log('Menu is busy; try again in a moment'); return end
@@ -1514,7 +1514,7 @@ local function ownerOf(declared)
 end
 
 local function api(name, fn)
-    Platform.export('NLib', name, fn)
+    Platform.export('norden_lib', name, fn)
 end
 
 function MC.registerApi()
@@ -1641,7 +1641,7 @@ function MC.registerApi()
         return MC.bindKey(owner, menuId)
     end)
 
-    -- For a resource whose settings live in a NLib DIALOG rather than a menu, and
+    -- For a resource whose settings live in a Norden Lib DIALOG rather than a menu, and
     -- which therefore never gets the row the menu injects into an owner's root
     -- page. tRadio's /tradio is the first.
     --
