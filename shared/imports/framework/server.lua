@@ -74,6 +74,16 @@ local function esx(deps)
         return out
     end
 
+    --- One page of everyone, in an order that looks random but is the same on every page for a given seed (use the date).
+    function B.listPeople(offset, limit, seed)
+        offset, limit = math.max(0, math.floor(offset or 0)), math.max(1, math.min(50, math.floor(limit or 10)))
+        local rows = deps.db.query('SELECT identifier, firstname, lastname, dateofbirth, phone_number FROM users ORDER BY CRC32(CONCAT(identifier, ?)), identifier LIMIT ? OFFSET ?', { tostring(seed or ''), limit, offset })
+        local count = deps.db.query('SELECT COUNT(*) AS n FROM users')
+        local out = {}
+        for i, r in ipairs(rows or {}) do out[i] = person(r) end
+        return out, tonumber(count and count[1] and count[1].n) or 0
+    end
+
     function B.getPerson(identifier)
         local r = deps.db.query('SELECT identifier, firstname, lastname, dateofbirth, phone_number FROM users WHERE identifier = ? LIMIT 1', { identifier })
         return r and r[1] and person(r[1]) or nil
@@ -87,6 +97,15 @@ local function esx(deps)
     function B.getVehicle(plate)
         local r = deps.db.query('SELECT plate, owner, vehicle FROM owned_vehicles WHERE REPLACE(plate, " ", "") = ? LIMIT 1', { (plate:gsub('%s', '')) })
         return r and r[1] and vehicle(r[1]) or nil
+    end
+
+    function B.listVehicles(offset, limit, seed)
+        offset, limit = math.max(0, math.floor(offset or 0)), math.max(1, math.min(50, math.floor(limit or 10)))
+        local rows = deps.db.query('SELECT plate, owner, vehicle FROM owned_vehicles ORDER BY CRC32(CONCAT(plate, ?)), plate LIMIT ? OFFSET ?', { tostring(seed or ''), limit, offset })
+        local count = deps.db.query('SELECT COUNT(*) AS n FROM owned_vehicles')
+        local out = {}
+        for i, r in ipairs(rows or {}) do out[i] = vehicle(r) end
+        return out, tonumber(count and count[1] and count[1].n) or 0
     end
 
     function B.searchVehicles(term, limit)
@@ -142,6 +161,15 @@ local function qb(deps, core)
         return out
     end
 
+    function B.listPeople(offset, limit, seed)
+        offset, limit = math.max(0, math.floor(offset or 0)), math.max(1, math.min(50, math.floor(limit or 10)))
+        local rows = deps.db.query('SELECT citizenid, charinfo FROM players ORDER BY CRC32(CONCAT(citizenid, ?)), citizenid LIMIT ? OFFSET ?', { tostring(seed or ''), limit, offset })
+        local count = deps.db.query('SELECT COUNT(*) AS n FROM players')
+        local out = {}
+        for i, r in ipairs(rows or {}) do out[i] = person(r) end
+        return out, tonumber(count and count[1] and count[1].n) or 0
+    end
+
     function B.getPerson(identifier)
         local r = deps.db.query('SELECT citizenid, charinfo FROM players WHERE citizenid = ? LIMIT 1', { identifier })
         return r and r[1] and person(r[1]) or nil
@@ -152,6 +180,15 @@ local function qb(deps, core)
     function B.getVehicle(plate)
         local r = deps.db.query('SELECT plate, citizenid, vehicle FROM player_vehicles WHERE REPLACE(plate, " ", "") = ? LIMIT 1', { (plate:gsub('%s', '')) })
         return r and r[1] and vehicle(r[1]) or nil
+    end
+
+    function B.listVehicles(offset, limit, seed)
+        offset, limit = math.max(0, math.floor(offset or 0)), math.max(1, math.min(50, math.floor(limit or 10)))
+        local rows = deps.db.query('SELECT plate, citizenid, vehicle FROM player_vehicles ORDER BY CRC32(CONCAT(plate, ?)), plate LIMIT ? OFFSET ?', { tostring(seed or ''), limit, offset })
+        local count = deps.db.query('SELECT COUNT(*) AS n FROM player_vehicles')
+        local out = {}
+        for i, r in ipairs(rows or {}) do out[i] = vehicle(r) end
+        return out, tonumber(count and count[1] and count[1].n) or 0
     end
 
     function B.searchVehicles(term, limit)
@@ -181,6 +218,8 @@ local function standalone(deps)
         return { source = src, identifier = id, name = deps.playerName(src), job = { name = nil, grade = 0 }, hasAce = function(ace) return deps.hasAce(src, ace) end }
     end
     function B.searchPeople() return {} end
+    function B.listPeople() return {}, 0 end
+    function B.listVehicles() return {}, 0 end
     function B.getPerson() return nil end
     function B.getVehicle() return nil end
     function B.searchVehicles() return {} end

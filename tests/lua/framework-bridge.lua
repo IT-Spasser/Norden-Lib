@@ -10,6 +10,7 @@ eq(F.detect(function(n) return (n == 'qb-core' or n == 'qbx_core') and 'started'
 eq(F.detect(function() return 'missing' end), 'standalone', 'standalone fallback')
 
 local seen
+local sqlLog, paramLog = {}, {}
 local json = { decode = function(s) if s == '{"model":123}' then return { model = 123 } end; return { firstname = 'Anna', lastname = 'Jensen', birthdate = '1990-01-02', phone = '12345678' } end }
 local deps = {
     json = json,
@@ -19,6 +20,9 @@ local deps = {
     identifier = function(src) return 'license:' .. src end,
     db = { query = function(sql, params)
         seen = { sql = sql, params = params }
+        sqlLog[#sqlLog + 1] = sql
+        paramLog[#paramLog + 1] = params or {}
+        if sql:find('COUNT%(') then return { { n = 42 } } end
         if sql:find('FROM users') then return { { identifier = 'u1', firstname = 'Martin', lastname = 'Hansen', dateofbirth = '1992-03-15', phone_number = '555' } } end
         if sql:find('owned_vehicles') then return { { plate = 'AB 12 345', owner = 'u1', vehicle = '{"model":123}' } } end
         if sql:find('FROM players') then return { { citizenid = 'C1', charinfo = '{}' } } end
@@ -42,7 +46,19 @@ eq(seen.params[1], '%Mart\\_in%', 'search term escaped')
 eq(esx.getVehicle('AB 12 345').ownerId, 'u1', 'esx vehicle owner')
 eq(seen.params[1], 'AB12345', 'plate spaces removed for lookup')
 
+-- Paged lists: a stable order for the day, a total, and sane limits
+local listed, total = esx.listPeople(20, 10, '2026-10-21')
+eq(listed[1].name, 'Martin Hansen', 'esx list rows are people'); eq(total, 42, 'esx list total')
+local listSql = sqlLog[#sqlLog - 1]
+eq(listSql:find('ORDER BY CRC32%(CONCAT%(identifier, %?%)%), identifier LIMIT %? OFFSET %?') ~= nil, true, 'esx list orders by a seeded hash with a tie-break')
+local _, _t = esx.listPeople(-5, 9999, nil)
+local lp = paramLog[#paramLog - 1]
+eq(lp[2], 50, 'limit is capped'); eq(lp[3], 0, 'offset cannot be negative'); eq(lp[1], '', 'no seed is an empty seed')
+local cars, carTotal = esx.listVehicles(0, 10, 'x')
+eq(cars[1].plate, 'AB 12 345', 'esx list vehicles'); eq(carTotal, 42, 'and their total')
+
 local q = F.create(deps, 'qb')
+eq(q.listPeople(0, 10, 'x')[1].identifier, 'C1', 'qb list people'); eq(select(2, q.listVehicles(0, 10, 'x')), 42, 'qb list vehicles total')
 eq(q.getPlayer(1).job.grade, 2, 'qb grade level')
 eq(q.getPlayer(1).identifier, 'C1', 'qb identifier'); eq(q.getPlayer(1).name, 'Anna Jensen', 'qb: charinfo name')
 eq(q.getVehicle('CD 67 890').model, 'sultan', 'qb vehicle')
@@ -80,5 +96,6 @@ local s = F.create(deps, 'standalone')
 eq(s.getPlayer(3).identifier, 'license:3', 'standalone identifier'); s.getPlayer(4)
 eq(#logged, 1, 'standalone says once that it has no character names')
 eq(#s.searchPeople('x'), 0, 'standalone has no people')
+eq(select(2, s.listPeople(0, 10, 'x')), 0, 'and no list')
 eq(F.create(deps, 'auto').name, 'standalone', 'auto resolves')
 report('PASS framework bridge: detect, esx, qb, qbox, standalone')
